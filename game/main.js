@@ -1,46 +1,3 @@
-const closeInfo = document.getElementById("close-info");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-closeInfo.onclick = function (e) {
-  e.target.parentNode.style.display = "none";
-};
-
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
-canvas.style.background = "linear-gradient( 135deg, #F97794 10%, #623AA2 60%)";
-
-let mouse = {
-  // x: innerWidth / 2,
-  // y: innerHeight / 2,
-  x: 0,
-  y: 0,
-
-  velocity: {
-    x: (Math.random() - 0.5) * 2,
-    y: (Math.random() - 0.5) * 2,
-    // x: 0.5 * 2,
-    // y: 0.5 * 2,
-    // x: 2,
-    // y: 2,
-  },
-  mass: 2,
-};
-
-const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
-
-addEventListener("mousemove", (event) => {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
-});
-
-addEventListener("resize", (event) => {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-  init();
-});
-
 // Random Int from Range Inclusive
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -50,8 +7,14 @@ function randInt(min, max) {
 function randomColor(colors) {
   return colors[Math.floor(Math.random() * colors.length)];
 }
-const getColor = () => "#" + Math.floor(Math.random() * 16777215).toString(16);
-const niceColor = () => randInt(0, 360);
+
+function getColor() {
+  return "#" + Math.floor(Math.random() * 16777215).toString(16);
+}
+
+function niceColor() {
+  return randInt(0, 360);
+}
 
 // Pythagorean theorem
 function distance(x1, y1, x2, y2) {
@@ -65,8 +28,8 @@ class Particle {
     this.x = x;
     this.y = y;
     this.velocity = {
-      x: (Math.random() - 0.5) * 2,
-      y: (Math.random() - 0.5) * 2,
+      x: (Math.random() - 0.5) * 4,
+      y: (Math.random() - 0.5) * 4,
     };
     this.radius = radius;
     this.color = color;
@@ -87,10 +50,10 @@ class Particle {
 
     ctx.strokeStyle = this.color;
     ctx.stroke();
-    ctx.closePath();
+    // ctx.closePath(); // Not sure if necessary
   }
 
-  update(particles) {
+  update(particles, player) {
     this.draw();
 
     // Loop over particles for collision detection
@@ -99,7 +62,6 @@ class Particle {
       if (this === particles[i]) continue;
 
       const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
-      // const mD = distance(mouse.x, mouse.y, this.x, this.y);
 
       if (dist - this.radius - particles[i].radius < 0) {
         // Elastic collision
@@ -109,45 +71,34 @@ class Particle {
         this.opacity = 0.6;
         particles[i].opacity = 0.6;
       }
+    }
 
-      // if (mD - this.radius -  < 0) {}
+    // Reset back to transparent after collision
+    if (this.opacity > 0.02) {
+      this.opacity -= 0.02;
+      this.opacity = Math.max(0, this.opacity);
     }
 
     // Collision detection for walls
-    if (this.x - this.radius <= 0 || this.x + this.radius >= innerWidth) {
+    const w = wall ? 105 : 0;
+    if (this.x - this.radius <= w || this.x + this.radius >= innerWidth) {
       this.velocity.x = -this.velocity.x;
     }
     if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
       this.velocity.y = -this.velocity.y;
     }
 
-    // Mouse collision detection
-    // if (
-    //   distance(mouse.x, mouse.y, this.x, this.y) < this.radius &&
-    //   this.opacity < 1
-    // ) {
-    //   this.opacity += 0.02;
-    // } else if (this.opacity > 0) {
-    //   this.opacity -= 0.02;
-    //   this.opacity = Math.max(0, this.opacity);
-    // }
-
-    if (distance(mouse.x, mouse.y, this.x, this.y) < this.radius + 30) {
-      if (this.opacity < 1) {
-        this.opacity += 0.02;
-      }
-
-      // console.log("I touch you!");
-      // resolveCollision(this, mouse);
-      // mouse.velocity.x = Math.random() * 2;
-      // mouse.velocity.y = Math.random() * 2;
-      // mouse.velocity.x = (Math.random() - 0.5) * 2;
-      // mouse.velocity.y = (Math.random() - 0.5) * 2;
-      // mouse.velocity.x = 5;
-      // mouse.velocity.y = 5;
-    } else if (this.opacity > 0) {
-      this.opacity -= 0.02;
-      this.opacity = Math.max(0, this.opacity);
+    // Player object collision (should I handle in player class?)
+    const playerDistance = distance(this.x, this.y, player.x, player.y);
+    if (playerDistance - this.radius - player.radius <= 0) {
+      this.opacity = 1;
+      cancelAnimationFrame(frameRequest);
+      draw();
+      setTimeout(() => {
+        alert("You lose");
+        init();
+        animate();
+      });
     }
 
     // Set particles to next position
@@ -156,32 +107,86 @@ class Particle {
   }
 }
 
-let particles;
+class Player {
+  constructor(x, y, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = color;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+  update() {
+    this.draw();
+  }
+}
 
-function init(numOfObj = 15) {
-  particles = [];
+class Goal {
+  constructor(x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.fill = false;
+  }
+  draw() {
+    if (this.fill === true) {
+      ctx.fillStyle = "#7bf977";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+      cancelAnimationFrame(frameRequest);
+      setTimeout(() => {
+        alert("You win!");
+        init();
+        animate();
+      });
+    } else {
+      ctx.strokeStyle = "#7bf977";
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
+  }
 
+  update(player) {
+    this.draw();
+    if (
+      player.x - player.radius > this.x &&
+      player.y - player.radius > this.y &&
+      player.y + player.radius < this.y + this.height
+    ) {
+      this.fill = true;
+    } else {
+      this.fill = false;
+    }
+  }
+}
+
+// Create particle objects
+function particleCreator(numOfObj) {
+  const p = [];
   for (let i = 0; i < numOfObj; i++) {
-    const radius = Math.random() * 60 + 15;
-    let x = randInt(radius, canvas.width - radius);
+    let radius = Math.random() * 60 + 15;
+    let x = randInt(radius + 100, canvas.width - radius);
     let y = randInt(radius, canvas.height - radius);
-
-    const color = getColor();
+    let color = getColor();
 
     // Skip first generation, only 1 circle
     if (i !== 0) {
       // Keep track of retries for a no overlap circle
       let retries = 0;
 
-      for (let j = 0; j < particles.length; j++) {
+      for (let j = 0; j < p.length; j++) {
         if (retries > 100) {
           console.log("Not enough space for circles!");
           break;
         }
-        const dist = distance(x, y, particles[j].x, particles[j].y);
+        const dist = distance(x, y, p[j].x, p[j].y);
 
-        if (dist - radius - particles[j].radius < 0) {
-          x = randInt(radius, canvas.width - radius);
+        if (dist - radius - p[j].radius < 0) {
+          // The + 100 here is for the wall
+          x = randInt(radius + 100, canvas.width - radius);
           y = randInt(radius, canvas.height - radius);
 
           // Reset loop to check if replacement
@@ -192,31 +197,127 @@ function init(numOfObj = 15) {
       }
     }
 
-    particles.push(new Particle(x, y, radius, color));
+    p.push(new Particle(x, y, radius, color));
   }
-
-  return "Particles created.";
+  return p;
 }
 
+function init(numOfObj = 15) {
+  particles = [];
+  player = null;
+  wall = true;
+  goal = null;
+
+  // Create particle objects
+  particles = particleCreator(numOfObj);
+
+  // Create player object
+  const pR = 30;
+  const pX = randInt(pR, 100 - pR);
+  const pY = randInt(pR, canvas.height - pR);
+  player = new Player(pX, pY, pR, "red");
+
+  // Create goal object
+  const goalWidth = 100;
+  const goalHeight = 160;
+  const goalX = canvas.width - goalWidth;
+  const goalY = canvas.height / 2 - goalHeight / 2;
+  goal = new Goal(goalX, goalY, goalWidth, goalHeight);
+
+  return "Initialized game objects.";
+}
+
+// The animation loop
 function animate() {
-  requestAnimationFrame(animate);
+  frameRequest = requestAnimationFrame(animate);
+
+  // Clear canvas for next draw
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // Draw goal, detects if player has entered.
+  goal.update(player);
+
+  if (wall === true) {
+    // Draw left start area barrier
+    ctx.beginPath();
+    ctx.moveTo(100, 0);
+    ctx.lineTo(100, canvas.height);
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+    player.x = mouse.x + player.radius > 95 ? 95 - player.radius : mouse.x;
+  } else {
+    player.x = mouse.x;
+  }
+
+  // Attach player object to mouse
+  player.y = mouse.y;
+  player.update(particles);
+
+  // Draw and update particles
   particles.forEach((p) => {
-    p.update(particles);
+    p.update(particles, player);
   });
 }
 
-addEventListener("click", (event) => {
+// For testing to see first render. Comment out animate().
+function draw() {
   particles.forEach((p) => {
-    const d = distance(event.clientX, event.clientY, p.x, p.y);
-    if (d < p.radius) {
-      p.velocity.x = p.velocity.x * 5;
-      p.velocity.y = p.velocity.y * 5;
-    }
+    p.draw();
   });
+}
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+canvas.style.background = "linear-gradient( 135deg, #F97794 10%, #623AA2 60%)";
+
+const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
+
+let mouse = {
+  x: 0,
+  y: innerHeight / 2,
+};
+
+let wall = true;
+
+// Objects for canvas
+let particles;
+let player;
+let goal;
+
+let frameRequest;
+
+// Updates mouse state
+addEventListener("mousemove", (event) => {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
 });
 
+// Resizing resets game
+addEventListener("resize", (event) => {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  init();
+});
+
+addEventListener("click", (event) => {
+  const clickDistance = distance(
+    event.clientX,
+    event.clientY,
+    player.x,
+    player.y
+  );
+
+  // If click happens within radius of player circle, set wall to false
+  if (clickDistance < player.radius) {
+    wall = false;
+  }
+});
+
+// Right click resets game
 addEventListener("contextmenu", (event) => {
   event.preventDefault();
   init();

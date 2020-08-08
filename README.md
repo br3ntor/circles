@@ -14,3 +14,11 @@ Color themes for levels
 
 Drag circle from left side of the screen, to the right side to beat level.
 Hitting another circle and you lose.
+
+### Ideas
+
+- One level all the balls start still except introduce one to set the rest off.
+
+TODO:
+
+- Player can cheat right now by hitting the edge
