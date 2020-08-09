@@ -29,7 +29,7 @@ class Particle {
     this.y = y;
     this.velocity = {
       x: (Math.random() - 0.5) * 4,
-      y: (Math.random() - 0.5) * 4,
+      y: (Math.random() - 0.5) * 8,
     };
     this.radius = radius;
     this.color = color;
@@ -96,7 +96,7 @@ class Particle {
       draw();
       setTimeout(() => {
         alert("You lose");
-        init();
+        init(balls());
         animate();
       });
     }
@@ -111,6 +111,7 @@ class Player {
   constructor(x, y, radius, color) {
     this.x = x;
     this.y = y;
+    this.speed = 3;
     this.radius = radius;
     this.color = color;
   }
@@ -120,8 +121,30 @@ class Player {
     ctx.fillStyle = this.color;
     ctx.fill();
   }
-  update() {
+  update(wall) {
     this.draw();
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const angle = Math.atan2(dy, dx);
+    const xVelocity = Math.cos(angle) * this.speed;
+    const yVelocity = Math.sin(angle) * this.speed;
+
+    // Only update player if distance from mouse greater than 2
+    // I must be able to simplify this if else chain though, maybe?
+    // Gross disgusting 3am code
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+      if (wall) {
+        if (this.x + this.radius >= 95 && dx > 2) {
+          this.x = 95 - this.radius;
+        } else {
+          this.x += xVelocity;
+        }
+      } else {
+        this.x += xVelocity;
+      }
+
+      this.y += yVelocity;
+    }
   }
 }
 
@@ -140,7 +163,7 @@ class Goal {
       cancelAnimationFrame(frameRequest);
       setTimeout(() => {
         alert("You win!");
-        init();
+        init(balls());
         animate();
       });
     } else {
@@ -243,21 +266,21 @@ function animate() {
     ctx.moveTo(100, 0);
     ctx.lineTo(100, canvas.height);
     ctx.lineWidth = 10;
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = "#eeeeee";
     ctx.stroke();
-    player.x = mouse.x + player.radius > 95 ? 95 - player.radius : mouse.x;
+    draw();
   } else {
-    player.x = mouse.x;
+    particles.forEach((p) => {
+      p.update(particles, player);
+    });
   }
 
-  // Attach player object to mouse
-  player.y = mouse.y;
-  player.update(particles);
+  player.update(wall);
 
   // Draw and update particles
-  particles.forEach((p) => {
-    p.update(particles, player);
-  });
+  // particles.forEach((p) => {
+  //   p.update(particles, player);
+  // });
 }
 
 // For testing to see first render. Comment out animate().
@@ -272,7 +295,8 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
-canvas.style.background = "linear-gradient( 135deg, #F97794 10%, #623AA2 60%)";
+// canvas.style.background = "linear-gradient( 135deg, #F97794 10%, #623AA2 60%)";
+canvas.style.background = "#0c0c0c";
 
 const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
 
@@ -280,6 +304,9 @@ let mouse = {
   x: 0,
   y: innerHeight / 2,
 };
+
+// Calling this anytime init gets called, idk about the setup though
+const balls = () => Math.floor(innerHeight / 100 + innerWidth / 200);
 
 let wall = true;
 
@@ -300,7 +327,7 @@ addEventListener("mousemove", (event) => {
 addEventListener("resize", (event) => {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
-  init();
+  init(balls());
 });
 
 addEventListener("click", (event) => {
@@ -320,8 +347,9 @@ addEventListener("click", (event) => {
 // Right click resets game
 addEventListener("contextmenu", (event) => {
   event.preventDefault();
-  init();
+  init(balls());
 });
 
-init();
+init(balls());
+// init(1);
 animate();
