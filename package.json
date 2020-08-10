@@ -1,5 +1,5 @@
 {
-  "name": "canvas",
+  "name": "canvas-game",
   "version": "1.0.0",
   "description": "Extending my canvas experiments into a simple game.",
   "main": "index.js",
