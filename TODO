@@ -11,6 +11,9 @@ Ideas:
 
 - Diff circle sizes, speed, etc for levels and difficulty.
 
+- Character selection based on discord avatars, characters have different abilities like more speed.
+
 TODO:
 
 ☐ Implement option for infinite space(game edges wrap)
+☐ Implement array of objects to contain settings for levels

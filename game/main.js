@@ -1,4 +1,6 @@
-// Random Int from Range Inclusive
+/**
+ * Random Int from Range Inclusive
+ */
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -8,6 +10,7 @@ function randomColor(colors) {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
+/* Cool */
 function getColor() {
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 }
@@ -189,9 +192,10 @@ class Goal {
 // Create particle objects
 function particleCreator(numOfObj) {
   const p = [];
+  const wallEnd = 105;
   for (let i = 0; i < numOfObj; i++) {
     let radius = Math.random() * 60 + 15;
-    let x = randInt(radius + 100, canvas.width - radius);
+    let x = randInt(radius + wallEnd, canvas.width - radius);
     let y = randInt(radius, canvas.height - radius);
     let color = getColor();
 
@@ -208,8 +212,8 @@ function particleCreator(numOfObj) {
         const dist = distance(x, y, p[j].x, p[j].y);
 
         if (dist - radius - p[j].radius < 0) {
-          // The + 100 here is for the wall
-          x = randInt(radius + 100, canvas.width - radius);
+          // The + 105 here is for the wall
+          x = randInt(radius + wallEnd, canvas.width - radius);
           y = randInt(radius, canvas.height - radius);
 
           // Reset loop to check if replacement
@@ -316,6 +320,24 @@ let player;
 let goal;
 
 let frameRequest;
+
+// Options for particle objects
+const particleOptions = [
+  {
+    radius: function () {
+      return Math.random() * 60 + 15;
+    },
+    x: function (radius) {
+      return randInt(radius + 100, canvas.width - radius);
+    },
+    y: function (radius) {
+      randInt(this.radius, canvas.height - this.radius);
+    },
+    color: function () {
+      return getColor();
+    },
+  },
+];
 
 // Updates mouse state
 addEventListener("mousemove", (event) => {
