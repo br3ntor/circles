@@ -1,0 +1,16 @@
+Description:
+Drag circle from left side of the screen, to the right side to beat level. Hitting another circle and you lose.
+
+Ideas:
+
+- Color themes for levels
+
+- One level all the balls start still except introduce one to set the rest off.
+
+- Different patterns of circle movement.
+
+- Diff circle sizes, speed, etc for levels and difficulty.
+
+TODO:
+
+☐ Implement option for infinite space(game edges wrap)
