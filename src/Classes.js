@@ -1,11 +1,5 @@
 import resolveCollision from "./util-elastic-collision";
-
-// Pythagorean theorem
-function distance(x1, y1, x2, y2) {
-  let xDistance = x2 - x1;
-  let yDistance = y2 - y1;
-  return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-}
+import { distance } from "./utils";
 
 export class Particle {
   constructor(x, y, radius, color, xSpeed, ySpeed, wallCollision = true) {
@@ -40,7 +34,7 @@ export class Particle {
     // ctx.closePath(); // Not sure if necessary
   }
 
-  update(ctx, particles, player, frameRequest) {
+  update(ctx, particles, player) {
     this.draw(ctx);
 
     // Loop over particles for collision detection
@@ -68,7 +62,7 @@ export class Particle {
 
     // Collision detection for walls
     if (this.wallCollision) {
-      if (this.x - this.radius || this.x + this.radius >= innerWidth) {
+      if (this.x - this.radius < 0 || this.x + this.radius >= innerWidth) {
         this.velocity.x = -this.velocity.x;
       }
       if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
@@ -84,6 +78,7 @@ export class Particle {
 
     // Player object collision (should I handle in player class?)
     const playerDistance = distance(this.x, this.y, player.x, player.y);
+
     if (playerDistance - this.radius - player.radius <= 0) {
       this.opacity = 1;
       return true;

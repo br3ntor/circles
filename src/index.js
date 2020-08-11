@@ -1,34 +1,6 @@
 // import resolveCollision from "./util-elastic-collision";
 import { Particle, Goal, Player } from "./Classes";
-
-/**
- * Random Int from Range Inclusive
- */
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-// Three optional function to get different colors
-function randomColor(colors) {
-  return colors[Math.floor(Math.random() * colors.length)];
-}
-
-/* Cool */
-function getColor() {
-  return "#" + Math.floor(Math.random() * 16777215).toString(16);
-}
-
-function niceColor() {
-  const r = randInt(0, 360);
-  return `hsl(${r}deg 100% 50%)`;
-}
-
-// Pythagorean theorem
-function distance(x1, y1, x2, y2) {
-  let xDistance = x2 - x1;
-  let yDistance = y2 - y1;
-  return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-}
+import { randInt, randomColor, getColor, niceColor, distance } from "./utils";
 
 // Create particle objects
 function particleCreator(level) {
@@ -106,12 +78,12 @@ function animate() {
   // Clear canvas for next draw
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw goal, detects if player has entered.
+  // Draws goal and detects if player has entered the goal.
+  // Returns undefined until goal reached then returns true.
   const goalReached = goal.update(ctx, player);
 
   if (goalReached) {
     cancelAnimationFrame(frameRequest);
-    // drawParticleFrame(ctx);
     goal.draw(ctx);
     setTimeout(() => {
       alert(`You beat level ${level + 1}!`);
@@ -136,12 +108,11 @@ function animate() {
     drawParticleFrame(ctx);
   } else {
     // Hmm what happens here when init and animate is called
-    // after cancleanimation?
+    // after cancle animation?
     particles.forEach((p) => {
       const collision = p.update(ctx, particles, player, frameRequest);
       if (collision) {
         cancelAnimationFrame(frameRequest);
-        // drawParticleFrame(ctx);
         p.draw(ctx);
         setTimeout(() => {
           alert("You lose");
@@ -153,11 +124,6 @@ function animate() {
   }
 
   player.update(ctx, wall, mouse);
-
-  // Draw and update particles
-  // particles.forEach((p) => {
-  //   p.update(particles, player);
-  // });
 }
 
 // For testing to see first render. Comment out animate().
@@ -177,7 +143,6 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
-// canvas.style.background = "linear-gradient( 135deg, #F97794 10%, #623AA2 60%)";
 canvas.style.background = "#0c0c0c";
 
 // Colors for randomColor function
