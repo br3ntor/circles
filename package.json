@@ -2,10 +2,18 @@
   "name": "canvas-game",
   "version": "1.0.0",
   "description": "Extending my canvas experiments into a simple game.",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --colors",
+    "start": "webpack-dev-server --open --colors"
   },
   "author": "br3ntor",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {}
 }
