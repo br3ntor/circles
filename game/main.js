@@ -1,4 +1,6 @@
-// Random Int from Range Inclusive
+/**
+ * Random Int from Range Inclusive
+ */
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -8,12 +10,14 @@ function randomColor(colors) {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
+/* Cool */
 function getColor() {
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 }
 
 function niceColor() {
-  return randInt(0, 360);
+  const r = randInt(0, 360);
+  return `hsl(${r}deg 100% 50%)`;
 }
 
 // Pythagorean theorem
@@ -24,17 +28,20 @@ function distance(x1, y1, x2, y2) {
 }
 
 class Particle {
-  constructor(x, y, radius, color) {
+  constructor(x, y, radius, color, xSpeed, ySpeed, wallCollision = true) {
     this.x = x;
     this.y = y;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
     this.velocity = {
-      x: (Math.random() - 0.5) * 4,
-      y: (Math.random() - 0.5) * 8,
+      x: this.xSpeed,
+      y: this.ySpeed,
     };
     this.radius = radius;
     this.color = color;
     this.mass = 1; // Used in elastic collision
     this.opacity = 0.2;
+    this.wallCollision = wallCollision;
   }
 
   draw() {
@@ -79,13 +86,21 @@ class Particle {
       this.opacity = Math.max(0, this.opacity);
     }
 
-    // Collision detection for walls
-    const w = wall ? 105 : 0;
-    if (this.x - this.radius <= w || this.x + this.radius >= innerWidth) {
-      this.velocity.x = -this.velocity.x;
-    }
-    if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
-      this.velocity.y = -this.velocity.y;
+    if (this.wallCollision) {
+      // Collision detection for walls
+      const w = wall ? 105 : 0;
+      if (this.x - this.radius <= w || this.x + this.radius >= innerWidth) {
+        this.velocity.x = -this.velocity.x;
+      }
+      if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
+        this.velocity.y = -this.velocity.y;
+      }
+    } else {
+      // Particles can go offscreen and come back opposite side
+      if (this.x - this.radius > innerWidth) this.x = 0 - this.radius;
+      if (this.x + this.radius < 0) this.x = innerWidth + this.radius;
+      if (this.y - this.radius > innerHeight) this.y = 0 - this.radius;
+      if (this.y + this.radius < 0) this.y = innerHeight + this.radius;
     }
 
     // Player object collision (should I handle in player class?)
@@ -96,7 +111,7 @@ class Particle {
       draw();
       setTimeout(() => {
         alert("You lose");
-        init(balls());
+        init();
         animate();
       });
     }
@@ -162,8 +177,13 @@ class Goal {
       ctx.fillRect(this.x, this.y, this.width, this.height);
       cancelAnimationFrame(frameRequest);
       setTimeout(() => {
-        alert("You win!");
-        init(balls());
+        alert(`You beat level ${level + 1}!`);
+        if (level < particleConfigs.length - 1) {
+          level += 1;
+        } else {
+          level = 0;
+        }
+        init();
         animate();
       });
     } else {
@@ -187,13 +207,18 @@ class Goal {
 }
 
 // Create particle objects
-function particleCreator(numOfObj) {
+function particleCreator(level) {
   const p = [];
-  for (let i = 0; i < numOfObj; i++) {
-    let radius = Math.random() * 60 + 15;
-    let x = randInt(radius + 100, canvas.width - radius);
-    let y = randInt(radius, canvas.height - radius);
-    let color = getColor();
+  const wallEnd = 105;
+  const objects = level.objects();
+
+  for (let i = 0; i < objects; i++) {
+    const radius = level.radius();
+    let x = level.x(radius, wallEnd);
+    let y = level.y(radius);
+    const xS = level.xSpeed();
+    const yS = level.ySpeed();
+    const color = level.color();
 
     // Skip first generation, only 1 circle
     if (i !== 0) {
@@ -208,9 +233,9 @@ function particleCreator(numOfObj) {
         const dist = distance(x, y, p[j].x, p[j].y);
 
         if (dist - radius - p[j].radius < 0) {
-          // The + 100 here is for the wall
-          x = randInt(radius + 100, canvas.width - radius);
-          y = randInt(radius, canvas.height - radius);
+          // The + 105 here is for the wall
+          x = level.x(radius, wallEnd);
+          y = level.y(radius);
 
           // Reset loop to check if replacement
           // circle has overlap itself.
@@ -220,19 +245,19 @@ function particleCreator(numOfObj) {
       }
     }
 
-    p.push(new Particle(x, y, radius, color));
+    p.push(new Particle(x, y, radius, color, xS, yS, level.wallCollision));
   }
   return p;
 }
 
-function init(numOfObj = 15) {
+function init() {
   particles = [];
   player = null;
   wall = true;
   goal = null;
 
   // Create particle objects
-  particles = particleCreator(numOfObj);
+  particles = particleCreator(particleConfigs[level]);
 
   // Create player object
   const pR = 30;
@@ -290,6 +315,11 @@ function draw() {
   });
 }
 
+// Calling this anytime init gets called, idk about the setup though
+function balls() {
+  return Math.floor(innerHeight / 100 + innerWidth / 200);
+}
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -298,15 +328,15 @@ canvas.height = innerHeight;
 // canvas.style.background = "linear-gradient( 135deg, #F97794 10%, #623AA2 60%)";
 canvas.style.background = "#0c0c0c";
 
+// Colors for randomColor function
 const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
 
 let mouse = {
-  x: 0,
+  x: 30,
   y: innerHeight / 2,
 };
 
-// Calling this anytime init gets called, idk about the setup though
-const balls = () => Math.floor(innerHeight / 100 + innerWidth / 200);
+let level = 1;
 
 let wall = true;
 
@@ -316,6 +346,47 @@ let player;
 let goal;
 
 let frameRequest;
+
+// Options for particle objects
+const particleConfigs = [
+  {
+    objects: () => balls(),
+    radius: () => Math.random() * 60 + 15,
+    x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
+    y: (radius) => randInt(radius, canvas.height - radius),
+    xSpeed: () => (Math.random() - 0.5) * 5,
+    ySpeed: () => (Math.random() - 0.5) * 5,
+    color: () => getColor(),
+  },
+  {
+    wallCollision: false,
+    objects: () => balls() + 10,
+    radius: () => 30,
+    x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
+    y: (radius) => randInt(radius, canvas.height - radius),
+    ySpeed: () => (Math.random() - 0.5) * 8,
+    xSpeed: () => (Math.random() - 0.5) * 1,
+    color: () => randomColor(colors),
+  },
+  {
+    objects: () => balls() + 20,
+    radius: () => 10,
+    x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
+    y: (radius) => randInt(radius, canvas.height - radius),
+    xSpeed: () => 3,
+    ySpeed: () => 0,
+    color: () => niceColor(),
+  },
+  {
+    objects: () => balls() - 5,
+    radius: () => 100,
+    x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
+    y: (radius) => randInt(radius, canvas.height - radius),
+    xSpeed: () => (Math.random() - 0.5) * 2,
+    ySpeed: () => (Math.random() - 0.5) * 2,
+    color: () => getColor(),
+  },
+];
 
 // Updates mouse state
 addEventListener("mousemove", (event) => {
@@ -327,7 +398,7 @@ addEventListener("mousemove", (event) => {
 addEventListener("resize", (event) => {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
-  init(balls());
+  init();
 });
 
 addEventListener("click", (event) => {
@@ -347,9 +418,8 @@ addEventListener("click", (event) => {
 // Right click resets game
 addEventListener("contextmenu", (event) => {
   event.preventDefault();
-  init(balls());
+  init();
 });
 
-init(balls());
-// init(1);
+init();
 animate();

@@ -1,16 +1,16 @@
 Description:
-Drag circle from left side of the screen, to the right side to beat level. Hitting another circle and you lose.
+  Drag circle from left side of the screen, to the right side to beat level. Hitting another circle and you lose.
 
 Ideas:
-
-- Color themes for levels
-
-- One level all the balls start still except introduce one to set the rest off.
-
-- Different patterns of circle movement.
-
-- Diff circle sizes, speed, etc for levels and difficulty.
+  - Color themes for levels
+  - One level all the balls start still, then shoot in one at high speed to set others off.
+  - Different patterns of circle movement.
+  - Diff circle sizes, speed, etc for levels and difficulty.
+  - Character selection based on discord avatars, characters have different abilities like more speed.
 
 TODO:
+  ☐ Implement option for infinite space(game edges wrap)
+  ☐ Add another particle creator function with the goal of making other shapes
 
-☐ Implement option for infinite space(game edges wrap)
+Archive:
+  ✔ Implement array of objects to contain settings for levels @done(20-08-10 03:08) @project(TODO)
