@@ -1,5 +1,5 @@
 import resolveCollision from "./util-elastic-collision";
-import { distance } from "./utils";
+import { distance, randInt } from "./utils";
 
 export class Particle {
   constructor(x, y, radius, color, xSpeed, ySpeed, wallCollision = true) {
@@ -11,11 +11,19 @@ export class Particle {
       x: this.xSpeed,
       y: this.ySpeed,
     };
+    this.circlVelocity = 0.01;
     this.radius = radius;
     this.color = color;
     this.mass = 1; // Used in elastic collision
     this.opacity = 0.2;
     this.wallCollision = wallCollision;
+    this.radians = Math.random() * Math.PI * 2;
+    this.distanceFromCenter = randInt(100, 220);
+    this.lastMouse = { x: x, y: y };
+    // this.distanceFromCenter = {
+    //   x: randInt(50, 120),
+    //   y: randInt(50, 120),
+    // };
   }
 
   draw(ctx) {
@@ -34,25 +42,61 @@ export class Particle {
     // ctx.closePath(); // Not sure if necessary
   }
 
+  circleDraw(ctx, lastPoint) {
+    ctx.beginPath();
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.radius;
+    ctx.moveTo(lastPoint.x, lastPoint.y);
+    ctx.lineTo(this.x, this.y);
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  circleUpdate(ctx, mouse) {
+    const lastPoint = { x: this.x, y: this.y };
+
+    // Move points over time
+    this.radians += this.circlVelocity;
+
+    // Drag effect
+    this.lastMouse.x += (mouse.x - this.lastMouse.x) * 0.05;
+    this.lastMouse.y += (mouse.y - this.lastMouse.y) * 0.05;
+
+    // Circular Motion
+    // this.x = innerWidth / 2 + Math.cos(this.radians) * this.distanceFromCenter;
+    // this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
+
+    // this.x = mouse.x + Math.cos(this.radians) * this.distanceFromCenter;
+    // this.y = mouse.y + Math.sin(this.radians) * this.distanceFromCenter;
+
+    this.x =
+      this.lastMouse.x + Math.cos(this.radians) * this.distanceFromCenter;
+    this.y =
+      this.lastMouse.y + Math.sin(this.radians) * this.distanceFromCenter;
+
+    // this.draw(ctx);
+    this.circleDraw(ctx, lastPoint);
+  }
+
   update(ctx, particles, player) {
     this.draw(ctx);
 
     // Loop over particles for collision detection
-    for (let i = 0; i < particles.length; i++) {
-      // Never compare particle to itself, skips if true.
-      if (this === particles[i]) continue;
+    // for (let i = 0; i < particles.length; i++) {
+    //   // Never compare particle to itself, skips if true.
+    //   if (this === particles[i]) continue;
 
-      const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
+    //   const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
 
-      if (dist - this.radius - particles[i].radius < 0) {
-        // Elastic collision
-        resolveCollision(this, particles[i]);
+    //   if (dist - this.radius - particles[i].radius < 0) {
+    //     // Elastic collision
+    //     resolveCollision(this, particles[i]);
 
-        // Light up particles on collision
-        this.opacity = 0.6;
-        particles[i].opacity = 0.6;
-      }
-    }
+    //     // Light up particles on collision
+    //     this.opacity = 0.6;
+    //     particles[i].opacity = 0.6;
+    //   }
+    // }
 
     // Reset back to transparent after collision
     if (this.opacity > 0.02) {
@@ -70,10 +114,10 @@ export class Particle {
       }
     } else {
       // Particles can go offscreen and come back opposite side
-      if (this.x - this.radius > innerWidth) this.x = 0 - this.radius;
-      if (this.x + this.radius < 0) this.x = innerWidth + this.radius;
-      if (this.y - this.radius > innerHeight) this.y = 0 - this.radius;
-      if (this.y + this.radius < 0) this.y = innerHeight + this.radius;
+      if (this.x - this.radius > innerWidth + 1000) this.x = 0 - this.radius;
+      if (this.x + this.radius < 0 - 1000) this.x = innerWidth + this.radius;
+      if (this.y - this.radius > innerHeight + 1000) this.y = 0 - this.radius;
+      if (this.y + this.radius < 0 - 1000) this.y = innerHeight + this.radius;
     }
 
     // Player object collision (should I handle in player class?)
@@ -128,6 +172,12 @@ export class Player {
 
       this.y += yVelocity;
     }
+
+    // Collision for walls
+    if (this.x - this.radius <= 0) this.x = this.radius + 1;
+    if (this.x + this.radius >= innerWidth) this.x = innerWidth - this.radius;
+    if (this.y - this.radius <= 0) this.y = this.radius + 1;
+    if (this.y + this.radius >= innerHeight) this.y = innerHeight - this.radius;
   }
 }
 

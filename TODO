@@ -1,5 +1,3 @@
-Description:
-  Drag circle from left side of the screen, to the right side to beat level. Hitting another circle and you lose.
 
 Ideas:
   - Color themes for levels
@@ -9,8 +7,10 @@ Ideas:
   - Character selection based on discord avatars, characters have different abilities like more speed.
 
 TODO:
-  ☐ Implement option for infinite space(game edges wrap)
   ☐ Add another particle creator function with the goal of making other shapes
+  ☐ Feature: Mouse click makse ball move faster towards mouse
+  ☐ A level where the goal moves around
 
 Archive:
+  ✔ Implement option for infinite space(game edges wrap) @done(20-08-12 15:45) @project(TODO)
   ✔ Implement array of objects to contain settings for levels @done(20-08-10 03:08) @project(TODO)
