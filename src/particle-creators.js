@@ -1,7 +1,14 @@
 import { Particle } from "./Classes";
 import { randInt, randomColor, getColor, niceColor, distance } from "./utils";
 
-// Create particle objects
+/**
+ * This particle creator will spawn random,
+ * non-overlapping cirlces. They will also
+ * have random speeds, directions, and colors
+ * based on the level object argument.
+ *
+ * @param Object | level | The paramters for the current level
+ */
 export function particleCreator(level) {
   const p = [];
   const wallEnd = 105;
@@ -45,6 +52,11 @@ export function particleCreator(level) {
   return p;
 }
 
+/**
+ * Returns an array of particles with
+ * coordinates set to form a circle
+ * when drawn to the canvas.
+ */
 export function circlePattern() {
   const p = [];
   const particleCount = 6;

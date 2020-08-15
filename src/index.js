@@ -92,6 +92,10 @@ addEventListener("resize", (event) => {
   init();
 });
 
+/**
+ * Left click event.
+ * Starts the game when player is clicked.
+ */
 addEventListener("click", (event) => {
   const clickDistance = distance(
     event.clientX,
@@ -105,11 +109,19 @@ addEventListener("click", (event) => {
     wall = false;
   }
 
+  /**
+   * Starting some particle manipulation functions
+   * triggered at the start game event
+   */
+
   // changeParticlesSequential(particles);
   // changeParticlesConcurrent(particles);
 });
 
-// Right click resets game
+/**
+ * Right click event.
+ * Resets the game.
+ */
 addEventListener("contextmenu", (event) => {
   event.preventDefault();
   init();
@@ -164,8 +176,9 @@ function animate() {
 
   // Clear canvas for next draw
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // ctx.globalAlpha = 0.5;
-  // Alt to clearRect for an effect
+
+  // Alt to clearRect using fillRect
+
   // ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
   // ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
   // ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -204,14 +217,20 @@ function animate() {
     ctx.stroke();
     drawParticleFrame(ctx);
   } else {
-    // Hmm what happens here when init and animate
-    // are called after cancle animation?
+    /**
+     * Loop through particles array
+     * and call their update functions
+     */
     particles.forEach((p) => {
+      // Hmm what happens here when init and animate
+      // are called after cancle animation?
       // p.circleUpdate(ctx, mouse);
       const collision = p.update(ctx, particles, player);
+
       if (collision) {
         cancelAnimationFrame(frameRequest);
         p.draw(ctx);
+
         setTimeout(() => {
           alert("You lose");
           init();

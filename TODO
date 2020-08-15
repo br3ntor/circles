@@ -5,11 +5,18 @@ Ideas:
   - Different patterns of circle movement.
   - Diff circle sizes, speed, etc for levels and difficulty.
   - Character selection based on discord avatars, characters have different abilities like more speed.
+  - Focus on bringing it back to game
+  - Figure out how I want overall system to work
+  - Branch off experiments into two games, one is the current, the other a bullet hell game
+  - Make the circles bosses like uniquely and nhcarrigan
 
 TODO:
   ☐ Add another particle creator function with the goal of making other shapes
   ☐ Feature: Mouse click makse ball move faster towards mouse
   ☐ A level where the goal moves around
+  ☐ Ability for enemy to shoot bullets
+  ☐ Ability to be character
+  ☐ Ability to choose character
 
 Archive:
   ✔ Implement option for infinite space(game edges wrap) @done(20-08-12 15:45) @project(TODO)
