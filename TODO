@@ -9,15 +9,18 @@ Ideas:
   - Figure out how I want overall system to work
   - Branch off experiments into two games, one is the current, the other a bullet hell game
   - Make the circles bosses like uniquely and nhcarrigan
+  - Gather all the keys before the guardians let you in.
+  - Add another mode, instead of levels, key goal. Do survival mode.
 
 TODO:
   ☐ Add another particle creator function with the goal of making other shapes
-  ☐ Feature: Mouse click makse ball move faster towards mouse
   ☐ A level where the goal moves around
   ☐ Ability for enemy to shoot bullets
   ☐ Ability to be character
   ☐ Ability to choose character
+  ☐ Create a base class for circle and extend that into appropriate objects
 
 Archive:
+  ✔ Feature: Mouse click makse ball move faster towards mouse @done(20-08-20 00:47) @project(TODO)
   ✔ Implement option for infinite space(game edges wrap) @done(20-08-12 15:45) @project(TODO)
   ✔ Implement array of objects to contain settings for levels @done(20-08-10 03:08) @project(TODO)

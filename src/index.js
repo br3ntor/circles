@@ -9,7 +9,7 @@ import {
 } from "./utils";
 import {
   particleCreator,
-  circlePattern,
+  guardianCreator,
   newParticlePattern,
 } from "./particle-creators";
 import {
@@ -20,7 +20,7 @@ import {
 // Options for the original particleCreator function to create levels
 const particleConfigs = [
   {
-    objects: () => balls(),
+    objects: () => balls() - 15,
     radius: () => Math.random() * 60 + 15,
     x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
     y: (radius) => randInt(radius, canvas.height - radius),
@@ -30,7 +30,7 @@ const particleConfigs = [
   },
   {
     wallCollision: false,
-    objects: () => balls() + 10,
+    objects: () => 15,
     radius: () => 30,
     x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
     y: (radius) => randInt(radius, canvas.height - radius),
@@ -39,7 +39,7 @@ const particleConfigs = [
     color: () => randomColor(colors),
   },
   {
-    objects: () => balls() + 20,
+    objects: () => balls() - 15,
     radius: () => 10,
     x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
     y: (radius) => randInt(radius, canvas.height - radius),
@@ -64,8 +64,6 @@ const ctx = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 canvas.style.background = "#0c0c0c";
-// canvas.style.background = "green";
-// canvas.style.background = "rgb(0, 0, 0)";
 
 const mouse = {
   x: innerWidth / 2,
@@ -75,9 +73,9 @@ const mouse = {
 // Colors for randomColor function
 const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
 
-let level = 1;
+let level = 0;
 
-let wall = true;
+let wall = false;
 
 // Updates mouse state
 addEventListener("mousemove", (event) => {
@@ -119,6 +117,16 @@ addEventListener("click", (event) => {
 });
 
 /**
+ * Events to add a mouse boost
+ */
+// addEventListener("mousedown", (event) => {
+//   player.speed = 5;
+// });
+// addEventListener("mouseup", (event) => {
+//   player.speed = 2;
+// });
+
+/**
  * Right click event.
  * Resets the game.
  */
@@ -129,9 +137,12 @@ addEventListener("contextmenu", (event) => {
 
 // Objects for canvas
 let particles;
+let guardians;
+let test;
 let player;
 let goal;
 
+// Request frame ID
 let frameRequest;
 
 // Sets game state and all objects to starting setup
@@ -143,9 +154,8 @@ function init() {
 
   // Create particle objects
   particles = particleCreator(particleConfigs[level]);
-  // particles = newParticlePattern();
-  // particles = stackParticles();
-  // particles = circlePattern();
+  guardians = guardianCreator();
+  // test = newParticlePattern();
 
   // Create player object
   const pR = 30;
@@ -154,19 +164,31 @@ function init() {
   player = new Player(pX, pY, pR, "red");
 
   // Create goal object
-  const goalWidth = 100;
-  const goalHeight = 160;
-  const goalX = canvas.width - goalWidth;
+  // const goalWidth = 100;
+  // const goalHeight = 160;
+  // const goalX = canvas.width - goalWidth;
+  // const goalY = canvas.height / 2 - goalHeight / 2;
+
+  // Draw goal on the right side
+  const goalWidth = 120;
+  const goalHeight = 120;
+  const goalX = canvas.width / 1.2 - goalWidth / 2;
   const goalY = canvas.height / 2 - goalHeight / 2;
   goal = new Goal(goalX, goalY, goalWidth, goalHeight);
 
   return "Initialized game objects.";
 }
 
-// Used inside animate to draw still particles
-function drawParticleFrame(ctx) {
+/**
+ * Used inside animate to draw still
+ * particles while the wall is up
+ */
+function drawCurrentState(ctx) {
   particles.forEach((p) => {
     p.draw(ctx);
+  });
+  guardians.forEach((g) => {
+    g.draw(ctx);
   });
 }
 
@@ -176,13 +198,6 @@ function animate() {
 
   // Clear canvas for next draw
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Alt to clearRect using fillRect
-
-  // ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
-  // ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-  // ctx.fillRect(0, 0, canvas.width, canvas.height);
-  // ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draws goal and detects if player has entered the goal.
   // Returns undefined until goal reached then returns true.
@@ -215,16 +230,14 @@ function animate() {
     ctx.lineWidth = 10;
     ctx.strokeStyle = "#eeeeee";
     ctx.stroke();
-    drawParticleFrame(ctx);
+    ctx.closePath();
+    drawCurrentState(ctx);
   } else {
     /**
      * Loop through particles array
      * and call their update functions
      */
     particles.forEach((p) => {
-      // Hmm what happens here when init and animate
-      // are called after cancle animation?
-      // p.circleUpdate(ctx, mouse);
       const collision = p.update(ctx, particles, player);
 
       if (collision) {
@@ -238,12 +251,43 @@ function animate() {
         });
       }
     });
+
+    // Update guardians of the goal
+    guardians.forEach((guardian) => {
+      const collision = guardian.update(ctx, particles, player);
+
+      if (collision) {
+        cancelAnimationFrame(frameRequest);
+        guardian.draw(ctx);
+
+        setTimeout(() => {
+          alert("You lose");
+          init();
+          animate();
+        });
+      }
+    });
+
+    // test.forEach((p) => {
+    //   const collision = p.update(ctx, particles, player);
+
+    //   if (collision) {
+    //     cancelAnimationFrame(frameRequest);
+    //     p.draw(ctx);
+
+    //     setTimeout(() => {
+    //       alert("You lose");
+    //       init();
+    //       animate();
+    //     });
+    //   }
+    // });
   }
 
+  // Might make sense to draw/update player first
   player.update(ctx, wall, mouse);
 }
 
+// Start this bad boy up!
 init();
-
-// drawParticleFrame(ctx);
 animate();
