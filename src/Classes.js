@@ -1,41 +1,24 @@
 import resolveCollision from "./util-elastic-collision";
-import { distance, randInt } from "./utils";
+import { distance } from "./utils";
 
+/**
+ * Particles move through space at a given velocity
+ * until they collide with a wall, another particle,
+ * or the player. Or perhaps manipulated with a function.
+ */
 export class Particle {
-  constructor(
-    x,
-    y,
-    radius,
-    color,
-    xSpeed,
-    ySpeed,
-    wallCollision = true,
-    radians = 0
-  ) {
+  constructor(x, y, radius, color, xSpeed, ySpeed, wallCollision = true) {
     this.x = x;
     this.y = y;
+    this.radius = radius;
+    this.color = color;
     this.velocity = {
       x: xSpeed,
       y: ySpeed,
     };
-    this.circlVelocity = 0.003;
-    this.radius = radius;
-    this.color = color;
+    this.wallCollision = wallCollision;
     this.mass = 1; // Used in elastic collision
     this.opacity = 0.2;
-    this.wallCollision = wallCollision;
-
-    // this.radians = Math.random() * Math.PI * 2;
-    this.radians = radians;
-
-    // this.distanceFromCenter = {
-    //   x: randInt(50, 120),
-    //   y: randInt(50, 120),
-    // };
-    // this.distanceFromCenter = randInt(100, 220);
-    this.distanceFromCenter = 120;
-
-    this.lastMouse = { x: x, y: y };
   }
 
   draw(ctx) {
@@ -51,50 +34,7 @@ export class Particle {
 
     ctx.strokeStyle = this.color;
     ctx.stroke();
-    ctx.closePath(); // Not sure if necessary
-  }
-
-  // circleDraw(ctx, lastPoint) {
-  //   ctx.beginPath();
-  //   ctx.strokeStyle = this.color;
-  //   ctx.lineWidth = this.radius;
-  //   ctx.moveTo(lastPoint.x, lastPoint.y);
-  //   ctx.lineTo(this.x, this.y);
-  //   // ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-
-  //   ctx.stroke();
-  //   ctx.closePath();
-  // }
-
-  circleUpdate(ctx, mouse) {
-    const lastPoint = { x: this.x, y: this.y };
-    // const r = angle * Math.PI * 2;
-
-    // Move points over time
-    // this.radians += this.circlVelocity;
-
-    // Drag effect
-    // this.lastMouse.x += (mouse.x - this.lastMouse.x) * 0.05;
-    // this.lastMouse.y += (mouse.y - this.lastMouse.y) * 0.05;
-
-    // Circular Motion
-    this.x = innerWidth / 2 + Math.cos(this.radians) * this.distanceFromCenter;
-    this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
-
-    // this.x = mouse.x + Math.cos(this.radians) * this.distanceFromCenter;
-    // this.y = mouse.y + Math.sin(this.radians) * this.distanceFromCenter;
-
-    // this.x =
-    //   this.lastMouse.x + Math.cos(this.radians) * this.distanceFromCenter;
-    // this.y =
-    //   this.lastMouse.y + Math.sin(this.radians) * this.distanceFromCenter;
-
-    // if (this.x < innerWidth) {
-    //   this.distanceFromCenter += 0.5;
-    // }
-
-    this.draw(ctx);
-    // this.circleDraw(ctx, lastPoint);
+    ctx.closePath();
   }
 
   update(ctx, particles, player) {
@@ -123,7 +63,7 @@ export class Particle {
       this.opacity = Math.max(0, this.opacity);
     }
 
-    // Collision detection for walls
+    // Particles collide with walls if option set true
     if (this.wallCollision) {
       if (this.x - this.radius < 0 || this.x + this.radius >= innerWidth) {
         this.velocity.x = -this.velocity.x;
@@ -131,9 +71,9 @@ export class Particle {
       if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
         this.velocity.y = -this.velocity.y;
       }
+      // Else the particles come back on other side if they travel offscreen
     } else {
-      const space = 0; // Extra offscreen space
-      // Particles can go offscreen and come back opposite side
+      const space = 0; // Extra space offscreen
       if (this.x - this.radius > innerWidth + space) this.x = 0 - this.radius;
       if (this.x + this.radius < 0 - space) this.x = innerWidth + this.radius;
       if (this.y - this.radius > innerHeight + space) this.y = 0 - this.radius;
@@ -151,6 +91,85 @@ export class Particle {
     // Set particles to next position
     this.x += this.velocity.x;
     this.y += this.velocity.y;
+  }
+}
+
+/**
+ * Guardians protect and guard the goal
+ */
+
+export class Guardian {
+  constructor(x, y, radius, radians = 0, color) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.radians = radians;
+    this.color = color;
+    this.opacity = 0.2;
+    this.circlVelocity = 0.01;
+    this.distanceFromCenter = 100;
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.lineWidth = 2;
+    ctx.fillStyle = this.color;
+
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.strokeStyle = this.color;
+    ctx.stroke();
+    ctx.closePath(); // Not sure if necessary
+  }
+
+  update(ctx, particles, player) {
+    // Loop over particles to check for collision with guardians
+    for (let i = 0; i < particles.length; i++) {
+      const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
+
+      // Particles intersect with guardians here
+      if (dist - this.radius - particles[i].radius < 0) {
+        // Circles get boosted when intersecting with mid circles
+        // particles[i].velocity.x += particles[i].velocity.x * 0.02;
+        // particles[i].velocity.y += particles[i].velocity.y * 0.02;
+
+        // Light up particles and guardian on collision
+        this.opacity = 0.6;
+        particles[i].opacity = 0.6;
+      }
+    }
+
+    // Reset back to transparent after collision
+    if (this.opacity > 0.02) {
+      this.opacity -= 0.02;
+      this.opacity = Math.max(0, this.opacity);
+    }
+
+    // Move points over time
+    this.radians += this.circlVelocity;
+
+    // Circular Motion
+    // this.x =
+    //   innerWidth / 1.2 + Math.cos(this.radians) * this.distanceFromCenter;
+    // this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
+    this.x = this.x + Math.cos(this.radians) * 2;
+    this.y = this.y + Math.sin(this.radians) * 2;
+
+    // Player object collision (should I handle in player class?)
+    // This is the second object checking for player collision, maybe
+    // the player should be checking all the objects instead
+    const playerDistance = distance(this.x, this.y, player.x, player.y);
+
+    if (playerDistance - this.radius - player.radius <= 0) {
+      this.opacity = 1;
+      return true;
+    }
+
+    this.draw(ctx);
   }
 }
 

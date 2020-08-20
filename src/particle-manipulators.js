@@ -1,4 +1,5 @@
-// This would be great to make it accept also a function and delay pehaps
+// This would be great to make into a HOF
+// that would just run the function at the interval
 export function changeParticlesSequential(particles) {
   let i = 0;
 

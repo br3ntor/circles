@@ -1,4 +1,4 @@
-import { Particle } from "./Classes";
+import { Particle, Guardian } from "./Classes";
 import { randInt, randomColor, getColor, niceColor, distance } from "./utils";
 
 /**
@@ -7,7 +7,8 @@ import { randInt, randomColor, getColor, niceColor, distance } from "./utils";
  * have random speeds, directions, and colors
  * based on the level object argument.
  *
- * @param Object | level | The paramters for the current level
+ * @param Object | level | Methods to create random parameters.
+ * @returns Array | An array of randomized particle objects.
  */
 export function particleCreator(level) {
   const p = [];
@@ -24,7 +25,7 @@ export function particleCreator(level) {
 
     // Skip first generation, only 1 circle
     if (i !== 0) {
-      // Keep track of retries for a no overlap circle
+      // Number of retries to not overlap circle
       let retries = 0;
 
       for (let j = 0; j < p.length; j++) {
@@ -53,11 +54,11 @@ export function particleCreator(level) {
 }
 
 /**
- * Returns an array of particles with
- * coordinates set to form a circle
+ * Returns an array of guardian circles
+ * with coordinates set to form a circle
  * when drawn to the canvas.
  */
-export function circlePattern() {
+export function guardianCreator() {
   const p = [];
   const particleCount = 6;
   const spaceBetween = 1 / particleCount;
@@ -65,17 +66,20 @@ export function circlePattern() {
 
   for (let i = 0; i < particleCount; i++) {
     const radians = angle * Math.PI * 2;
-    const radius = 120;
-    const distance = 120;
-    const x = innerWidth / 2 + Math.cos(radians) * distance;
+    const radius = 50;
+    const distance = radius;
+    const x = innerWidth / 1.2 + Math.cos(radians) * distance;
     const y = innerHeight / 2 + Math.sin(radians) * distance;
-    p.push(new Particle(x, y, radius, getColor(), 0, 0, false, radians));
+    p.push(new Guardian(x, y, radius, radians, getColor()));
     angle += spaceBetween;
   }
 
   return p;
 }
 
+/**
+ * Current experiment
+ */
 export function newParticlePattern() {
   const p = [];
   const particleCount = 15;
