@@ -1,5 +1,5 @@
 import resolveCollision from "./util-elastic-collision";
-import { distance } from "./utils";
+import { distance, getHSL } from "./utils";
 
 /**
  * Particles move through space at a given velocity
@@ -12,6 +12,7 @@ export class Particle {
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.hue = parseFloat(this.color.slice(4, this.color.indexOf("d")));
     this.velocity = {
       x: xSpeed,
       y: ySpeed,
@@ -37,6 +38,13 @@ export class Particle {
     ctx.closePath();
   }
 
+  /**
+   * Propells particles through space
+   * Collision with other particles,
+   * optional wall collision
+   * Can I abstract this to smaller
+   * particle methods?
+   */
   update(ctx, particles, player) {
     this.draw(ctx);
 
@@ -91,6 +99,18 @@ export class Particle {
     // Set particles to next position
     this.x += this.velocity.x;
     this.y += this.velocity.y;
+
+    // console.log(parseFloat(this.color.slice(4, this.color.indexOf("d"))));
+    // console.log(parseFloat(this.color.slice(4, this.color.indexOf("d"))));
+    // console.log(this.hue);
+
+    // Update color
+    if (this.hue >= 360) {
+      this.hue = 0;
+    } else {
+      this.color = `hsl(${this.hue}deg, 100%, 50%)`;
+      this.hue += 0.4;
+    }
   }
 }
 
@@ -106,8 +126,13 @@ export class Guardian {
     this.radians = radians;
     this.color = color;
     this.opacity = 0.2;
-    this.circlVelocity = 0.01;
-    this.distanceFromCenter = 100;
+    this.circlVelocity = 0.005;
+    this.distanceFromCenter = 50;
+    this.velocity = {
+      x: 0,
+      y: 0,
+    };
+    this.mass = 1;
   }
 
   draw(ctx) {
@@ -127,12 +152,16 @@ export class Guardian {
   }
 
   update(ctx, particles, player) {
+    const x = this.x;
+    const y = this.y;
     // Loop over particles to check for collision with guardians
     for (let i = 0; i < particles.length; i++) {
       const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
 
       // Particles intersect with guardians here
       if (dist - this.radius - particles[i].radius < 0) {
+        // resolveCollision(this, particles[i]);
+
         // Circles get boosted when intersecting with mid circles
         // particles[i].velocity.x += particles[i].velocity.x * 0.02;
         // particles[i].velocity.y += particles[i].velocity.y * 0.02;
@@ -140,6 +169,17 @@ export class Guardian {
         // Light up particles and guardian on collision
         this.opacity = 0.6;
         particles[i].opacity = 0.6;
+        this.color = particles[i].color;
+      } else {
+        // this.color = "green";
+        // if (this.color !== "hsl(0deg, 0%, 100%)") {
+        //   const hsl = getHSL(this.color);
+        //   const h = Math.max(0, hsl.H - 1);
+        //   const s = Math.max(0, hsl.S - 1);
+        //   const l = Math.min(100, hsl.L + 1);
+        //   this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
+        //   // console.log(this.color);
+        // }
       }
     }
 
@@ -149,15 +189,35 @@ export class Guardian {
       this.opacity = Math.max(0, this.opacity);
     }
 
+    if (this.color !== "hsl(0deg, 0%, 100%)") {
+      const hsl = getHSL(this.color);
+      const h = Math.max(0, hsl.H - 1);
+      const s = Math.max(0, hsl.S - 1);
+      const l = Math.min(100, hsl.L + 1);
+      this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
+      // console.log(this.color);
+    }
+
     // Move points over time
     this.radians += this.circlVelocity;
 
     // Circular Motion
-    // this.x =
-    //   innerWidth / 1.2 + Math.cos(this.radians) * this.distanceFromCenter;
-    // this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
-    this.x = this.x + Math.cos(this.radians) * 2;
-    this.y = this.y + Math.sin(this.radians) * 2;
+    this.x =
+      innerWidth / 1.2 + Math.cos(this.radians) * this.distanceFromCenter;
+    this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
+
+    // Check distance from last point
+    // console.log((this.x - x) * 3);
+    this.velocity.x = (this.x - x) * 3;
+    this.velocity.y = (this.y - y) * 3;
+
+    // this.x = this.x + Math.cos(this.radians) * 2;
+    // this.y = this.y + Math.sin(this.radians) * 2;
+
+    // Expand the circle over time
+    if (this.distanceFromCenter < 300) {
+      this.distanceFromCenter += 0.5;
+    }
 
     // Player object collision (should I handle in player class?)
     // This is the second object checking for player collision, maybe

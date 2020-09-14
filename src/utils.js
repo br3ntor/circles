@@ -42,3 +42,15 @@ export function distance(x1, y1, x2, y2) {
 export function balls() {
   return Math.floor(innerHeight / 100 + innerWidth / 200);
 }
+
+/**
+ * Parses values out of HSL string
+ * @param String | hsl | CSS hsl string
+ * @return Object | HSL values
+ */
+export function getHSL(hsl) {
+  const H = parseFloat(hsl.slice(4, hsl.indexOf("d")));
+  const S = parseFloat(hsl.split(",")[1]);
+  const L = parseFloat(hsl.split(",")[2].slice(0, -1));
+  return { H, S, L };
+}

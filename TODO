@@ -2,25 +2,34 @@
 Ideas:
   - Color themes for levels
   - One level all the balls start still, then shoot in one at high speed to set others off.
-  - Different patterns of circle movement.
   - Diff circle sizes, speed, etc for levels and difficulty.
   - Character selection based on discord avatars, characters have different abilities like more speed.
-  - Focus on bringing it back to game
   - Figure out how I want overall system to work
   - Branch off experiments into two games, one is the current, the other a bullet hell game
   - Make the circles bosses like uniquely and nhcarrigan
   - Gather all the keys before the guardians let you in.
   - Add another mode, instead of levels, key goal. Do survival mode.
-
-TODO:
-  ☐ Add another particle creator function with the goal of making other shapes
-  ☐ A level where the goal moves around
-  ☐ Ability for enemy to shoot bullets
-  ☐ Ability to be character
-  ☐ Ability to choose character
-  ☐ Create a base class for circle and extend that into appropriate objects
+  - Maybe a nice effect: Guardians transparent and benign when touching, else dangerous and opaque
+  - Add sound effects for ball, player, and goal collisions.
+  - A level where the goal moves around
+  - Ability for enemy to shoot bullets
+  - Ability to be/choose character
+  
+  TODO:
+    I might switch the color system to take all hsl inputs because it is easier to
+    iterate through them for the classic psychedelic effect. I'm not sure how it will
+    effect the current system however. I might have to choose one way or refactor something.
+    ☐ Figure out and implement color system
+    
+    Have to figure out how my system will be. One particle creator or more, do I make another
+    set of config objects for the new particle creator? What about the particle manipulators?
+    ☐ Different patterns of circle movement.
+    
+    ☐ Create a base class for circle and extend that into appropriate objects
 
 Archive:
+  ✔ Focus on bringing it back to game @done(20-08-22 03:05) @project(Ideas)
+  ✔ Add another particle creator function with the goal of making other shapes @done(20-08-22 03:03) @project(TODO)
   ✔ Feature: Mouse click makse ball move faster towards mouse @done(20-08-20 00:47) @project(TODO)
   ✔ Implement option for infinite space(game edges wrap) @done(20-08-12 15:45) @project(TODO)
   ✔ Implement array of objects to contain settings for levels @done(20-08-10 03:08) @project(TODO)

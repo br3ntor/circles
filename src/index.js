@@ -20,26 +20,48 @@ import {
 // Options for the original particleCreator function to create levels
 const particleConfigs = [
   {
-    objects: () => balls() - 15,
+    wallCollision: false,
+    objects: () => balls(),
+    radius: () => 20,
+    x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
+    y: (radius) => randInt(radius, canvas.height - radius),
+    xSpeed: () => -1,
+    ySpeed: () => -1,
+    color: () => `hsl(0deg, 100%, 50%)`,
+  },
+  {
+    wallCollision: false,
+    objects: () => balls(),
+    radius: () => 60,
+    x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
+    y: (radius) => randInt(radius, canvas.height - radius),
+    // xSpeed: () => 0,
+    xSpeed: () => 0,
+    ySpeed: () => -0.5,
+    // color: () => `hsl(220deg, 100%, 50%)`,
+    color: () => `hsl(75deg, 100%, 50%)`,
+  },
+  {
+    objects: () => balls(),
     radius: () => Math.random() * 60 + 15,
     x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
     y: (radius) => randInt(radius, canvas.height - radius),
     xSpeed: () => (Math.random() - 0.5) * 5,
     ySpeed: () => (Math.random() - 0.5) * 5,
-    color: () => getColor(),
+    color: () => niceColor(),
   },
   {
     wallCollision: false,
-    objects: () => 15,
+    objects: () => balls(),
     radius: () => 30,
     x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
     y: (radius) => randInt(radius, canvas.height - radius),
     ySpeed: () => (Math.random() - 0.5) * 8,
     xSpeed: () => (Math.random() - 0.5) * 1,
-    color: () => randomColor(colors),
+    color: () => niceColor(),
   },
   {
-    objects: () => balls() - 15,
+    objects: () => balls() + 15,
     radius: () => 10,
     x: (radius, wall) => randInt(radius + wall, canvas.width - radius),
     y: (radius) => randInt(radius, canvas.height - radius),
@@ -54,7 +76,7 @@ const particleConfigs = [
     y: (radius) => randInt(radius, canvas.height - radius),
     xSpeed: () => (Math.random() - 0.5) * 2,
     ySpeed: () => (Math.random() - 0.5) * 2,
-    color: () => getColor(),
+    color: () => niceColor(),
   },
 ];
 
@@ -73,7 +95,7 @@ const mouse = {
 // Colors for randomColor function
 const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
 
-let level = 0;
+let level = 5;
 
 let wall = false;
 
@@ -190,6 +212,9 @@ function drawCurrentState(ctx) {
   guardians.forEach((g) => {
     g.draw(ctx);
   });
+  // test.forEach((t) => {
+  //   t.draw(ctx);
+  // });
 }
 
 // The animation loop
@@ -253,12 +278,13 @@ function animate() {
     });
 
     // Update guardians of the goal
-    guardians.forEach((guardian) => {
-      const collision = guardian.update(ctx, particles, player);
+    guardians.forEach((g) => {
+      // g.draw(ctx);
+      const collision = g.update(ctx, particles, player);
 
       if (collision) {
         cancelAnimationFrame(frameRequest);
-        guardian.draw(ctx);
+        g.draw(ctx);
 
         setTimeout(() => {
           alert("You lose");
