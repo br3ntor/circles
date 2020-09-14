@@ -60,7 +60,7 @@ export function particleCreator(level) {
  */
 export function guardianCreator() {
   const p = [];
-  const particleCount = 6;
+  const particleCount = 4;
   const spaceBetween = 1 / particleCount;
   let angle = 0;
 
@@ -70,7 +70,7 @@ export function guardianCreator() {
     const distance = radius;
     const x = innerWidth / 1.2 + Math.cos(radians) * distance;
     const y = innerHeight / 2 + Math.sin(radians) * distance;
-    p.push(new Guardian(x, y, radius, radians, getColor()));
+    p.push(new Guardian(x, y, radius, radians, "hsl(0deg, 0%, 100%)"));
     angle += spaceBetween;
   }
 
