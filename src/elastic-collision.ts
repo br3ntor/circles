@@ -26,7 +26,20 @@ function rotate(velocity: { x: number; y: number }, angle: number) {
  * @return Null | Does not return a value
  */
 
-export default function resolveCollision(particle: { velocity: { x: number; y: number; }; mass: number; x: number; y: number; }, otherParticle: { velocity: { x: number; y: number; }; mass: number; x: number; y: number; }) {
+export default function resolveCollision(
+  particle: {
+    velocity: { x: number; y: number };
+    mass: number;
+    x: number;
+    y: number;
+  },
+  otherParticle: {
+    velocity: { x: number; y: number };
+    mass: number;
+    x: number;
+    y: number;
+  }
+) {
   const xVelocityDiff = particle.velocity.x - otherParticle.velocity.x;
   const yVelocityDiff = particle.velocity.y - otherParticle.velocity.y;
 

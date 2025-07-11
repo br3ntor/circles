@@ -1,4 +1,4 @@
-import resolveCollision from "./util-elastic-collision.ts";
+import resolveCollision from "./elastic-collision.ts";
 import { distance, getHSL } from "./utils.ts";
 
 /**
@@ -17,7 +17,15 @@ export class Particle {
   mass: number;
   opacity: number;
 
-  constructor(x: number, y: number, radius: number, color: string, xSpeed: number, ySpeed: number, wallCollision = true) {
+  constructor(
+    x: number,
+    y: number,
+    radius: number,
+    color: string,
+    xSpeed: number,
+    ySpeed: number,
+    wallCollision = true
+  ) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -140,7 +148,13 @@ export class Guardian {
   velocity: { x: number; y: number };
   mass: number;
 
-  constructor(x: number, y: number, radius: number, radians = 0, color: string) {
+  constructor(
+    x: number,
+    y: number,
+    radius: number,
+    radians = 0,
+    color: string
+  ) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -276,7 +290,11 @@ export class Player {
     ctx.fill();
   }
 
-  update(ctx: CanvasRenderingContext2D, wall: boolean, mouse: { x: number; y: number }) {
+  update(
+    ctx: CanvasRenderingContext2D,
+    wall: boolean,
+    mouse: { x: number; y: number }
+  ) {
     this.draw(ctx);
     const dx = mouse.x - this.x;
     const dy = mouse.y - this.y;
@@ -374,7 +392,9 @@ export class Timer {
     }
     this.running = false;
     this.endTime = new Date();
-    const seconds = ((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000;
+    const seconds =
+      ((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) /
+      1000;
     this.durration += seconds;
   }
   reset() {
