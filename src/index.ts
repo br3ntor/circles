@@ -1,24 +1,17 @@
-import { Goal, Player } from "./Classes";
+import { Goal, Player } from "./Classes.ts";
 import {
   randInt,
-  randomColor,
-  getColor,
-  niceColor,
   distance,
   balls,
-} from "./utils";
+  niceColor,
+} from "./utils.ts";
 import {
   particleCreator,
   guardianCreator,
-  newParticlePattern,
-} from "./particle-creators";
-import {
-  changeParticlesSequential,
-  changeParticlesConcurrent,
-} from "./particle-manipulators";
+} from "./particle-creators.ts";
 
 // Options for the original particleCreator function to create levels
-const particleConfigs = [
+const particleConfigs: { wallCollision?: boolean; objects: () => number; radius: () => number; x: (radius: number, wall: number) => number; y: (radius: number) => number; xSpeed: () => number; ySpeed: () => number; color: () => string; }[] = [
   {
     wallCollision: false,
     objects: () => balls(),
@@ -80,8 +73,8 @@ const particleConfigs = [
   },
 ];
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement;
+const ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -93,20 +86,18 @@ const mouse = {
 };
 
 // Colors for randomColor function
-const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
-
-let level = 5;
+let level = 0;
 
 let wall = false;
 
 // Updates mouse state
-addEventListener("mousemove", (event) => {
+addEventListener("mousemove", (event: MouseEvent) => {
   mouse.x = event.clientX;
   mouse.y = event.clientY;
 });
 
 // Resizing resets game
-addEventListener("resize", (event) => {
+addEventListener("resize", () => {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
   init();
@@ -116,16 +107,16 @@ addEventListener("resize", (event) => {
  * Left click event.
  * Starts the game when player is clicked.
  */
-addEventListener("click", (event) => {
+addEventListener("click", (event: MouseEvent) => {
   const clickDistance = distance(
     event.clientX,
     event.clientY,
-    player.x,
-    player.y
+    player!.x,
+    player!.y
   );
 
   // If click happens within radius of player circle, set wall to false
-  if (clickDistance < player.radius) {
+  if (clickDistance < player!.radius) {
     wall = false;
   }
 
@@ -152,20 +143,17 @@ addEventListener("click", (event) => {
  * Right click event.
  * Resets the game.
  */
-addEventListener("contextmenu", (event) => {
+addEventListener("contextmenu", (event: MouseEvent) => {
   event.preventDefault();
   init();
 });
 
 // Objects for canvas
-let particles;
-let guardians;
-let test;
-let player;
-let goal;
-
-// Request frame ID
-let frameRequest;
+let particles: import("./Classes").Particle[];
+let guardians: import("./Classes").Guardian[];
+let player: Player | null;
+let goal: Goal | null;
+let frameRequest: number;
 
 // Sets game state and all objects to starting setup
 function init() {
@@ -205,7 +193,7 @@ function init() {
  * Used inside animate to draw still
  * particles while the wall is up
  */
-function drawCurrentState(ctx) {
+function drawCurrentState(ctx: CanvasRenderingContext2D) {
   particles.forEach((p) => {
     p.draw(ctx);
   });
@@ -226,12 +214,12 @@ function animate() {
 
   // Draws goal and detects if player has entered the goal.
   // Returns undefined until goal reached then returns true.
-  const goalReached = goal.update(ctx, player);
+  const goalReached = goal!.update(ctx, player!);
 
   // If Goal is reached set to next level and continue
   if (goalReached) {
     cancelAnimationFrame(frameRequest);
-    goal.draw(ctx);
+    goal!.draw(ctx);
     setTimeout(() => {
       alert(`You beat level ${level + 1}!`);
       if (level < particleConfigs.length - 1) {
@@ -263,7 +251,7 @@ function animate() {
      * and call their update functions
      */
     particles.forEach((p) => {
-      const collision = p.update(ctx, particles, player);
+      const collision = p.update(ctx, particles, player!);
 
       if (collision) {
         cancelAnimationFrame(frameRequest);
@@ -280,7 +268,7 @@ function animate() {
     // Update guardians of the goal
     guardians.forEach((g) => {
       // g.draw(ctx);
-      const collision = g.update(ctx, particles, player);
+      const collision = g.update(ctx, particles, player!);
 
       if (collision) {
         cancelAnimationFrame(frameRequest);
@@ -311,7 +299,7 @@ function animate() {
   }
 
   // Might make sense to draw/update player first
-  player.update(ctx, wall, mouse);
+  player!.update(ctx, wall, mouse);
 }
 
 // Start this bad boy up!

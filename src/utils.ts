@@ -1,14 +1,14 @@
 /**
  * Random Int from Range Inclusive
  */
-export function randInt(min, max) {
+export function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 /**
  * Random custom color from array.
  */
-export function randomColor(colors) {
+export function randomColor(colors: string[]) {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
@@ -30,7 +30,7 @@ export function niceColor() {
 /**
  * Pythagorean theorem
  */
-export function distance(x1, y1, x2, y2) {
+export function distance(x1: number, y1: number, x2: number, y2: number) {
   let xDistance = x2 - x1;
   let yDistance = y2 - y1;
   return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
@@ -48,7 +48,7 @@ export function balls() {
  * @param String | hsl | CSS hsl string
  * @return Object | HSL values
  */
-export function getHSL(hsl) {
+export function getHSL(hsl: string) {
   const H = parseFloat(hsl.slice(4, hsl.indexOf("d")));
   const S = parseFloat(hsl.split(",")[1]);
   const L = parseFloat(hsl.split(",")[2].slice(0, -1));
