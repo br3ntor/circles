@@ -1,5 +1,5 @@
 import { init } from "./game-loop";
-import { canvas, mouse, player, setWall } from "./game-state";
+import { canvas, mouse, player, wall, setWall } from "./game-state";
 import { distance } from "./utils";
 
 export function setupEventListeners() {
@@ -20,7 +20,7 @@ export function setupEventListeners() {
    * Left click event.
    * Starts the game when player is clicked.
    */
-  addEventListener("click", (event: MouseEvent) => {
+  addEventListener("click", (event) => {
     const clickDistance = distance(
       event.clientX,
       event.clientY,
@@ -42,15 +42,21 @@ export function setupEventListeners() {
     // changeParticlesConcurrent(particles);
   });
 
+  addEventListener("keydown", (event) => {
+    if (event.key === " " || event.code === "Space") {
+      if (wall) setWall(false);
+    }
+  });
+
   /**
    * Events to add a mouse boost
    */
-  // addEventListener("mousedown", (event) => {
-  //   player.speed = 5;
-  // });
-  // addEventListener("mouseup", (event) => {
-  //   player.speed = 2;
-  // });
+  addEventListener("mousedown", () => {
+    if (player !== null) player.speed = 5;
+  });
+  addEventListener("mouseup", () => {
+    if (player !== null) player.speed = 2;
+  });
 
   /**
    * Right click event.

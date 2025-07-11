@@ -1,5 +1,6 @@
 import { Particle, Guardian } from "./Classes.ts";
 import { distance, getColor } from "./utils.ts";
+import { ParticleConfig } from "./types.ts";
 
 /**
  * This particle creator will spawn random,
@@ -10,16 +11,7 @@ import { distance, getColor } from "./utils.ts";
  * @param Object | level | Methods to create random parameters.
  * @returns Array | An array of randomized particle objects.
  */
-export function particleCreator(level: {
-  objects: () => number;
-  radius: () => number;
-  x: (radius: number, wall: number) => number;
-  y: (radius: number) => number;
-  xSpeed: () => number;
-  ySpeed: () => number;
-  color: () => string;
-  wallCollision?: boolean;
-}) {
+export function particleCreator(level: ParticleConfig) {
   const p = [];
   const wallEnd = 105;
   const objects = level.objects();

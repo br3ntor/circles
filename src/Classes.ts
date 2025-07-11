@@ -356,6 +356,7 @@ export class Goal {
     this.draw(ctx);
     if (
       player.x - player.radius > this.x &&
+      player.x + player.radius < this.x + this.width &&
       player.y - player.radius > this.y &&
       player.y + player.radius < this.y + this.height
     ) {
