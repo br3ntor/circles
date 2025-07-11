@@ -17,7 +17,7 @@ export const mouse = {
 };
 
 export let level = 0;
-export let wall = false;
+export let gameRunning = false;
 export let particles: Particle[];
 export let guardians: Guardian[];
 export let player: Player | null;
@@ -28,8 +28,8 @@ export function setLevel(newLevel: number) {
   level = newLevel;
 }
 
-export function setWall(newWall: boolean) {
-  wall = newWall;
+export function setGameRunning(isRunning: boolean) {
+  gameRunning = isRunning;
 }
 
 export function setParticles(newParticles: Particle[]) {

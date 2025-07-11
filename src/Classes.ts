@@ -292,38 +292,43 @@ export class Player {
 
   update(
     ctx: CanvasRenderingContext2D,
-    wall: boolean,
+    gameRunning: boolean,
     mouse: { x: number; y: number }
   ) {
     this.draw(ctx);
     const dx = mouse.x - this.x;
     const dy = mouse.y - this.y;
+
+    // Skip movement if too close to target
+    if (Math.abs(dx) <= 2 && Math.abs(dy) <= 2) {
+      this.constrainToBounds();
+      return;
+    }
+
     const angle = Math.atan2(dy, dx);
     const xVelocity = Math.cos(angle) * this.speed;
     const yVelocity = Math.sin(angle) * this.speed;
 
-    // Only update player if distance from mouse greater than 2
-    // I must be able to simplify this if else chain though, maybe?
-    // Gross disgusting 3am code
-    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-      if (wall) {
-        if (this.x + this.radius >= 95 && dx > 2) {
-          this.x = 95 - this.radius;
-        } else {
-          this.x += xVelocity;
-        }
-      } else {
-        this.x += xVelocity;
-      }
-
-      this.y += yVelocity;
+    // Handle X movement with wall constraint when game not running
+    if (!gameRunning && this.x + this.radius >= 95 && dx > 2) {
+      this.x = 95 - this.radius;
+    } else {
+      this.x += xVelocity;
     }
 
-    // Collision for walls
-    if (this.x - this.radius <= 0) this.x = this.radius + 1;
-    if (this.x + this.radius >= innerWidth) this.x = innerWidth - this.radius;
-    if (this.y - this.radius <= 0) this.y = this.radius + 1;
-    if (this.y + this.radius >= innerHeight) this.y = innerHeight - this.radius;
+    this.y += yVelocity;
+    this.constrainToBounds();
+  }
+
+  private constrainToBounds() {
+    this.x = Math.max(
+      this.radius + 1,
+      Math.min(innerWidth - this.radius, this.x)
+    );
+    this.y = Math.max(
+      this.radius + 1,
+      Math.min(innerHeight - this.radius, this.y)
+    );
   }
 }
 

@@ -12,8 +12,8 @@ import {
   setGuardians,
   setParticles,
   setPlayer,
-  setWall,
-  wall,
+  setGameRunning,
+  gameRunning,
   guardians,
   particles,
   goal,
@@ -22,10 +22,12 @@ import {
 } from "./game-state";
 import { randInt } from "./utils";
 
+const particleConfigs = getParticleConfigs(canvas);
+
 // Sets game state and all objects to starting setup
 export function init() {
-  // Create particle objects
-  setParticles(particleCreator(getParticleConfigs(canvas, "roo")[level]));
+  const levelParticles = particleCreator(particleConfigs[level]);
+  setParticles(levelParticles);
   setGuardians(guardianCreator());
   // test = newParticlePattern();
 
@@ -35,12 +37,6 @@ export function init() {
   const pY = randInt(pR, canvas.height - pR);
   setPlayer(new Player(pX, pY, pR, "red"));
 
-  // Create goal object
-  // const goalWidth = 100;
-  // const goalHeight = 160;
-  // const goalX = canvas.width - goalWidth;
-  // const goalY = canvas.height / 2 - goalHeight / 2;
-
   // Draw goal on the right side
   const goalWidth = 120;
   const goalHeight = 120;
@@ -48,14 +44,12 @@ export function init() {
   const goalY = canvas.height / 2 - goalHeight / 2;
   setGoal(new Goal(goalX, goalY, goalWidth, goalHeight));
 
-  setWall(true);
-
-  return "Initialized game objects.";
+  setGameRunning(false);
 }
 
 /**
  * Used inside animate to draw still
- * particles while the wall is up
+ * particles before game starts
  */
 function drawCurrentState(ctx: CanvasRenderingContext2D) {
   particles.forEach((p) => {
@@ -86,7 +80,7 @@ export function animate() {
     goal!.draw(ctx);
     setTimeout(() => {
       alert(`You beat level ${level + 1}!`);
-      if (level < getParticleConfigs(canvas, "roo").length - 1) {
+      if (level < particleConfigs.length - 1) {
         setLevel(level + 1);
       } else {
         setLevel(0);
@@ -99,7 +93,7 @@ export function animate() {
   // If they player is behind starting wall, draw the wall
   // else, update / draw particle position and check for
   // collision. If collision then reset level
-  if (wall === true) {
+  if (!gameRunning) {
     // Draw left start area barrier
     ctx.beginPath();
     ctx.moveTo(100, 0);
@@ -131,7 +125,6 @@ export function animate() {
 
     // Update guardians of the goal
     guardians.forEach((g) => {
-      // g.draw(ctx);
       const collision = g.update(ctx, particles, player!);
 
       if (collision) {
@@ -163,5 +156,5 @@ export function animate() {
   }
 
   // Might make sense to draw/update player first
-  player!.update(ctx, wall, mouse);
+  player!.update(ctx, gameRunning, mouse);
 }
