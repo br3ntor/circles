@@ -8,7 +8,7 @@
  * @return Object | The altered x and y velocities after the coordinate system has been rotated
  */
 
-function rotate(velocity, angle) {
+function rotate(velocity: { x: number; y: number }, angle: number) {
   const rotatedVelocities = {
     x: velocity.x * Math.cos(angle) - velocity.y * Math.sin(angle),
     y: velocity.x * Math.sin(angle) + velocity.y * Math.cos(angle),
@@ -26,7 +26,7 @@ function rotate(velocity, angle) {
  * @return Null | Does not return a value
  */
 
-export default function resolveCollision(particle, otherParticle) {
+export default function resolveCollision(particle: { velocity: { x: number; y: number; }; mass: number; x: number; y: number; }, otherParticle: { velocity: { x: number; y: number; }; mass: number; x: number; y: number; }) {
   const xVelocityDiff = particle.velocity.x - otherParticle.velocity.x;
   const yVelocityDiff = particle.velocity.y - otherParticle.velocity.y;
 

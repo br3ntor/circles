@@ -1,5 +1,5 @@
-import resolveCollision from "./util-elastic-collision";
-import { distance, getHSL } from "./utils";
+import resolveCollision from "./util-elastic-collision.ts";
+import { distance, getHSL } from "./utils.ts";
 
 /**
  * Particles move through space at a given velocity
@@ -7,7 +7,17 @@ import { distance, getHSL } from "./utils";
  * or the player. Or perhaps manipulated with a function.
  */
 export class Particle {
-  constructor(x, y, radius, color, xSpeed, ySpeed, wallCollision = true) {
+  x: number;
+  y: number;
+  radius: number;
+  color: string;
+  hue: number;
+  velocity: { x: number; y: number };
+  wallCollision: boolean;
+  mass: number;
+  opacity: number;
+
+  constructor(x: number, y: number, radius: number, color: string, xSpeed: number, ySpeed: number, wallCollision = true) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -22,7 +32,7 @@ export class Particle {
     this.opacity = 0.2;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     ctx.lineWidth = 2;
@@ -45,7 +55,7 @@ export class Particle {
    * Can I abstract this to smaller
    * particle methods?
    */
-  update(ctx, particles, player) {
+  update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
     this.draw(ctx);
 
     // Loop over particles for collision detection
@@ -119,7 +129,18 @@ export class Particle {
  */
 
 export class Guardian {
-  constructor(x, y, radius, radians = 0, color) {
+  x: number;
+  y: number;
+  radius: number;
+  radians: number;
+  color: string;
+  opacity: number;
+  circlVelocity: number;
+  distanceFromCenter: number;
+  velocity: { x: number; y: number };
+  mass: number;
+
+  constructor(x: number, y: number, radius: number, radians = 0, color: string) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -135,7 +156,7 @@ export class Guardian {
     this.mass = 1;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     ctx.lineWidth = 2;
@@ -151,7 +172,7 @@ export class Guardian {
     ctx.closePath(); // Not sure if necessary
   }
 
-  update(ctx, particles, player) {
+  update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
     const x = this.x;
     const y = this.y;
     // Loop over particles to check for collision with guardians
@@ -234,7 +255,13 @@ export class Guardian {
 }
 
 export class Player {
-  constructor(x, y, radius, color) {
+  x: number;
+  y: number;
+  speed: number;
+  radius: number;
+  color: string;
+
+  constructor(x: number, y: number, radius: number, color: string) {
     this.x = x;
     this.y = y;
     this.speed = 2;
@@ -242,14 +269,14 @@ export class Player {
     this.color = color;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     ctx.fillStyle = this.color;
     ctx.fill();
   }
 
-  update(ctx, wall, mouse) {
+  update(ctx: CanvasRenderingContext2D, wall: boolean, mouse: { x: number; y: number }) {
     this.draw(ctx);
     const dx = mouse.x - this.x;
     const dy = mouse.y - this.y;
@@ -283,7 +310,13 @@ export class Player {
 }
 
 export class Goal {
-  constructor(x, y, width, height) {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: boolean;
+
+  constructor(x: number, y: number, width: number, height: number) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -291,7 +324,7 @@ export class Goal {
     this.fill = false;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     if (this.fill === true) {
       ctx.fillStyle = "#7bf977";
       ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -301,7 +334,7 @@ export class Goal {
     }
   }
 
-  update(ctx, player) {
+  update(ctx: CanvasRenderingContext2D, player: Player) {
     this.draw(ctx);
     if (
       player.x - player.radius > this.x &&
@@ -313,5 +346,44 @@ export class Goal {
     } else {
       this.fill = false;
     }
+  }
+}
+
+export class Timer {
+  running: boolean;
+  startTime: Date | number;
+  endTime: Date | number;
+  durration: number;
+
+  constructor() {
+    this.running = false;
+    this.startTime = 0;
+    this.endTime = 0;
+    this.durration = 0;
+  }
+  start() {
+    if (this.running) {
+      throw new Error("Already started");
+    }
+    this.running = true;
+    this.startTime = new Date();
+  }
+  stop() {
+    if (!this.running) {
+      throw new Error("Not started");
+    }
+    this.running = false;
+    this.endTime = new Date();
+    const seconds = ((this.endTime as Date).getTime() - (this.startTime as Date).getTime()) / 1000;
+    this.durration += seconds;
+  }
+  reset() {
+    this.startTime = 0;
+    this.endTime = 0;
+    this.running = false;
+    this.durration = 0;
+  }
+  now() {
+    return (Date.now() - (this.startTime as Date).getTime()) / 1000;
   }
 }
