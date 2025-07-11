@@ -25,7 +25,7 @@ import { randInt } from "./utils";
 // Sets game state and all objects to starting setup
 export function init() {
   // Create particle objects
-  setParticles(particleCreator(getParticleConfigs(canvas)[level]));
+  setParticles(particleCreator(getParticleConfigs(canvas, "roo")[level]));
   setGuardians(guardianCreator());
   // test = newParticlePattern();
 
@@ -86,7 +86,7 @@ export function animate() {
     goal!.draw(ctx);
     setTimeout(() => {
       alert(`You beat level ${level + 1}!`);
-      if (level < getParticleConfigs(canvas).length - 1) {
+      if (level < getParticleConfigs(canvas, "roo").length - 1) {
         setLevel(level + 1);
       } else {
         setLevel(0);
