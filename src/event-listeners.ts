@@ -1,5 +1,11 @@
 import { init } from "./game-loop";
-import { canvas, mouse, player, wall, setWall } from "./game-state";
+import {
+  canvas,
+  mouse,
+  player,
+  gameRunning,
+  setGameRunning,
+} from "./game-state";
 import { distance } from "./utils";
 
 export function setupEventListeners() {
@@ -30,7 +36,7 @@ export function setupEventListeners() {
 
     // If click happens within radius of player circle, set wall to false
     if (clickDistance < player!.radius) {
-      setWall(false);
+      setGameRunning(true);
     }
 
     /**
@@ -44,19 +50,19 @@ export function setupEventListeners() {
 
   addEventListener("keydown", (event) => {
     if (event.key === " " || event.code === "Space") {
-      if (wall) setWall(false);
+      if (!gameRunning) setGameRunning(true);
     }
   });
 
   /**
    * Events to add a mouse boost
    */
-  addEventListener("mousedown", () => {
-    if (player !== null) player.speed = 5;
-  });
-  addEventListener("mouseup", () => {
-    if (player !== null) player.speed = 2;
-  });
+  // addEventListener("mousedown", () => {
+  //   if (player !== null) player.speed = 5;
+  // });
+  // addEventListener("mouseup", () => {
+  //   if (player !== null) player.speed = 2;
+  // }); // Not sure how if i should use these, maybe as power ups or only for certain level set?
 
   /**
    * Right click event.
