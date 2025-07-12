@@ -1,8 +1,7 @@
+import { Particle } from "./game-objects";
 // This would be great to make into a HOF
 // that would just run the function at the interval
-export function changeParticlesSequential(
-  particles: import("./Classes").Particle[]
-) {
+export function changeParticlesSequential(particles: Particle[]) {
   let i = 0;
 
   const interval = setInterval(() => {
@@ -18,9 +17,7 @@ export function changeParticlesSequential(
   return interval;
 }
 
-export function changeParticlesConcurrent(
-  particles: import("./Classes").Particle[]
-) {
+export function changeParticlesConcurrent(particles: Particle[]) {
   const moveSequence = [
     [2, 0],
     [0, 1],

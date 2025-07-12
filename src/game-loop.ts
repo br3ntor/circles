@@ -1,4 +1,4 @@
-import { Goal, Player } from "./Classes";
+import { Goal, Player } from "./game-objects";
 import { particleCreator, guardianCreator } from "./particle-creators";
 import { getParticleConfigs } from "./level-configs";
 import {

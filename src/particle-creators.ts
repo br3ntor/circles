@@ -1,4 +1,4 @@
-import { Particle, Guardian } from "./Classes.ts";
+import { Particle, Guardian } from "./game-objects.ts";
 import { distance, getColor } from "./utils.ts";
 import { ParticleConfig } from "./types.ts";
 

@@ -1,4 +1,5 @@
 export type ParticleConfig = {
+  title: string;
   objects: () => number;
   radius: () => number;
   x: (radius: number, wall: number) => number;
