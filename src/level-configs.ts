@@ -6,6 +6,7 @@ type LevelSet = (canvas: HTMLCanvasElement) => ParticleConfig[];
 const levelSets: Record<string, LevelSet> = {
   default: (canvas) => [
     {
+      title: "Red",
       wallCollision: false,
       objects: () => balls(),
       radius: () => 20,
@@ -17,6 +18,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => `hsl(0deg, 100%, 50%)`,
     },
     {
+      title: "Yellow",
       wallCollision: false,
       objects: () => balls(),
       radius: () => 60,
@@ -28,6 +30,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => `hsl(75deg, 100%, 50%)`,
     },
     {
+      title: "Random",
       objects: () => balls(),
       radius: () => Math.random() * 60 + 15,
       x: (radius: number, wall: number) =>
@@ -38,6 +41,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => niceColor(),
     },
     {
+      title: "Subtle",
       wallCollision: false,
       objects: () => balls(),
       radius: () => 30,
@@ -49,6 +53,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => niceColor(),
     },
     {
+      title: "Fast",
       objects: () => balls() + 15,
       radius: () => 10,
       x: (radius: number, wall: number) =>
@@ -59,6 +64,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => niceColor(),
     },
     {
+      title: "Big",
       objects: () => balls() - 4,
       radius: () => 100,
       x: (radius: number, wall: number) =>
@@ -71,6 +77,7 @@ const levelSets: Record<string, LevelSet> = {
   ],
   roo: (canvas) => [
     {
+      title: "Colorful",
       objects: () => 50,
       radius: () => 5,
       x: (radius: number, wall: number) =>
@@ -81,6 +88,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => `hsl(${Math.random() * 360}deg, 100%, 50%)`,
     },
     {
+      title: "Black Hole",
       objects: () => 1,
       radius: () => 200,
       x: () => canvas.width / 2,
@@ -90,6 +98,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => "black",
     },
     {
+      title: "Small",
       wallCollision: false,
       objects: () => 200,
       radius: () => 2,
@@ -101,6 +110,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => niceColor(),
     },
     {
+      title: "Horizontal",
       objects: () => 20,
       radius: () => 30,
       x: (radius: number, wall: number) =>
@@ -111,6 +121,7 @@ const levelSets: Record<string, LevelSet> = {
       color: () => `hsl(${randInt(0, 50)}deg, 100%, 50%)`,
     },
     {
+      title: "Vertical",
       objects: () => 20,
       radius: () => 30,
       x: (radius: number, wall: number) =>
@@ -119,6 +130,43 @@ const levelSets: Record<string, LevelSet> = {
       xSpeed: () => 0,
       ySpeed: () => (Math.random() > 0.5 ? 5 : -5),
       color: () => `hsl(${randInt(180, 230)}deg, 100%, 50%)`,
+    },
+  ],
+  rebirth: (canvas) => [
+    // {
+    //   title: "One",
+    //   objects: () => 1,
+    //   radius: () => 60,
+    //   x: (radius: number, wall: number) =>
+    //     randInt(radius + wall, canvas.width - radius),
+    //   y: (radius: number) => randInt(radius, canvas.height - radius),
+    //   xSpeed: () => (Math.random() - 0.5) * 50,
+    //   ySpeed: () => (Math.random() - 0.5) * 50,
+    //   color: () => `hsl(${randInt(0, 360)}deg, 100%, 50%)`,
+    // },
+    // {
+    //   title: "Two",
+    //   wallCollision: false,
+    //   objects: () => 2,
+    //   radius: () => 80,
+    //   x: (radius: number, wall: number) =>
+    //     randInt(radius + wall, canvas.width - radius),
+    //   y: (radius: number) => randInt(radius, canvas.height - radius),
+    //   xSpeed: () => (Math.random() - 0.5) * 40,
+    //   ySpeed: () => (Math.random() - 0.5) * 40,
+    //   color: () => `hsl(${randInt(0, 360)}deg, 100%, 50%)`,
+    // },
+    {
+      title: "Three",
+      wallCollision: true,
+      objects: () => randInt(3, 10),
+      radius: () => Math.random() * 100 + 15,
+      x: (radius: number, wall: number) =>
+        randInt(radius + wall, canvas.width - radius),
+      y: (radius: number) => randInt(radius, canvas.height - radius),
+      xSpeed: () => (Math.random() - 0.5) * 5,
+      ySpeed: () => (Math.random() - 0.5) * 5,
+      color: () => `hsl(${randInt(0, 360)}deg, 100%, 50%)`,
     },
   ],
 };

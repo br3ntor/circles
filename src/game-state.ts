@@ -1,4 +1,4 @@
-import { Player, Goal, Particle, Guardian } from "./Classes.ts";
+import { Player, Goal, Particle, Guardian } from "./game-objects.ts";
 
 export const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
