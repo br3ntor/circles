@@ -22,8 +22,8 @@ export class Particle {
     y: number,
     radius: number,
     color: string,
-    xSpeed: number,
-    ySpeed: number,
+    dx: number,
+    dy: number,
     wallCollision = true
   ) {
     this.x = x;
@@ -32,8 +32,8 @@ export class Particle {
     this.color = color;
     this.hue = parseFloat(this.color.slice(4, this.color.indexOf("d")));
     this.velocity = {
-      x: xSpeed,
-      y: ySpeed,
+      x: dx,
+      y: dy,
     };
     this.wallCollision = wallCollision;
     this.mass = 1; // Used in elastic collision

@@ -15,7 +15,7 @@ export function randomColor(colors: string[]) {
 /**
  * Random hexidecimal color
  */
-export function getColor() {
+export function getRandomColor() {
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 }
 

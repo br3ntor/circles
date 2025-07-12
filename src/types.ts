@@ -1,11 +1,11 @@
 export type ParticleConfig = {
   title: string;
-  objects: () => number;
+  particleCount: () => number;
   radius: () => number;
   x: (radius: number, wall: number) => number;
   y: (radius: number) => number;
-  xSpeed: () => number;
-  ySpeed: () => number;
+  dx: () => number;
+  dy: () => number;
   color: () => string;
   wallCollision?: boolean;
 };
