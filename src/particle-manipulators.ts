@@ -10,9 +10,8 @@ export function changeParticlesSequential(particles: Particle[]) {
 
     if (i++ >= particles.length - 1) {
       i = 0;
-      // clearInterval(interval);
     }
-  }, 300);
+  }, 3000);
 
   return interval;
 }

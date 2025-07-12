@@ -1,5 +1,9 @@
 import { Goal, Player } from "./game-objects";
-import { particleCreator, guardianCreator } from "./particle-creators";
+import {
+  particleCreator,
+  guardianCreator,
+  rainingPattern,
+} from "./particle-creators";
 import { getParticleConfigs } from "./level-configs";
 import {
   canvas,
@@ -21,12 +25,17 @@ import {
   setLevel,
 } from "./game-state";
 import { randInt } from "./utils";
+// import {
+//   changeParticlesConcurrent,
+//   changeParticlesSequential,
+// } from "./particle-manipulators";
 
 const particleConfigs = getParticleConfigs(canvas);
 
 // Sets game state and all objects to starting setup
 export function init() {
-  const levelParticles = particleCreator(particleConfigs[level]);
+  // const levelParticles = particleCreator(particleConfigs[level]);
+  const levelParticles = rainingPattern(canvas);
   setParticles(levelParticles);
   setGuardians(guardianCreator());
   // test = newParticlePattern();
@@ -44,6 +53,8 @@ export function init() {
   const goalY = canvas.height / 2 - goalHeight / 2;
   setGoal(new Goal(goalX, goalY, goalWidth, goalHeight));
 
+  // changeParticlesConcurrent(particles);
+  // changeParticlesSequential(particles);
   setGameRunning(false);
 }
 
