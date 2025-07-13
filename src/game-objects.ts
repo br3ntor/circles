@@ -1,5 +1,6 @@
 import resolveCollision from "./elastic-collision.ts";
 import { distance, getHSL } from "./utils.ts";
+import { ParticleProps } from "./types.ts";
 
 /**
  * Particles move through space at a given velocity
@@ -17,25 +18,17 @@ export class Particle {
   mass: number;
   opacity: number;
 
-  constructor(
-    x: number,
-    y: number,
-    radius: number,
-    color: string,
-    dx: number,
-    dy: number,
-    wallCollision = true
-  ) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
+  constructor(config: ParticleProps) {
+    this.x = config.x;
+    this.y = config.y;
+    this.radius = config.radius;
+    this.color = config.color;
     this.hue = parseFloat(this.color.slice(4, this.color.indexOf("d")));
     this.velocity = {
-      x: dx,
-      y: dy,
+      x: config.dx,
+      y: config.dy,
     };
-    this.wallCollision = wallCollision;
+    this.wallCollision = config.wallCollision;
     this.mass = 1; // Used in elastic collision
     this.opacity = 0.2;
   }

@@ -1,10 +1,6 @@
 import { Goal, Player } from "./game-objects";
-import {
-  particleCreator,
-  guardianCreator,
-  rainingPattern,
-} from "./particle-creators";
-import { getParticleConfigs } from "./level-configs";
+import { guardianCreator } from "./particle-creators";
+import { levelSet } from "./levels";
 import {
   canvas,
   ctx,
@@ -25,20 +21,13 @@ import {
   setLevel,
 } from "./game-state";
 import { randInt } from "./utils";
-// import {
-//   changeParticlesConcurrent,
-//   changeParticlesSequential,
-// } from "./particle-manipulators";
-
-const particleConfigs = getParticleConfigs(canvas);
 
 // Sets game state and all objects to starting setup
 export function init() {
-  // const levelParticles = particleCreator(particleConfigs[level]);
-  const levelParticles = rainingPattern(canvas);
-  setParticles(levelParticles);
-  setGuardians(guardianCreator());
-  // test = newParticlePattern();
+  // Setup level particles
+  const startingLevel = levelSet[0];
+  setParticles(startingLevel.particles);
+  setGuardians(guardianCreator(canvas));
 
   // Create player object
   const pR = 30;
@@ -53,6 +42,8 @@ export function init() {
   const goalY = canvas.height / 2 - goalHeight / 2;
   setGoal(new Goal(goalX, goalY, goalWidth, goalHeight));
 
+  // Test for starting functions that change behavior mid game,
+  // could trigger on other events as well.
   // changeParticlesConcurrent(particles);
   // changeParticlesSequential(particles);
   setGameRunning(false);
@@ -69,9 +60,6 @@ function drawCurrentState(ctx: CanvasRenderingContext2D) {
   guardians.forEach((g) => {
     g.draw(ctx);
   });
-  // test.forEach((t) => {
-  //   t.draw(ctx);
-  // });
 }
 
 // The animation loop
@@ -91,7 +79,7 @@ export function animate() {
     goal!.draw(ctx);
     setTimeout(() => {
       alert(`You beat level ${level + 1}!`);
-      if (level < particleConfigs.length - 1) {
+      if (level < levelSet.length - 1) {
         setLevel(level + 1);
       } else {
         setLevel(0);
@@ -149,21 +137,6 @@ export function animate() {
         });
       }
     });
-
-    // test.forEach((p) => {
-    //   const collision = p.update(ctx, particles, player);
-
-    //   if (collision) {
-    //     cancelAnimationFrame(frameRequest);
-    //     p.draw(ctx);
-
-    //     setTimeout(() => {
-    //       alert("You lose");
-    //       init();
-    //       animate();
-    //     });
-    //   }
-    // });
   }
 
   // Might make sense to draw/update player first

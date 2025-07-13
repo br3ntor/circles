@@ -16,6 +16,8 @@ export const mouse = {
   y: innerHeight / 2,
 };
 
+export const wallEnd = 105;
+
 export let level = 0;
 export let gameRunning = false;
 export let particles: Particle[];
