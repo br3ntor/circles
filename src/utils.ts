@@ -54,3 +54,10 @@ export function getHSL(hsl: string) {
   const L = parseFloat(hsl.split(",")[2].slice(0, -1));
   return { H, S, L };
 }
+
+/**
+ * Canvas Utilities
+ */
+// export function getRandomX(canvas: HTMLCanvasElement, radius: number, wallEnd: number) {
+
+// }
