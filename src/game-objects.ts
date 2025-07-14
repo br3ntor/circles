@@ -1,6 +1,12 @@
 import resolveCollision from "./elastic-collision.ts";
 import { distance, getHSL } from "./utils.ts";
 import { ParticleProps } from "./types.ts";
+import {
+  OrbitBehavior,
+  RandomMovement,
+  SpiralBehavior,
+  WaveBehavior,
+} from "./particle-behaviors.ts";
 
 /**
  * Particles move through space at a given velocity
@@ -56,8 +62,11 @@ export class Particle {
    * Can I abstract this to smaller
    * particle methods?
    */
+  behavior: (particle: Particle) => void = () => {};
+
   update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
     this.draw(ctx);
+    this.behavior(this);
 
     const hasCollidedWithPlayer = this.detectCollision(
       ctx.canvas,
@@ -68,10 +77,6 @@ export class Particle {
     if (hasCollidedWithPlayer) {
       return true;
     }
-
-    // Set particles to next position
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
 
     // Update color
     if (this.hue >= 360) {
@@ -418,5 +423,373 @@ export class Timer {
   }
   now() {
     return (Date.now() - (this.startTime as Date).getTime()) / 1000;
+  }
+}
+
+/**
+ * THE NEW SHIT DOWN HERE
+ */
+
+export class Vector2 {
+  x: number;
+  y: number;
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+
+  add(other: Vector2) {
+    return new Vector2(this.x + other.x, this.y + other.y);
+  }
+
+  multiply(scalar: number) {
+    return new Vector2(this.x * scalar, this.y * scalar);
+  }
+
+  rotate(angle: number) {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    return new Vector2(
+      this.x * cos - this.y * sin,
+      this.x * sin + this.y * cos
+    );
+  }
+
+  magnitude() {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
+  normalize() {
+    const mag = this.magnitude();
+    return mag > 0
+      ? new Vector2(this.x / mag, this.y / mag)
+      : new Vector2(0, 0);
+  }
+}
+
+export interface ParticleBehavior {
+  update(particle: Particle_2, deltaTime: number, time: number): void;
+}
+
+export interface ParticleOptions {
+  vx?: number;
+  vy?: number;
+  radius?: number;
+  color?: string;
+  life?: number;
+  maxLife?: number;
+  fadeRate?: number;
+  isDynamic?: boolean;
+  behaviors?: ParticleBehavior[];
+  angle?: number;
+  angularVelocity?: number;
+  centerPoint?: Vector2;
+  distance?: number;
+}
+
+export class Particle_2 {
+  position: Vector2;
+  velocity: Vector2;
+  acceleration: Vector2;
+
+  radius: number;
+  color: string;
+  life: number;
+  maxLife: number;
+  fadeRate: number;
+
+  isDynamic: boolean;
+  behaviors: ParticleBehavior[];
+
+  angle: number;
+  angularVelocity: number;
+  centerPoint: Vector2;
+  distance: number;
+
+  constructor(x: number, y: number, options: ParticleOptions = {}) {
+    this.position = new Vector2(x, y);
+    this.velocity = new Vector2(options.vx || 0, options.vy || 0);
+    this.acceleration = new Vector2(0, 0);
+
+    this.radius = options.radius ?? 3;
+    this.color = options.color ?? "#ffffff";
+    this.life = options.life ?? 1.0;
+    this.maxLife = options.maxLife ?? 1.0;
+    this.fadeRate = options.fadeRate ?? 0.01;
+
+    this.isDynamic = options.isDynamic !== false;
+    this.behaviors = options.behaviors ?? [];
+
+    this.angle = options.angle ?? 0;
+    this.angularVelocity = options.angularVelocity ?? 0;
+    this.centerPoint = options.centerPoint ?? new Vector2(x, y);
+    this.distance = options.distance ?? 0;
+  }
+
+  update(deltaTime: number, time: number): void {
+    if (this.isDynamic) {
+      for (const behavior of this.behaviors) {
+        behavior.update(this, deltaTime, time);
+      }
+
+      this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
+      this.position = this.position.add(this.velocity.multiply(deltaTime));
+      this.angle += this.angularVelocity * deltaTime;
+      this.life -= this.fadeRate * deltaTime;
+    }
+  }
+
+  draw(ctx: CanvasRenderingContext2D): void {
+    if (this.life <= 0) return;
+
+    ctx.save();
+    ctx.globalAlpha = this.life;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  isAlive(): boolean {
+    return this.life > 0;
+  }
+}
+
+export class ParticleSystem {
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private particles: Particle_2[];
+  private time: number;
+  private lastTime: number;
+  private isRunning: boolean;
+  private patterns: { [key: string]: () => void };
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Could not get 2D rendering context");
+    }
+    this.ctx = context;
+    this.particles = [];
+    this.time = 0;
+    this.lastTime = 0;
+    this.isRunning = false;
+
+    this.patterns = {
+      random: this.createRandomPattern.bind(this),
+      spiral: this.createSpiralPattern.bind(this),
+      star: this.createStarPattern.bind(this),
+      circle: this.createCirclePattern.bind(this),
+      waves: this.createWavePattern.bind(this),
+      orbit: this.createOrbitPattern.bind(this),
+    };
+  }
+
+  start(): void {
+    this.isRunning = true;
+    this.lastTime = performance.now();
+    this.animate();
+  }
+
+  stop(): void {
+    this.isRunning = false;
+  }
+
+  private animate(): void {
+    if (!this.isRunning) return;
+
+    const currentTime = performance.now();
+    const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
+    this.lastTime = currentTime;
+    this.time += deltaTime;
+
+    this.update(deltaTime);
+    this.draw();
+
+    requestAnimationFrame(() => this.animate());
+  }
+
+  private update(deltaTime: number): void {
+    // Update particles
+    this.particles = this.particles.filter((particle) => {
+      particle.update(deltaTime, this.time);
+      return particle.isAlive();
+    });
+  }
+
+  private draw(): void {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.particles.forEach((particle) => {
+      particle.draw(this.ctx);
+    });
+  }
+
+  addParticle(particle: Particle_2): void {
+    this.particles.push(particle);
+  }
+
+  clearParticles(): void {
+    this.particles = [];
+  }
+
+  createPattern(patternName: string): void {
+    this.clearParticles();
+    if (this.patterns[patternName]) {
+      this.patterns[patternName]();
+    }
+  }
+
+  private createRandomPattern(): void {
+    const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
+
+    for (let i = 0; i < 100; i++) {
+      const particle = new Particle_2(
+        Math.random() * this.canvas.width,
+        Math.random() * this.canvas.height,
+        {
+          vx: (Math.random() - 0.5) * 100,
+          vy: (Math.random() - 0.5) * 100,
+          radius: Math.random() * 5 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          life: 1.0,
+          fadeRate: 0.005,
+          behaviors: [new RandomMovement(30)],
+        }
+      );
+      this.addParticle(particle);
+    }
+  }
+
+  private createSpiralPattern(): void {
+    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1"];
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 20; j++) {
+        const particle = new Particle_2(center.x, center.y, {
+          radius: 4,
+          color: colors[i],
+          life: 1.0,
+          fadeRate: 0,
+          angle: (j / 20) * Math.PI * 2 + (i * Math.PI * 2) / 3,
+          behaviors: [new SpiralBehavior(center, 30 + i * 20, 15, 1 + i * 0.5)],
+        });
+        this.addParticle(particle);
+      }
+    }
+  }
+
+  private createStarPattern(): void {
+    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    const starPoints = 10; // 2 stars with 5 points each
+    const colors = ["#ffdd59", "#ff6b6b"];
+
+    for (let star = 0; star < 2; star++) {
+      for (let i = 0; i < starPoints; i++) {
+        const angle = (i / starPoints) * Math.PI * 2;
+        const radius = star === 0 ? 100 : 150;
+        const rotationSpeed = star === 0 ? 0.5 : -0.3;
+
+        for (let j = 0; j < 8; j++) {
+          const particleRadius = radius * (0.3 + j * 0.1);
+          const particle = new Particle_2(center.x, center.y, {
+            radius: 3,
+            color: colors[star],
+            life: 1.0,
+            fadeRate: 0,
+            angle: angle,
+            behaviors: [
+              new OrbitBehavior(center, particleRadius, rotationSpeed),
+            ],
+          });
+          this.addParticle(particle);
+        }
+      }
+    }
+  }
+
+  private createCirclePattern(): void {
+    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    const colors = ["#4ecdc4", "#45b7d1", "#96ceb4"];
+
+    for (let ring = 0; ring < 3; ring++) {
+      const particleCount = 20 + ring * 10;
+      const radius = 80 + ring * 60;
+      const speed = 0.5 + ring * 0.3;
+
+      for (let i = 0; i < particleCount; i++) {
+        const angle = (i / particleCount) * Math.PI * 2;
+        const particle = new Particle_2(center.x, center.y, {
+          radius: 4 - ring,
+          color: colors[ring],
+          life: 1.0,
+          fadeRate: 0,
+          angle: angle,
+          behaviors: [new OrbitBehavior(center, radius, speed)],
+        });
+        this.addParticle(particle);
+      }
+    }
+  }
+
+  private createWavePattern(): void {
+    const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"];
+
+    for (let wave = 0; wave < 4; wave++) {
+      for (let i = 0; i < 15; i++) {
+        const particle = new Particle_2(i * 60 - 100, 200 + wave * 80, {
+          radius: 4,
+          color: colors[wave],
+          life: 1.0,
+          fadeRate: 0,
+          behaviors: [
+            new WaveBehavior(
+              30 + wave * 10,
+              0.01 + wave * 0.005,
+              50 + wave * 20
+            ),
+          ],
+        });
+        this.addParticle(particle);
+      }
+    }
+  }
+
+  private createOrbitPattern(): void {
+    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    const colors = ["#ffdd59", "#ff6b6b", "#4ecdc4", "#45b7d1"];
+
+    // Central particle
+    const central = new Particle_2(center.x, center.y, {
+      radius: 8,
+      color: "#ffffff",
+      life: 1.0,
+      fadeRate: 0,
+      isDynamic: false,
+    });
+    this.addParticle(central);
+
+    // Orbiting systems
+    for (let system = 0; system < 4; system++) {
+      const systemRadius = 80 + system * 40;
+      const systemSpeed = 0.3 + system * 0.2;
+      const particleCount = 3 + system;
+
+      for (let i = 0; i < particleCount; i++) {
+        const angle = (i / particleCount) * Math.PI * 2;
+        const particle = new Particle_2(center.x, center.y, {
+          radius: 5 - system,
+          color: colors[system],
+          life: 1.0,
+          fadeRate: 0,
+          angle: angle,
+          behaviors: [new OrbitBehavior(center, systemRadius, systemSpeed)],
+        });
+        this.addParticle(particle);
+      }
+    }
   }
 }

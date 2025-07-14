@@ -33,3 +33,11 @@ export type DynamicParticleConfig = {
   dy: () => number; // Or initialDy
   wallCollision: boolean;
 };
+
+export type RotatingParticleGroup = {
+  particles: Particle[];
+  centerX: number;
+  centerY: number;
+  angle: number;
+  rotationSpeed: number;
+};

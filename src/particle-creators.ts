@@ -133,3 +133,36 @@ export function dynamicParticleCreator(
   }
   return particles;
 }
+
+export function starPatternCreator(canvas: HTMLCanvasElement) {
+  const particles = [];
+  const particleRadius = 20;
+  const numLines = 3;
+  const particlesPerLine = 40;
+  const lineLength = 1000;
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  for (let i = 0; i < numLines; i++) {
+    const angle = (i * Math.PI) / numLines;
+    for (let j = 0; j < particlesPerLine; j++) {
+      const distance =
+        (j / (particlesPerLine - 1)) * lineLength - lineLength / 2;
+      const x = centerX + Math.cos(angle) * distance;
+      const y = centerY + Math.sin(angle) * distance;
+
+      const p: ParticleProps = {
+        x: x,
+        y: y,
+        radius: particleRadius,
+        color: getRandomColor(),
+        dx: 0,
+        dy: 0,
+        wallCollision: false,
+      };
+      particles.push(new Particle(p));
+    }
+  }
+
+  return particles;
+}
