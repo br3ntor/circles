@@ -59,6 +59,34 @@ export class Particle {
   update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
     this.draw(ctx);
 
+    const hasCollidedWithPlayer = this.detectCollision(
+      ctx.canvas,
+      particles,
+      player
+    );
+    // If a collision with the player happened, exit early.
+    if (hasCollidedWithPlayer) {
+      return true;
+    }
+
+    // Set particles to next position
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+
+    // Update color
+    if (this.hue >= 360) {
+      this.hue = 0;
+    } else {
+      this.color = `hsl(${this.hue}deg, 100%, 50%)`;
+      this.hue += 0.4;
+    }
+  }
+
+  detectCollision(
+    canvas: HTMLCanvasElement,
+    particles: Particle[],
+    player: Player
+  ) {
     // Loop over particles for collision detection
     for (let i = 0; i < particles.length; i++) {
       // Never compare particle to itself, skips if true.
@@ -84,19 +112,21 @@ export class Particle {
 
     // Particles collide with walls if option set true
     if (this.wallCollision) {
-      if (this.x - this.radius < 0 || this.x + this.radius >= innerWidth) {
+      if (this.x - this.radius < 0 || this.x + this.radius >= canvas.width) {
         this.velocity.x = -this.velocity.x;
       }
-      if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
+      if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
         this.velocity.y = -this.velocity.y;
       }
       // Else the particles come back on other side if they travel offscreen
     } else {
       const space = 0; // Extra space offscreen
-      if (this.x - this.radius > innerWidth + space) this.x = 0 - this.radius;
-      if (this.x + this.radius < 0 - space) this.x = innerWidth + this.radius;
-      if (this.y - this.radius > innerHeight + space) this.y = 0 - this.radius;
-      if (this.y + this.radius < 0 - space) this.y = innerHeight + this.radius;
+      if (this.x - this.radius > canvas.width + space) this.x = 0 - this.radius;
+      if (this.x + this.radius < 0 - space) this.x = canvas.width + this.radius;
+      if (this.y - this.radius > canvas.height + space)
+        this.y = 0 - this.radius;
+      if (this.y + this.radius < 0 - space)
+        this.y = canvas.height + this.radius;
     }
 
     // Player object collision (should I handle in player class?)
@@ -105,22 +135,6 @@ export class Particle {
     if (playerDistance - this.radius - player.radius <= 0) {
       this.opacity = 1;
       return true;
-    }
-
-    // Set particles to next position
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
-
-    // console.log(parseFloat(this.color.slice(4, this.color.indexOf("d"))));
-    // console.log(parseFloat(this.color.slice(4, this.color.indexOf("d"))));
-    // console.log(this.hue);
-
-    // Update color
-    if (this.hue >= 360) {
-      this.hue = 0;
-    } else {
-      this.color = `hsl(${this.hue}deg, 100%, 50%)`;
-      this.hue += 0.4;
     }
   }
 }
