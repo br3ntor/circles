@@ -62,6 +62,20 @@ function drawCurrentState(ctx: CanvasRenderingContext2D) {
   });
 }
 
+/**
+ * Draws a startup message in the center of the screen
+ */
+function drawStartupMessage(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = "white";
+  ctx.font = "26px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(
+    "Click the red circle or press space bar to start the game",
+    canvas.width / 2,
+    canvas.height - 200
+  );
+}
+
 // The animation loop
 export function animate() {
   setFrameRequest(requestAnimationFrame(animate));
@@ -102,6 +116,7 @@ export function animate() {
     ctx.stroke();
     ctx.closePath();
     drawCurrentState(ctx);
+    drawStartupMessage(ctx);
   } else {
     /**
      * Loop through particles array
