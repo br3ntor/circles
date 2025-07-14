@@ -58,6 +58,14 @@ export function getHSL(hsl: string) {
 /**
  * Canvas Utilities
  */
-// export function getRandomX(canvas: HTMLCanvasElement, radius: number, wallEnd: number) {
+export function getRandomX(
+  radius: number,
+  wall: number,
+  canvas: HTMLCanvasElement
+) {
+  return randInt(radius + wall, canvas.width - radius);
+}
 
-// }
+export function getRandomY(radius: number, canvas: HTMLCanvasElement) {
+  return randInt(radius, canvas.height - radius);
+}

@@ -1,67 +1,8 @@
+import { DynamicParticleConfig, ParticleProps } from "./types.ts";
 import { Particle, Guardian } from "./game-objects.ts";
-// import { distance, getRandomColor } from "./utils.ts";
-import { getRandomColor } from "./utils.ts";
-import { ParticleProps } from "./types.ts";
-
-// import { OldParticleConfig } from "./types.ts";
+import { distance, getRandomColor } from "./utils.ts";
 
 const wallEnd = 105;
-
-/**
- * This particle creator will spawn random,
- * non-overlapping cirlces. They will also
- * have random speeds, directions, and colors
- * based on the level object argument.
- *
- * @param Object | config | Methods to create random parameters.
- * @returns Array | An array of randomized particle objects.
- */
-// export function levelCreator(canvas: HTMLCanvasElement, config: ) {
-//   const p = [];
-//   const wallEnd = 105;
-//   const particleCount = config.particleCount();
-
-//   for (let i = 0; i < particleCount; i++) {
-//     const radius = config.radius();
-//     let x = config.x(radius, wallEnd);
-//     let y = config.y(radius);
-//     const dx = config.dx();
-//     const dy = config.dy();
-//     const color = config.color();
-
-//     // Now we will retry
-//     // Skip first generation, only 1 circle
-//     if (i !== 0) {
-//       let retries = 0;
-
-//       // Go over our particles so far
-//       for (let j = 0; j < p.length; j++) {
-//         if (retries > 100) {
-//           console.log("Not enough space for circles!");
-//           break;
-//         }
-
-//         // Check if our new partcile overlaps
-//         const dist = distance(x, y, p[j].x, p[j].y);
-//         if (dist - radius - p[j].radius < 0) {
-//           // If there's an overlap we overwrite x, y to create a new set
-//           x = config.x(radius, wallEnd);
-//           y = config.y(radius);
-
-//           // Reset loop to check if replacement
-//           // circle has overlap itself.
-//           j = -1;
-//           retries++;
-//         }
-//       }
-//     }
-
-//     p.push(
-//       new Particle(x, y, radius, color, dx, dy, config.wallCollision ?? true)
-//     );
-//   }
-//   return p;
-// }
 
 /**
  * Returns an array of guardian circles
@@ -93,10 +34,13 @@ export function guardianCreator(canvas: HTMLCanvasElement) {
  * anything the function doesn't do, really this function
  * Yea could prob just also have a config param
  */
-export function gridPattern(canvas: HTMLCanvasElement) {
+export function gridPattern(
+  canvas: HTMLCanvasElement,
+  config: { radius: number; velocity: { x: number; y: number } }
+) {
   const particles = [];
-  const particleRadius = 30;
-  const gap = particleRadius * 7; // Wider gap for player
+  const particleRadius = config.radius;
+  const gap = particleRadius * 6; // Wider gap for player
   const cols = Math.floor(canvas.width / gap);
   const rows = Math.floor(canvas.height / gap);
   const verticalOffset = gap / 2;
@@ -115,8 +59,8 @@ export function gridPattern(canvas: HTMLCanvasElement) {
         y: y,
         radius: particleRadius,
         color: getRandomColor(),
-        dx: 0,
-        dy: -0.1,
+        dx: config.velocity.x,
+        dy: config.velocity.y,
         wallCollision: false,
       };
       const p = new Particle(c);
@@ -126,24 +70,66 @@ export function gridPattern(canvas: HTMLCanvasElement) {
   return particles;
 }
 
-// import { Level, ParticleConfig } from "./types.ts";
-
 /**
- * Creates an array of particles from a level blueprint.
+ * This particle creator will spawn particles
+ * with dynamically created particle properties.
  *
- * @param {Level} blueprint - The level blueprint to use.
- * @returns {Particle[]} An array of particle objects.
+ * @param Object | config | Methods to create dynamic parameters.
+ * @returns Array | An array of dynamic particle objects.
  */
-// export function createParticlesFromBlueprint(blueprint: Level): Particle[] {
-//   return blueprint.particles.map((p) => {
-//     return new Particle(
-//       p.x,
-//       p.y,
-//       p.radius,
-//       p.color,
-//       p.dx,
-//       p.dy,
-//       p.wallCollision
-//     );
-//   });
-// }
+export function dynamicParticleCreator(
+  canvas: HTMLCanvasElement,
+  config: DynamicParticleConfig
+) {
+  const particles = [];
+  const particleCount = config.particleCount();
+
+  for (let i = 0; i < particleCount; i++) {
+    const radius = config.radius();
+    let x = config.x(radius, wallEnd, canvas);
+    let y = config.y(radius, canvas);
+    const dx = config.dx();
+    const dy = config.dy();
+    const color = config.color();
+
+    // Now we will retry
+    // Skip first generation, only 1 circle
+    if (i !== 0) {
+      let retries = 0;
+
+      // Go over our particles so far
+      for (let j = 0; j < particles.length; j++) {
+        if (retries > 100) {
+          console.log("Not enough space for circles!");
+          break;
+        }
+
+        // Check if our new partcile overlaps
+        const dist = distance(x, y, particles[j].x, particles[j].y);
+        if (dist - radius - particles[j].radius < 0) {
+          // If there's an overlap we overwrite x, y to create a new set
+          x = config.x(radius, wallEnd, canvas);
+          y = config.y(radius, canvas);
+
+          // Reset loop to check if replacement
+          // circle has overlap itself.
+          j = -1;
+          retries++;
+        }
+      }
+    }
+
+    particles.push(
+      new Particle({
+        x,
+        y,
+        radius,
+        color,
+        dx,
+        dy,
+        wallCollision: config.wallCollision,
+      })
+    );
+  }
+  return particles;
+}

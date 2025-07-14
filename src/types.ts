@@ -19,15 +19,17 @@ export type ParticleProps = {
 
 export type Level = {
   title: string;
-  particles: Particle[];
+  particles: () => Particle[];
 };
 
-export type ParticleConfig = {
+export type DynamicParticleConfig = {
+  title: string;
   particleCount: () => number;
-  x: (radius: number, wall: number) => number;
-  y: (radius: number) => number;
+  x: (radius: number, wall: number, canvas: HTMLCanvasElement) => number;
+  y: (radius: number, canvas: HTMLCanvasElement) => number;
   radius: () => number;
   color: () => string;
   dx: () => number; // Or initialDx
   dy: () => number; // Or initialDy
+  wallCollision: boolean;
 };

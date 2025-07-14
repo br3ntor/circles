@@ -25,8 +25,8 @@ import { randInt } from "./utils";
 // Sets game state and all objects to starting setup
 export function init() {
   // Setup level particles
-  const startingLevel = levelSet[0];
-  setParticles(startingLevel.particles);
+  const currentLevel = levelSet[level];
+  setParticles(currentLevel.particles());
   setGuardians(guardianCreator(canvas));
 
   // Create player object
