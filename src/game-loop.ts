@@ -1,4 +1,4 @@
-import { Goal, Player } from "./game-objects";
+import { Goal, ParticleSystem, Player } from "./game-objects";
 import { guardianCreator } from "./particle-creators";
 import { levelSet } from "./levels";
 import {
@@ -21,13 +21,39 @@ import {
   setLevel,
 } from "./game-state";
 import { randInt } from "./utils";
+import { rotationBehavior, velocityBehavior } from "./particle-behaviors";
 
 // Sets game state and all objects to starting setup
 export function init() {
+  const particleSystem = new ParticleSystem(canvas);
+  particleSystem.start();
+
+  // Global functions for buttons
+  function showPattern(patternName: string) {
+    particleSystem.createPattern(patternName);
+  }
+
+  function clearParticles() {
+    particleSystem.clearParticles();
+  }
+
+  // Start with a demo pattern
+  showPattern("spiral");
   // Setup level particles
   const currentLevel = levelSet[level];
   setParticles(currentLevel.particles());
   setGuardians(guardianCreator(canvas));
+
+  if (currentLevel.title === "Star Pattern") {
+    const rotation = rotationBehavior(
+      canvas.width / 2,
+      canvas.height / 2,
+      0.01
+    );
+    particles.forEach((p) => (p.behavior = rotation));
+  } else {
+    particles.forEach((p) => (p.behavior = velocityBehavior));
+  }
 
   // Create player object
   const pR = 30;
