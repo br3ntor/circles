@@ -69,3 +69,13 @@ export function getRandomX(
 export function getRandomY(radius: number, canvas: HTMLCanvasElement) {
   return randInt(radius, canvas.height - radius);
 }
+
+/**
+ * Returns a random integer between min and max, inclusive.
+ * The distribution is weighted towards the minimum value.
+ */
+export function randIntLow(min: number, max: number) {
+  // Using Math.pow with a higher exponent further skews the distribution towards 0.
+  const r = Math.pow(Math.random(), 10);
+  return Math.floor(r * (max - min + 1) + min);
+}

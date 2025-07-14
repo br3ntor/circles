@@ -1,12 +1,19 @@
-import { balls, niceColor, randInt, getRandomX, getRandomY } from "./utils";
+import {
+  balls,
+  niceColor,
+  randInt,
+  getRandomX,
+  getRandomY,
+  randIntLow,
+} from "./utils";
 import { DynamicParticleConfig } from "./types";
 
 export const dynamicConfigs: DynamicParticleConfig[] = [
   {
     title: "Red",
     wallCollision: false,
-    particleCount: () => balls(),
-    radius: () => 20,
+    particleCount: () => balls() + 20,
+    radius: () => randIntLow(20, 150),
     x: getRandomX,
     y: getRandomY,
     dx: () => -1,
