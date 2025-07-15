@@ -39,6 +39,8 @@ export class Game {
     this.particleSystem.clearParticles();
     this.player = new Player(50, this.player.y, 30, "red");
     this.gameRunning = false;
+    this.particleSystem.createPattern("random");
+
     this.start();
   }
 
@@ -47,6 +49,7 @@ export class Game {
     this.animate();
   }
 
+  // Main loop
   animate() {
     const now = performance.now();
     const deltaTime = (now - this.lastTime) / 1000;

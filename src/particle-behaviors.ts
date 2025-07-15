@@ -1,30 +1,30 @@
 import {
-  Particle,
+  // Particle,
   Particle_2,
   ParticleBehavior,
   Vector2,
 } from "./game-objects";
 
-export function rotationBehavior(
-  centerX: number,
-  centerY: number,
-  rotationSpeed: number
-): (particle: Particle) => void {
-  return function (particle: Particle) {
-    const dx = particle.x - centerX;
-    const dy = particle.y - centerY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const originalAngle = Math.atan2(dy, dx);
-    const newAngle = originalAngle + rotationSpeed;
-    particle.x = centerX + Math.cos(newAngle) * distance;
-    particle.y = centerY + Math.sin(newAngle) * distance;
-  };
-}
+// export function rotationBehavior(
+//   centerX: number,
+//   centerY: number,
+//   rotationSpeed: number
+// ): (particle: Particle) => void {
+//   return function (particle: Particle) {
+//     const dx = particle.x - centerX;
+//     const dy = particle.y - centerY;
+//     const distance = Math.sqrt(dx * dx + dy * dy);
+//     const originalAngle = Math.atan2(dy, dx);
+//     const newAngle = originalAngle + rotationSpeed;
+//     particle.x = centerX + Math.cos(newAngle) * distance;
+//     particle.y = centerY + Math.sin(newAngle) * distance;
+//   };
+// }
 
-export function velocityBehavior(particle: Particle) {
-  particle.x += particle.velocity.x;
-  particle.y += particle.velocity.y;
-}
+// export function velocityBehavior(particle: Particle) {
+//   particle.x += particle.velocity.x;
+//   particle.y += particle.velocity.y;
+// }
 
 export class RandomMovement implements ParticleBehavior {
   intensity: number;
