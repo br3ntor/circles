@@ -4,7 +4,7 @@ import { setupEventListeners } from "./event-listeners";
 
 function startGame() {
   const game = new Game();
-  game.start();
+  game.draw();
   setupEventListeners(game);
 }
 

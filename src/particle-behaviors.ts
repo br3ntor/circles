@@ -4,6 +4,8 @@ import {
   ParticleBehavior,
   Vector2,
 } from "./game-objects";
+import { distance } from "./utils";
+import resolveCollision from "./elastic-collision";
 
 // export function rotationBehavior(
 //   centerX: number,
@@ -118,6 +120,83 @@ export class WaveBehavior implements ParticleBehavior {
     // Wrap around screen
     if (particle.position.x > 850) {
       particle.position.x = -50;
+    }
+  }
+}
+
+export class CollisionBehavior implements ParticleBehavior {
+  particles: Particle_2[];
+
+  constructor(particles: Particle_2[]) {
+    this.particles = particles;
+  }
+
+  update(particle: Particle_2): void {
+    for (let i = 0; i < this.particles.length; i++) {
+      const otherParticle = this.particles[i];
+      if (particle === otherParticle) continue;
+
+      const dist = distance(
+        particle.position.x,
+        particle.position.y,
+        otherParticle.position.x,
+        otherParticle.position.y
+      );
+
+      if (dist - particle.radius - otherParticle.radius < 0) {
+        resolveCollision(particle, otherParticle);
+        // Light up particles on collision
+        particle.opacity = 0.6;
+        otherParticle.opacity = 0.6;
+      }
+    }
+
+    // Reset back to transparent after collision
+    if (particle.opacity > 0.02) {
+      particle.opacity -= 0.02;
+      particle.opacity = Math.max(0, particle.opacity);
+    }
+  }
+}
+
+export type WallBehaviorMode = "collide" | "wrap";
+
+export class WallBehavior implements ParticleBehavior {
+  canvas: HTMLCanvasElement;
+  mode: WallBehaviorMode;
+
+  constructor(canvas: HTMLCanvasElement, mode: WallBehaviorMode = "collide") {
+    this.canvas = canvas;
+    this.mode = mode;
+  }
+
+  update(particle: Particle_2): void {
+    if (this.mode === "collide") {
+      if (
+        particle.position.x - particle.radius < 0 ||
+        particle.position.x + particle.radius > this.canvas.width
+      ) {
+        particle.velocity.x = -particle.velocity.x;
+      }
+      if (
+        particle.position.y - particle.radius < 0 ||
+        particle.position.y + particle.radius > this.canvas.height
+      ) {
+        particle.velocity.y = -particle.velocity.y;
+      }
+    } else if (this.mode === "wrap") {
+      if (particle.position.x - particle.radius > this.canvas.width) {
+        particle.position.x = -particle.radius;
+      }
+      if (particle.position.x + particle.radius < 0) {
+        particle.position.x = this.canvas.width + particle.radius;
+      }
+      if (particle.position.y - particle.radius > this.canvas.height) {
+        particle.position.y = -particle.radius;
+      }
+      if (particle.position.y + particle.radius < 0) {
+        particle.position.y = this.canvas.height + particle.radius;
+      }
     }
   }
 }

@@ -31,7 +31,51 @@ export class Game {
     this.frameRequest = 0;
     this.time = 0;
     this.lastTime = 0;
-    this.particleSystem.createPattern("random");
+    this.setupControls();
+    this.recreateSystem();
+  }
+
+  setupControls() {
+    const patternSelector = document.createElement("select");
+    patternSelector.style.position = "absolute";
+    patternSelector.style.top = "10px";
+    patternSelector.style.left = "10px";
+    document.body.appendChild(patternSelector);
+
+    const patterns = ["random", "spiral", "star", "circle", "waves", "orbit"];
+    for (const pattern of patterns) {
+      const option = document.createElement("option");
+      option.value = pattern;
+      option.text = pattern;
+      patternSelector.appendChild(option);
+    }
+    patternSelector.addEventListener("change", () => this.recreateSystem());
+
+    const wallBehaviorSelector = document.createElement("select");
+    wallBehaviorSelector.style.position = "absolute";
+    wallBehaviorSelector.style.top = "40px";
+    wallBehaviorSelector.style.left = "10px";
+    document.body.appendChild(wallBehaviorSelector);
+
+    const wallBehaviors = ["collide", "wrap", "none"];
+    for (const behavior of wallBehaviors) {
+      const option = document.createElement("option");
+      option.value = behavior;
+      option.text = behavior;
+      wallBehaviorSelector.appendChild(option);
+    }
+    wallBehaviorSelector.addEventListener("change", () =>
+      this.recreateSystem()
+    );
+  }
+
+  recreateSystem() {
+    const patternSelector = document.querySelector("select");
+    const wallBehaviorSelector = document.querySelectorAll("select")[1];
+    const pattern = patternSelector?.value || "random";
+    const wallBehavior =
+      (wallBehaviorSelector?.value as "collide" | "wrap" | "none") || "collide";
+    this.particleSystem.createPattern(pattern, wallBehavior);
   }
 
   reset() {
@@ -39,9 +83,11 @@ export class Game {
     this.particleSystem.clearParticles();
     this.player = new Player(50, this.player.y, 30, "red");
     this.gameRunning = false;
-    this.particleSystem.createPattern("random");
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.start();
+    this.recreateSystem();
+
+    this.draw();
   }
 
   start() {

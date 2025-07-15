@@ -30,12 +30,16 @@ export function setupEventListeners(game: Game) {
     // If click happens within radius of player circle, set wall to false
     if (clickDistance < game.player.radius) {
       game.gameRunning = true;
+      game.start();
     }
   });
 
   addEventListener("keydown", (event) => {
     if (event.key === " " || event.code === "Space") {
-      if (!game.gameRunning) game.gameRunning = true;
+      if (!game.gameRunning) {
+        game.gameRunning = true;
+        game.start();
+      }
     }
   });
 
