@@ -344,6 +344,17 @@ export class Player {
       Math.min(innerHeight - this.radius, this.y)
     );
   }
+
+  detectCollision(particles: Particle_2[]): boolean {
+    for (const particle of particles) {
+      const dist = distance(this.x, this.y, particle.x, particle.y);
+      if (dist - this.radius - particle.radius < 0) {
+        particle.opacity = 1;
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 export class Goal {
@@ -496,7 +507,6 @@ export class Particle_2 {
   position: Vector2;
   velocity: Vector2;
   acceleration: Vector2;
-
   radius: number;
   color: string;
   life: number;
@@ -623,6 +633,10 @@ export class ParticleSystem {
     this.particles = [];
   }
 
+  getParticles(): Particle_2[] {
+    return this.particles;
+  }
+
   createPattern(
     patternName: string,
     wallBehaviorMode: "collide" | "wrap" | "none" = "collide"
@@ -640,28 +654,42 @@ export class ParticleSystem {
 
     for (let i = 0; i < 10; i++) {
       const behaviors: ParticleBehavior[] = [
-        // new RandomMovement(1000),
         new CollisionBehavior(this.particles),
       ];
       if (wallBehaviorMode !== "none") {
         behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
       }
-      const r = Math.random() * 5 + 120;
-      const particle = new Particle_2(
-        getRandomX(r, 105, this.canvas),
-        getRandomY(r, this.canvas),
-        // Math.random() * this.canvas.width,
-        // Math.random() * this.canvas.height,
-        {
-          vx: (Math.random() - 0.5) * 100,
-          vy: (Math.random() - 0.5) * 100,
-          radius: Math.random() * 5 + 120,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          life: 1.0,
-          fadeRate: 0,
-          behaviors,
+
+      const radius = Math.random() * 5 + 120;
+      let x = getRandomX(radius, 105, this.canvas);
+      let y = getRandomY(radius, this.canvas);
+
+      if (i !== 0) {
+        let retries = 0;
+        for (let j = 0; j < this.particles.length; j++) {
+          if (retries > 100) {
+            console.log("Not enough space for circles!");
+            break;
+          }
+          const dist = distance(x, y, this.particles[j].x, this.particles[j].y);
+          if (dist - radius - this.particles[j].radius < 0) {
+            x = getRandomX(radius, 105, this.canvas);
+            y = getRandomY(radius, this.canvas);
+            j = -1; // restart the check
+            retries++;
+          }
         }
-      );
+      }
+
+      const particle = new Particle_2(x, y, {
+        vx: (Math.random() - 0.5) * 100,
+        vy: (Math.random() - 0.5) * 100,
+        radius,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1.0,
+        fadeRate: 0,
+        behaviors,
+      });
       this.addParticle(particle);
     }
   }
