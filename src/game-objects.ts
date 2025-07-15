@@ -360,6 +360,7 @@ export class Goal {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    ctx.lineWidth = 1;
     if (this.fill === true) {
       ctx.fillStyle = "#7bf977";
       ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -497,54 +498,45 @@ export class Particle_2 {
   life: number;
   maxLife: number;
   fadeRate: number;
-
   isDynamic: boolean;
   behaviors: ParticleBehavior[];
-
   angle: number;
   angularVelocity: number;
-  centerPoint: Vector2;
-  distance: number;
+  centerPoint?: Vector2;
+  distance?: number;
 
   constructor(x: number, y: number, options: ParticleOptions = {}) {
     this.position = new Vector2(x, y);
-    this.velocity = new Vector2(options.vx || 0, options.vy || 0);
+    this.velocity = new Vector2(options.vx, options.vy);
     this.acceleration = new Vector2(0, 0);
-
-    this.radius = options.radius ?? 3;
-    this.color = options.color ?? "#ffffff";
-    this.life = options.life ?? 1.0;
-    this.maxLife = options.maxLife ?? 1.0;
+    this.radius = options.radius ?? 10;
+    this.color = options.color ?? "white";
+    this.life = options.life ?? 1;
+    this.maxLife = options.maxLife ?? 1;
     this.fadeRate = options.fadeRate ?? 0.01;
-
-    this.isDynamic = options.isDynamic !== false;
+    this.isDynamic = options.isDynamic ?? false;
     this.behaviors = options.behaviors ?? [];
-
     this.angle = options.angle ?? 0;
     this.angularVelocity = options.angularVelocity ?? 0;
-    this.centerPoint = options.centerPoint ?? new Vector2(x, y);
-    this.distance = options.distance ?? 0;
+    this.centerPoint = options.centerPoint;
+    this.distance = options.distance;
   }
 
   update(deltaTime: number, time: number): void {
-    if (this.isDynamic) {
-      for (const behavior of this.behaviors) {
-        behavior.update(this, deltaTime, time);
-      }
+    this.life -= this.fadeRate;
 
-      this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
-      this.position = this.position.add(this.velocity.multiply(deltaTime));
-      this.angle += this.angularVelocity * deltaTime;
-      this.life -= this.fadeRate * deltaTime;
-    }
+    this.behaviors.forEach((behavior) =>
+      behavior.update(this, deltaTime, time)
+    );
+
+    this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
+    this.position = this.position.add(this.velocity.multiply(deltaTime));
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    if (this.life <= 0) return;
-
     ctx.save();
-    ctx.globalAlpha = this.life;
     ctx.fillStyle = this.color;
+    ctx.globalAlpha = Math.max(0, this.life);
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -558,25 +550,12 @@ export class Particle_2 {
 
 export class ParticleSystem {
   private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
   private particles: Particle_2[];
-  private time: number;
-  private lastTime: number;
-  private isRunning: boolean;
   private patterns: { [key: string]: () => void };
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    const context = canvas.getContext("2d");
-    if (!context) {
-      throw new Error("Could not get 2D rendering context");
-    }
-    this.ctx = context;
     this.particles = [];
-    this.time = 0;
-    this.lastTime = 0;
-    this.isRunning = false;
-
     this.patterns = {
       random: this.createRandomPattern.bind(this),
       spiral: this.createSpiralPattern.bind(this),
@@ -587,43 +566,17 @@ export class ParticleSystem {
     };
   }
 
-  start(): void {
-    this.isRunning = true;
-    this.lastTime = performance.now();
-    this.animate();
-  }
-
-  stop(): void {
-    this.isRunning = false;
-  }
-
-  private animate(): void {
-    if (!this.isRunning) return;
-
-    const currentTime = performance.now();
-    const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
-    this.lastTime = currentTime;
-    this.time += deltaTime;
-
-    this.update(deltaTime);
-    this.draw();
-
-    requestAnimationFrame(() => this.animate());
-  }
-
-  private update(deltaTime: number): void {
+  update(deltaTime: number, time: number): void {
     // Update particles
     this.particles = this.particles.filter((particle) => {
-      particle.update(deltaTime, this.time);
+      particle.update(deltaTime, time);
       return particle.isAlive();
     });
   }
 
-  private draw(): void {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
+  draw(ctx: CanvasRenderingContext2D): void {
     this.particles.forEach((particle) => {
-      particle.draw(this.ctx);
+      particle.draw(ctx);
     });
   }
 
@@ -655,8 +608,7 @@ export class ParticleSystem {
           radius: Math.random() * 5 + 2,
           color: colors[Math.floor(Math.random() * colors.length)],
           life: 1.0,
-          fadeRate: 0.005,
-          behaviors: [new RandomMovement(30)],
+          fadeRate: 0,
         }
       );
       this.addParticle(particle);
@@ -664,132 +616,126 @@ export class ParticleSystem {
   }
 
   private createSpiralPattern(): void {
-    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
-    const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1"];
+    const numParticles = 200;
+    const spiralDensity = 0.5;
+    const angleStep = (Math.PI * 2) / 50;
 
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 20; j++) {
-        const particle = new Particle_2(center.x, center.y, {
-          radius: 4,
-          color: colors[i],
-          life: 1.0,
-          fadeRate: 0,
-          angle: (j / 20) * Math.PI * 2 + (i * Math.PI * 2) / 3,
-          behaviors: [new SpiralBehavior(center, 30 + i * 20, 15, 1 + i * 0.5)],
-        });
-        this.addParticle(particle);
-      }
+    for (let i = 0; i < numParticles; i++) {
+      const angle = i * angleStep;
+      const distance = i * spiralDensity;
+      const x = this.canvas.width / 2 + Math.cos(angle) * distance;
+      const y = this.canvas.height / 2 + Math.sin(angle) * distance;
+
+      const particle = new Particle_2(x, y, {
+        radius: 3,
+        color: `hsl(${i * 2}, 100%, 50%)`,
+        life: 2.0,
+        fadeRate: 0.005,
+        behaviors: [
+          new SpiralBehavior(
+            new Vector2(this.canvas.width / 2, this.canvas.height / 2),
+            0.5,
+            0.01
+          ),
+        ],
+      });
+      this.addParticle(particle);
     }
   }
 
   private createStarPattern(): void {
-    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
-    const starPoints = 10; // 2 stars with 5 points each
-    const colors = ["#ffdd59", "#ff6b6b"];
+    const numParticles = 100;
+    const numArms = 5;
+    const armLength = 200;
 
-    for (let star = 0; star < 2; star++) {
-      for (let i = 0; i < starPoints; i++) {
-        const angle = (i / starPoints) * Math.PI * 2;
-        const radius = star === 0 ? 100 : 150;
-        const rotationSpeed = star === 0 ? 0.5 : -0.3;
+    for (let i = 0; i < numParticles; i++) {
+      const armIndex = i % numArms;
+      const angle = (armIndex * (Math.PI * 2)) / numArms;
+      const distance = (i / numParticles) * armLength;
+      const x = this.canvas.width / 2 + Math.cos(angle) * distance;
+      const y = this.canvas.height / 2 + Math.sin(angle) * distance;
 
-        for (let j = 0; j < 8; j++) {
-          const particleRadius = radius * (0.3 + j * 0.1);
-          const particle = new Particle_2(center.x, center.y, {
-            radius: 3,
-            color: colors[star],
-            life: 1.0,
-            fadeRate: 0,
-            angle: angle,
-            behaviors: [
-              new OrbitBehavior(center, particleRadius, rotationSpeed),
-            ],
-          });
-          this.addParticle(particle);
-        }
-      }
+      const particle = new Particle_2(x, y, {
+        radius: 2,
+        color: "white",
+        life: 1.5,
+        fadeRate: 0.01,
+      });
+      this.addParticle(particle);
     }
   }
 
   private createCirclePattern(): void {
-    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
-    const colors = ["#4ecdc4", "#45b7d1", "#96ceb4"];
+    const numParticles = 100;
+    const radius = 150;
 
-    for (let ring = 0; ring < 3; ring++) {
-      const particleCount = 20 + ring * 10;
-      const radius = 80 + ring * 60;
-      const speed = 0.5 + ring * 0.3;
+    for (let i = 0; i < numParticles; i++) {
+      const angle = (i / numParticles) * (Math.PI * 2);
+      const x = this.canvas.width / 2 + Math.cos(angle) * radius;
+      const y = this.canvas.height / 2 + Math.sin(angle) * radius;
 
-      for (let i = 0; i < particleCount; i++) {
-        const angle = (i / particleCount) * Math.PI * 2;
-        const particle = new Particle_2(center.x, center.y, {
-          radius: 4 - ring,
-          color: colors[ring],
-          life: 1.0,
-          fadeRate: 0,
-          angle: angle,
-          behaviors: [new OrbitBehavior(center, radius, speed)],
-        });
-        this.addParticle(particle);
-      }
+      const particle = new Particle_2(x, y, {
+        radius: 4,
+        color: `hsl(${(i / numParticles) * 360}, 100%, 50%)`,
+        life: 3.0,
+        fadeRate: 0.003,
+        behaviors: [
+          new OrbitBehavior(
+            new Vector2(this.canvas.width / 2, this.canvas.height / 2),
+            radius,
+            0.01
+          ),
+        ],
+      });
+      this.addParticle(particle);
     }
   }
 
   private createWavePattern(): void {
-    const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4"];
+    const numParticles = 200;
+    const waveAmplitude = 100;
+    const waveFrequency = 0.1;
 
-    for (let wave = 0; wave < 4; wave++) {
-      for (let i = 0; i < 15; i++) {
-        const particle = new Particle_2(i * 60 - 100, 200 + wave * 80, {
-          radius: 4,
-          color: colors[wave],
-          life: 1.0,
-          fadeRate: 0,
-          behaviors: [
-            new WaveBehavior(
-              30 + wave * 10,
-              0.01 + wave * 0.005,
-              50 + wave * 20
-            ),
-          ],
-        });
-        this.addParticle(particle);
-      }
+    for (let i = 0; i < numParticles; i++) {
+      const x = (i / numParticles) * this.canvas.width;
+      const y =
+        this.canvas.height / 2 + Math.sin(i * waveFrequency) * waveAmplitude;
+
+      const particle = new Particle_2(x, y, {
+        radius: 3,
+        color: `hsl(${(i / numParticles) * 360}, 100%, 50%)`,
+        life: 2.5,
+        fadeRate: 0.008,
+        behaviors: [new WaveBehavior(waveAmplitude, waveFrequency)],
+      });
+      this.addParticle(particle);
     }
   }
 
   private createOrbitPattern(): void {
-    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
-    const colors = ["#ffdd59", "#ff6b6b", "#4ecdc4", "#45b7d1"];
+    const numParticles = 50;
+    const center_x = this.canvas.width / 2;
+    const center_y = this.canvas.height / 2;
 
-    // Central particle
-    const central = new Particle_2(center.x, center.y, {
-      radius: 8,
-      color: "#ffffff",
-      life: 1.0,
-      fadeRate: 0,
-      isDynamic: false,
-    });
-    this.addParticle(central);
+    for (let i = 0; i < numParticles; i++) {
+      const distance = Math.random() * 150 + 50;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 0.02 + 0.01;
 
-    // Orbiting systems
-    for (let system = 0; system < 4; system++) {
-      const systemRadius = 80 + system * 40;
-      const systemSpeed = 0.3 + system * 0.2;
-      const particleCount = 3 + system;
-
-      for (let i = 0; i < particleCount; i++) {
-        const angle = (i / particleCount) * Math.PI * 2;
-        const particle = new Particle_2(center.x, center.y, {
-          radius: 5 - system,
-          color: colors[system],
-          life: 1.0,
-          fadeRate: 0,
-          angle: angle,
-          behaviors: [new OrbitBehavior(center, systemRadius, systemSpeed)],
-        });
-        this.addParticle(particle);
-      }
+      const particle = new Particle_2(
+        center_x + Math.cos(angle) * distance,
+        center_y + Math.sin(angle) * distance,
+        {
+          radius: 2,
+          color: "white",
+          life: 4.0,
+          fadeRate: 0.002,
+          behaviors: [
+            new OrbitBehavior(new Vector2(center_x, center_y), distance, speed),
+          ],
+        }
+      );
+      this.addParticle(particle);
     }
   }
 }

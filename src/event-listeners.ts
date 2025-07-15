@@ -1,25 +1,18 @@
-import { init } from "./game-loop";
-import {
-  canvas,
-  mouse,
-  player,
-  gameRunning,
-  setGameRunning,
-} from "./game-state";
+import { Game } from "./game";
 import { distance } from "./utils";
 
-export function setupEventListeners() {
+export function setupEventListeners(game: Game) {
   // Updates mouse state
   addEventListener("mousemove", (event: MouseEvent) => {
-    mouse.x = event.clientX;
-    mouse.y = event.clientY;
+    game.mouse.x = event.clientX;
+    game.mouse.y = event.clientY;
   });
 
   // Resizing resets game
   addEventListener("resize", () => {
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-    init();
+    game.canvas.width = innerWidth;
+    game.canvas.height = innerHeight;
+    game.reset();
   });
 
   /**
@@ -30,39 +23,21 @@ export function setupEventListeners() {
     const clickDistance = distance(
       event.clientX,
       event.clientY,
-      player!.x,
-      player!.y
+      game.player.x,
+      game.player.y
     );
 
     // If click happens within radius of player circle, set wall to false
-    if (clickDistance < player!.radius) {
-      setGameRunning(true);
+    if (clickDistance < game.player.radius) {
+      game.gameRunning = true;
     }
-
-    /**
-     * Starting some particle manipulation functions
-     * triggered at the start game event
-     */
-
-    // changeParticlesSequential(particles);
-    // changeParticlesConcurrent(particles);
   });
 
   addEventListener("keydown", (event) => {
     if (event.key === " " || event.code === "Space") {
-      if (!gameRunning) setGameRunning(true);
+      if (!game.gameRunning) game.gameRunning = true;
     }
   });
-
-  /**
-   * Events to add a mouse boost
-   */
-  // addEventListener("mousedown", () => {
-  //   if (player !== null) player.speed = 5;
-  // });
-  // addEventListener("mouseup", () => {
-  //   if (player !== null) player.speed = 2;
-  // }); // Not sure how if i should use these, maybe as power ups or only for certain level set?
 
   /**
    * Right click event.
@@ -70,6 +45,6 @@ export function setupEventListeners() {
    */
   addEventListener("contextmenu", (event: MouseEvent) => {
     event.preventDefault();
-    init();
+    game.reset();
   });
 }
