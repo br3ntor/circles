@@ -13,272 +13,272 @@ import {
  * until they collide with a wall, another particle,
  * or the player. Or perhaps manipulated with a function.
  */
-export class Particle {
-  x: number;
-  y: number;
-  radius: number;
-  color: string;
-  hue: number;
-  velocity: { x: number; y: number };
-  wallCollision: boolean;
-  mass: number;
-  opacity: number;
+// export class Particle {
+//   x: number;
+//   y: number;
+//   radius: number;
+//   color: string;
+//   hue: number;
+//   velocity: { x: number; y: number };
+//   wallCollision: boolean;
+//   mass: number;
+//   opacity: number;
 
-  constructor(config: ParticleProps) {
-    this.x = config.x;
-    this.y = config.y;
-    this.radius = config.radius;
-    this.color = config.color;
-    this.hue = parseFloat(this.color.slice(4, this.color.indexOf("d")));
-    this.velocity = {
-      x: config.dx,
-      y: config.dy,
-    };
-    this.wallCollision = config.wallCollision;
-    this.mass = 1; // Used in elastic collision
-    this.opacity = 0.2;
-  }
+//   constructor(config: ParticleProps) {
+//     this.x = config.x;
+//     this.y = config.y;
+//     this.radius = config.radius;
+//     this.color = config.color;
+//     this.hue = parseFloat(this.color.slice(4, this.color.indexOf("d")));
+//     this.velocity = {
+//       x: config.dx,
+//       y: config.dy,
+//     };
+//     this.wallCollision = config.wallCollision;
+//     this.mass = 1; // Used in elastic collision
+//     this.opacity = 0.2;
+//   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.lineWidth = 2;
-    ctx.fillStyle = this.color;
+//   draw(ctx: CanvasRenderingContext2D) {
+//     ctx.beginPath();
+//     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+//     ctx.lineWidth = 2;
+//     ctx.fillStyle = this.color;
 
-    ctx.save();
-    ctx.globalAlpha = this.opacity;
-    ctx.fill();
-    ctx.restore();
+//     ctx.save();
+//     ctx.globalAlpha = this.opacity;
+//     ctx.fill();
+//     ctx.restore();
 
-    ctx.strokeStyle = this.color;
-    ctx.stroke();
-    ctx.closePath();
-  }
+//     ctx.strokeStyle = this.color;
+//     ctx.stroke();
+//     ctx.closePath();
+//   }
 
-  /**
-   * Propells particles through space
-   * Collision with other particles,
-   * optional wall collision
-   * Can I abstract this to smaller
-   * particle methods?
-   */
-  behavior: (particle: Particle) => void = () => {};
+//   /**
+//    * Propells particles through space
+//    * Collision with other particles,
+//    * optional wall collision
+//    * Can I abstract this to smaller
+//    * particle methods?
+//    */
+//   behavior: (particle: Particle) => void = () => {};
 
-  update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
-    this.draw(ctx);
-    this.behavior(this);
+//   update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
+//     this.draw(ctx);
+//     this.behavior(this);
 
-    const hasCollidedWithPlayer = this.detectCollision(
-      ctx.canvas,
-      particles,
-      player
-    );
-    // If a collision with the player happened, exit early.
-    if (hasCollidedWithPlayer) {
-      return true;
-    }
+//     const hasCollidedWithPlayer = this.detectCollision(
+//       ctx.canvas,
+//       particles,
+//       player
+//     );
+//     // If a collision with the player happened, exit early.
+//     if (hasCollidedWithPlayer) {
+//       return true;
+//     }
 
-    // Update color
-    if (this.hue >= 360) {
-      this.hue = 0;
-    } else {
-      this.color = `hsl(${this.hue}deg, 100%, 50%)`;
-      this.hue += 0.4;
-    }
-  }
+//     // Update color
+//     if (this.hue >= 360) {
+//       this.hue = 0;
+//     } else {
+//       this.color = `hsl(${this.hue}deg, 100%, 50%)`;
+//       this.hue += 0.4;
+//     }
+//   }
 
-  detectCollision(
-    canvas: HTMLCanvasElement,
-    particles: Particle[],
-    player: Player
-  ) {
-    // Loop over particles for collision detection
-    for (let i = 0; i < particles.length; i++) {
-      // Never compare particle to itself, skips if true.
-      if (this === particles[i]) continue;
+//   detectCollision(
+//     canvas: HTMLCanvasElement,
+//     particles: Particle[],
+//     player: Player
+//   ) {
+//     // Loop over particles for collision detection
+//     for (let i = 0; i < particles.length; i++) {
+//       // Never compare particle to itself, skips if true.
+//       if (this === particles[i]) continue;
 
-      const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
+//       const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
 
-      if (dist - this.radius - particles[i].radius < 0) {
-        // Elastic collision
-        resolveCollision(this, particles[i]);
+//       if (dist - this.radius - particles[i].radius < 0) {
+//         // Elastic collision
+//         resolveCollision(this, particles[i]);
 
-        // Light up particles on collision
-        this.opacity = 0.6;
-        particles[i].opacity = 0.6;
-      }
-    }
+//         // Light up particles on collision
+//         this.opacity = 0.6;
+//         particles[i].opacity = 0.6;
+//       }
+//     }
 
-    // Reset back to transparent after collision
-    if (this.opacity > 0.02) {
-      this.opacity -= 0.02;
-      this.opacity = Math.max(0, this.opacity);
-    }
+//     // Reset back to transparent after collision
+//     if (this.opacity > 0.02) {
+//       this.opacity -= 0.02;
+//       this.opacity = Math.max(0, this.opacity);
+//     }
 
-    // Particles collide with walls if option set true
-    if (this.wallCollision) {
-      if (this.x - this.radius < 0 || this.x + this.radius >= canvas.width) {
-        this.velocity.x = -this.velocity.x;
-      }
-      if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
-        this.velocity.y = -this.velocity.y;
-      }
-      // Else the particles come back on other side if they travel offscreen
-    } else {
-      const space = 0; // Extra space offscreen
-      if (this.x - this.radius > canvas.width + space) this.x = 0 - this.radius;
-      if (this.x + this.radius < 0 - space) this.x = canvas.width + this.radius;
-      if (this.y - this.radius > canvas.height + space)
-        this.y = 0 - this.radius;
-      if (this.y + this.radius < 0 - space)
-        this.y = canvas.height + this.radius;
-    }
+//     // Particles collide with walls if option set true
+//     if (this.wallCollision) {
+//       if (this.x - this.radius < 0 || this.x + this.radius >= canvas.width) {
+//         this.velocity.x = -this.velocity.x;
+//       }
+//       if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
+//         this.velocity.y = -this.velocity.y;
+//       }
+//       // Else the particles come back on other side if they travel offscreen
+//     } else {
+//       const space = 0; // Extra space offscreen
+//       if (this.x - this.radius > canvas.width + space) this.x = 0 - this.radius;
+//       if (this.x + this.radius < 0 - space) this.x = canvas.width + this.radius;
+//       if (this.y - this.radius > canvas.height + space)
+//         this.y = 0 - this.radius;
+//       if (this.y + this.radius < 0 - space)
+//         this.y = canvas.height + this.radius;
+//     }
 
-    // Player object collision (should I handle in player class?)
-    const playerDistance = distance(this.x, this.y, player.x, player.y);
+//     // Player object collision (should I handle in player class?)
+//     const playerDistance = distance(this.x, this.y, player.x, player.y);
 
-    if (playerDistance - this.radius - player.radius <= 0) {
-      this.opacity = 1;
-      return true;
-    }
-  }
-}
+//     if (playerDistance - this.radius - player.radius <= 0) {
+//       this.opacity = 1;
+//       return true;
+//     }
+//   }
+// }
 
 /**
  * Guardians protect and guard the goal
  */
 
-export class Guardian {
-  x: number;
-  y: number;
-  radius: number;
-  radians: number;
-  color: string;
-  opacity: number;
-  circlVelocity: number;
-  distanceFromCenter: number;
-  velocity: { x: number; y: number };
-  mass: number;
+// export class Guardian {
+//   x: number;
+//   y: number;
+//   radius: number;
+//   radians: number;
+//   color: string;
+//   opacity: number;
+//   circlVelocity: number;
+//   distanceFromCenter: number;
+//   velocity: { x: number; y: number };
+//   mass: number;
 
-  constructor(
-    x: number,
-    y: number,
-    radius: number,
-    radians = 0,
-    color: string
-  ) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.radians = radians;
-    this.color = color;
-    this.opacity = 0.2;
-    this.circlVelocity = 0.005;
-    this.distanceFromCenter = 50;
-    this.velocity = {
-      x: 0,
-      y: 0,
-    };
-    this.mass = 1;
-  }
+//   constructor(
+//     x: number,
+//     y: number,
+//     radius: number,
+//     radians = 0,
+//     color: string
+//   ) {
+//     this.x = x;
+//     this.y = y;
+//     this.radius = radius;
+//     this.radians = radians;
+//     this.color = color;
+//     this.opacity = 0.2;
+//     this.circlVelocity = 0.005;
+//     this.distanceFromCenter = 50;
+//     this.velocity = {
+//       x: 0,
+//       y: 0,
+//     };
+//     this.mass = 1;
+//   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.lineWidth = 2;
-    ctx.fillStyle = this.color;
+//   draw(ctx: CanvasRenderingContext2D) {
+//     ctx.beginPath();
+//     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+//     ctx.lineWidth = 2;
+//     ctx.fillStyle = this.color;
 
-    ctx.save();
-    ctx.globalAlpha = this.opacity;
-    ctx.fill();
-    ctx.restore();
+//     ctx.save();
+//     ctx.globalAlpha = this.opacity;
+//     ctx.fill();
+//     ctx.restore();
 
-    ctx.strokeStyle = this.color;
-    ctx.stroke();
-    ctx.closePath(); // Not sure if necessary
-  }
+//     ctx.strokeStyle = this.color;
+//     ctx.stroke();
+//     ctx.closePath(); // Not sure if necessary
+//   }
 
-  update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
-    const x = this.x;
-    const y = this.y;
-    // Loop over particles to check for collision with guardians
-    for (let i = 0; i < particles.length; i++) {
-      const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
+//   update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
+//     const x = this.x;
+//     const y = this.y;
+//     // Loop over particles to check for collision with guardians
+//     for (let i = 0; i < particles.length; i++) {
+//       const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
 
-      // Particles intersect with guardians here
-      if (dist - this.radius - particles[i].radius < 0) {
-        // resolveCollision(this, particles[i]);
+//       // Particles intersect with guardians here
+//       if (dist - this.radius - particles[i].radius < 0) {
+//         // resolveCollision(this, particles[i]);
 
-        // Circles get boosted when intersecting with mid circles
-        // particles[i].velocity.x += particles[i].velocity.x * 0.02;
-        // particles[i].velocity.y += particles[i].velocity.y * 0.02;
+//         // Circles get boosted when intersecting with mid circles
+//         // particles[i].velocity.x += particles[i].velocity.x * 0.02;
+//         // particles[i].velocity.y += particles[i].velocity.y * 0.02;
 
-        // Light up particles and guardian on collision
-        this.opacity = 0.6;
-        particles[i].opacity = 0.6;
-        this.color = particles[i].color;
-      } else {
-        // this.color = "green";
-        // if (this.color !== "hsl(0deg, 0%, 100%)") {
-        //   const hsl = getHSL(this.color);
-        //   const h = Math.max(0, hsl.H - 1);
-        //   const s = Math.max(0, hsl.S - 1);
-        //   const l = Math.min(100, hsl.L + 1);
-        //   this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
-        //   // console.log(this.color);
-        // }
-      }
-    }
+//         // Light up particles and guardian on collision
+//         this.opacity = 0.6;
+//         particles[i].opacity = 0.6;
+//         this.color = particles[i].color;
+//       } else {
+//         // this.color = "green";
+//         // if (this.color !== "hsl(0deg, 0%, 100%)") {
+//         //   const hsl = getHSL(this.color);
+//         //   const h = Math.max(0, hsl.H - 1);
+//         //   const s = Math.max(0, hsl.S - 1);
+//         //   const l = Math.min(100, hsl.L + 1);
+//         //   this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
+//         //   // console.log(this.color);
+//         // }
+//       }
+//     }
 
-    // Reset back to transparent after collision
-    if (this.opacity > 0.02) {
-      this.opacity -= 0.02;
-      this.opacity = Math.max(0, this.opacity);
-    }
+//     // Reset back to transparent after collision
+//     if (this.opacity > 0.02) {
+//       this.opacity -= 0.02;
+//       this.opacity = Math.max(0, this.opacity);
+//     }
 
-    if (this.color !== "hsl(0deg, 0%, 100%)") {
-      const hsl = getHSL(this.color);
-      const h = Math.max(0, hsl.H - 1);
-      const s = Math.max(0, hsl.S - 1);
-      const l = Math.min(100, hsl.L + 1);
-      this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
-      // console.log(this.color);
-    }
+//     if (this.color !== "hsl(0deg, 0%, 100%)") {
+//       const hsl = getHSL(this.color);
+//       const h = Math.max(0, hsl.H - 1);
+//       const s = Math.max(0, hsl.S - 1);
+//       const l = Math.min(100, hsl.L + 1);
+//       this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
+//       // console.log(this.color);
+//     }
 
-    // Move points over time
-    this.radians += this.circlVelocity;
+//     // Move points over time
+//     this.radians += this.circlVelocity;
 
-    // Circular Motion
-    this.x =
-      innerWidth / 1.2 + Math.cos(this.radians) * this.distanceFromCenter;
-    this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
+//     // Circular Motion
+//     this.x =
+//       innerWidth / 1.2 + Math.cos(this.radians) * this.distanceFromCenter;
+//     this.y = innerHeight / 2 + Math.sin(this.radians) * this.distanceFromCenter;
 
-    // Check distance from last point
-    // console.log((this.x - x) * 3);
-    this.velocity.x = (this.x - x) * 3;
-    this.velocity.y = (this.y - y) * 3;
+//     // Check distance from last point
+//     // console.log((this.x - x) * 3);
+//     this.velocity.x = (this.x - x) * 3;
+//     this.velocity.y = (this.y - y) * 3;
 
-    // this.x = this.x + Math.cos(this.radians) * 2;
-    // this.y = this.y + Math.sin(this.radians) * 2;
+//     // this.x = this.x + Math.cos(this.radians) * 2;
+//     // this.y = this.y + Math.sin(this.radians) * 2;
 
-    // Expand the circle over time
-    if (this.distanceFromCenter < 300) {
-      this.distanceFromCenter += 0.5;
-    }
+//     // Expand the circle over time
+//     if (this.distanceFromCenter < 300) {
+//       this.distanceFromCenter += 0.5;
+//     }
 
-    // Player object collision (should I handle in player class?)
-    // This is the second object checking for player collision, maybe
-    // the player should be checking all the objects instead
-    const playerDistance = distance(this.x, this.y, player.x, player.y);
+//     // Player object collision (should I handle in player class?)
+//     // This is the second object checking for player collision, maybe
+//     // the player should be checking all the objects instead
+//     const playerDistance = distance(this.x, this.y, player.x, player.y);
 
-    if (playerDistance - this.radius - player.radius <= 0) {
-      this.opacity = 1;
-      return true;
-    }
+//     if (playerDistance - this.radius - player.radius <= 0) {
+//       this.opacity = 1;
+//       return true;
+//     }
 
-    this.draw(ctx);
-  }
-}
+//     this.draw(ctx);
+//   }
+// }
 
 export class Player {
   x: number;
@@ -603,12 +603,13 @@ export class ParticleSystem {
         Math.random() * this.canvas.width,
         Math.random() * this.canvas.height,
         {
-          vx: (Math.random() - 0.5) * 100,
-          vy: (Math.random() - 0.5) * 100,
-          radius: Math.random() * 5 + 2,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 0.5) * 10,
+          radius: Math.random() * 5 + 12,
           color: colors[Math.floor(Math.random() * colors.length)],
           life: 1.0,
           fadeRate: 0,
+          behaviors: [new RandomMovement(1000)],
         }
       );
       this.addParticle(particle);
