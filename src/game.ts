@@ -112,6 +112,15 @@ export class Game {
   update(deltaTime: number) {
     this.player.update(this.ctx, this.gameRunning, this.mouse);
     this.particleSystem.update(deltaTime, this.time);
+
+    if (
+      this.player.detectCollision(this.particleSystem.getParticles()) &&
+      this.gameRunning
+    ) {
+      this.gameRunning = false;
+      alert("You lose!");
+      this.reset();
+    }
   }
 
   draw() {

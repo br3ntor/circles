@@ -1,5 +1,5 @@
 import { DynamicParticleConfig, ParticleProps } from "./types.ts";
-import { Particle, Guardian } from "./game-objects.ts";
+import { Particle_2 } from "./game-objects.ts";
 import { distance, getRandomColor } from "./utils.ts";
 
 const wallEnd = 105;
@@ -9,24 +9,24 @@ const wallEnd = 105;
  * with coordinates set to form a circle
  * when drawn to the canvas.
  */
-export function guardianCreator(canvas: HTMLCanvasElement) {
-  const p = [];
-  const particleCount = 6;
-  const spaceBetween = 1 / particleCount;
-  let angle = 0;
-
-  for (let i = 0; i < particleCount; i++) {
-    const radians = angle * Math.PI * 2;
-    const radius = 50;
-    const distance = radius;
-    const x = canvas.width / 1.2 + Math.cos(radians) * distance;
-    const y = canvas.height / 2 + Math.sin(radians) * distance;
-    p.push(new Guardian(x, y, radius, radians, "hsl(0deg, 0%, 100%)"));
-    angle += spaceBetween;
-  }
-
-  return p;
-}
+// export function guardianCreator(canvas: HTMLCanvasElement) {
+//   const p = [];
+//   const particleCount = 6;
+//   const spaceBetween = 1 / particleCount;
+//   let angle = 0;
+//
+//   for (let i = 0; i < particleCount; i++) {
+//     const radians = angle * Math.PI * 2;
+//     const radius = 50;
+//     const distance = radius;
+//     const x = canvas.width / 1.2 + Math.cos(radians) * distance;
+//     const y = canvas.height / 2 + Math.sin(radians) * distance;
+//     p.push(new Guardian(x, y, radius, radians, "hsl(0deg, 0%, 100%)"));
+//     angle += spaceBetween;
+//   }
+//
+//   return p;
+// }
 
 /**
  * Particle Grid Pattern
@@ -63,7 +63,12 @@ export function gridPattern(
         dy: config.velocity.y,
         wallCollision: false,
       };
-      const p = new Particle(c);
+      const p = new Particle_2(c.x, c.y, {
+        radius: c.radius,
+        color: c.color,
+        vx: c.dx,
+        vy: c.dy,
+      });
       particles.push(p);
     }
   }
@@ -120,14 +125,11 @@ export function dynamicParticleCreator(
     }
 
     particles.push(
-      new Particle({
-        x,
-        y,
+      new Particle_2(x, y, {
         radius,
         color,
-        dx,
-        dy,
-        wallCollision: config.wallCollision,
+        vx: dx,
+        vy: dy,
       })
     );
   }
@@ -160,7 +162,14 @@ export function starPatternCreator(canvas: HTMLCanvasElement) {
         dy: 0,
         wallCollision: false,
       };
-      particles.push(new Particle(p));
+      particles.push(
+        new Particle_2(p.x, p.y, {
+          radius: p.radius,
+          color: p.color,
+          vx: p.dx,
+          vy: p.dy,
+        })
+      );
     }
   }
 
