@@ -37,12 +37,6 @@ export class Game {
     this.lastTime = 0;
     this.setupControls();
     this.recreateSystem();
-
-    this.canvas.addEventListener("click", () => {
-      if (this.gameOver) {
-        this.reset();
-      }
-    });
   }
 
   setupControls() {
@@ -91,7 +85,7 @@ export class Game {
   reset() {
     cancelAnimationFrame(this.frameRequest);
     this.particleSystem.clearParticles();
-    this.player = new Player(50, this.player.y, 30, "red");
+    this.player = new Player(50, this.canvas.height / 2, 30, "red");
     this.gameRunning = false;
     this.gameOver = false;
     this.fadeAlpha = 0;
@@ -103,8 +97,11 @@ export class Game {
   }
 
   start() {
-    this.lastTime = performance.now();
-    this.animate();
+    if (!this.gameOver) {
+      // Maybe set gameRunning true here?
+      this.lastTime = performance.now();
+      this.animate();
+    }
   }
 
   // Main loop
@@ -168,24 +165,24 @@ export class Game {
   }
 
   drawGameOver() {
-    if (this.fadeAlpha < 2) {
+    if (this.fadeAlpha < 1) {
       this.fadeAlpha += 0.01;
-      this.fadeAlpha = Math.min(this.fadeAlpha, 2);
+      this.fadeAlpha = Math.min(this.fadeAlpha, 1);
     }
 
     this.ctx.fillStyle = `rgba(0, 0, 0, ${this.fadeAlpha})`;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (this.fadeAlpha >= 1) {
-      this.ctx.fillStyle = "red";
-      this.ctx.font = "100px 'Times New Roman'";
-      this.ctx.textAlign = "center";
-      this.ctx.fillText(
-        "YOU DIED",
-        this.canvas.width / 2,
-        this.canvas.height / 2
-      );
+    this.ctx.fillStyle = `rgba(255, 0, 0, ${this.fadeAlpha})`;
+    this.ctx.font = "100px 'Times New Roman'";
+    this.ctx.textAlign = "center";
+    this.ctx.fillText(
+      "YOU DIED",
+      this.canvas.width / 2,
+      this.canvas.height / 2
+    );
 
+    if (this.fadeAlpha >= 0.8) {
       this.ctx.fillStyle = "white";
       this.ctx.font = "24px 'Times New Roman'";
       this.ctx.fillText(

@@ -20,17 +20,25 @@ export function setupEventListeners(game: Game) {
    * Starts the game when player is clicked.
    */
   addEventListener("click", (event) => {
-    const clickDistance = distance(
-      event.clientX,
-      event.clientY,
-      game.player.x,
-      game.player.y
-    );
+    // If the game is over and the fade-out is complete, reset the game
+    if (game.gameOver && game.fadeAlpha >= 1) {
+      game.reset();
+      return;
+    }
 
-    // If click happens within radius of player circle, set wall to false
-    if (clickDistance < game.player.radius) {
-      game.gameRunning = true;
-      game.start();
+    // If the game is not running, check if the player is clicked to start the game
+    if (!game.gameRunning) {
+      const clickDistance = distance(
+        event.clientX,
+        event.clientY,
+        game.player.x,
+        game.player.y
+      );
+
+      if (clickDistance < game.player.radius) {
+        game.gameRunning = true;
+        game.start();
+      }
     }
   });
 
