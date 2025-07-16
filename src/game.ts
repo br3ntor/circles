@@ -117,9 +117,14 @@ export class Game {
       this.player.detectCollision(this.particleSystem.getParticles()) &&
       this.gameRunning
     ) {
-      this.gameRunning = false;
+      this.draw();
       alert("You lose!");
       this.reset();
+
+      // setTimeout(() => {
+      //   this.reset();
+      //   alert("You lose!");
+      // });
     }
   }
 

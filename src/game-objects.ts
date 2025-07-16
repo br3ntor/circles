@@ -348,8 +348,9 @@ export class Player {
   detectCollision(particles: Particle_2[]): boolean {
     for (const particle of particles) {
       const dist = distance(this.x, this.y, particle.x, particle.y);
-      if (dist - this.radius - particle.radius < 0) {
-        particle.opacity = 1;
+      if (dist - this.radius - particle.radius <= 0) {
+        particle.opacity = 0.6;
+        // this.color = "blue";
         return true;
       }
     }
