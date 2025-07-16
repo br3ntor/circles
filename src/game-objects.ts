@@ -374,7 +374,7 @@ export class Goal {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     if (this.fill === true) {
       ctx.fillStyle = "#7bf977";
       ctx.fillRect(this.x, this.y, this.width, this.height);
