@@ -127,6 +127,7 @@ export class Game {
   update(deltaTime: number) {
     this.player.update(this.ctx, this.gameRunning, this.mouse);
     this.particleSystem.update(deltaTime, this.time);
+    this.goal.update(this.ctx, this.player);
 
     if (
       this.player.detectCollision(this.particleSystem.getParticles()) &&
