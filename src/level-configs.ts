@@ -1,144 +1,72 @@
-import {
-  balls,
-  niceColor,
-  randInt,
-  getRandomX,
-  getRandomY,
-  randIntLow,
-} from "./utils";
-import { DynamicParticleConfig } from "./types";
+// import { Vector2 } from "./game-objects";
+// import { WallBehaviorMode } from "./particle-behaviors";
 
-export const dynamicConfigs: DynamicParticleConfig[] = [
+export type Pattern =
+  | "random"
+  | "spiral"
+  | "star"
+  | "circle"
+  | "waves"
+  | "orbit";
+
+export type BehaviorType =
+  | "wall"
+  | "collision"
+  | "orbit"
+  | "spiral"
+  | "wave"
+  | "randomMovement";
+
+export interface BehaviorConfig {
+  type: BehaviorType;
+  [key: string]: any;
+}
+
+export interface LevelConfig {
+  pattern: Pattern;
+  behaviors: BehaviorConfig[];
+  particleCount?: number;
+}
+
+export const levels: LevelConfig[] = [
   {
-    title: "Red",
-    wallCollision: false,
-    particleCount: () => balls() + 20,
-    radius: () => randIntLow(20, 150),
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => -1,
-    dy: () => -1,
-    color: () => `hsl(0deg, 100%, 50%)`,
+    pattern: "random",
+    behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
+    particleCount: 10,
   },
   {
-    title: "Yellow",
-    wallCollision: false,
-    particleCount: () => balls(),
-    radius: () => 60,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => 0,
-    dy: () => -0.5,
-    color: () => `hsl(75deg, 100%, 50%)`,
+    pattern: "spiral",
+    behaviors: [
+      { type: "wall", mode: "wrap" },
+      {
+        type: "spiral",
+        // centerPoint will be calculated in ParticleSystem
+        initialRadius: 50,
+        growthRate: 10,
+        rotationSpeed: 2,
+      },
+    ],
+    particleCount: 150,
   },
   {
-    title: "Random",
-    wallCollision: true,
-    particleCount: () => balls(),
-    radius: () => Math.random() * 60 + 15,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => (Math.random() - 0.5) * 5,
-    dy: () => (Math.random() - 0.5) * 5,
-    color: () => niceColor(),
+    pattern: "waves",
+    behaviors: [
+      { type: "wall", mode: "wrap" },
+      { type: "wave", amplitude: 50, frequency: 0.02, speed: 100 },
+    ],
+    particleCount: 200,
   },
   {
-    title: "Subtle",
-    wallCollision: false,
-    particleCount: () => balls(),
-    radius: () => 30,
-    x: getRandomX,
-    y: getRandomY,
-    dy: () => (Math.random() - 0.5) * 8,
-    dx: () => (Math.random() - 0.5) * 1,
-    color: () => niceColor(),
-  },
-  {
-    title: "Fast",
-    wallCollision: true,
-    particleCount: () => balls() + 15,
-    radius: () => 10,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => 3,
-    dy: () => 0,
-    color: () => niceColor(),
-  },
-  {
-    title: "Big",
-    wallCollision: true,
-    particleCount: () => balls() - 4,
-    radius: () => 100,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => (Math.random() - 0.5) * 2,
-    dy: () => (Math.random() - 0.5) * 2,
-    color: () => niceColor(),
-  },
-  {
-    title: "Colorful",
-    wallCollision: true,
-    particleCount: () => 50,
-    radius: () => 5,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => (Math.random() - 0.5) * 5,
-    dy: () => (Math.random() - 0.5) * 5,
-    color: () => `hsl(${Math.random() * 360}deg, 100%, 50%)`,
-  },
-  {
-    title: "Black Hole",
-    wallCollision: true,
-    particleCount: () => 1,
-    radius: () => 200,
-    x: (_radius, _wall, canvas) => canvas.width / 2,
-    y: (_radius, canvas) => canvas.height / 2,
-    dx: () => 0,
-    dy: () => 0,
-    color: () => "black",
-  },
-  {
-    title: "Small",
-    wallCollision: false,
-    particleCount: () => 200,
-    radius: () => 2,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => (Math.random() - 0.5) * 3,
-    dy: () => (Math.random() - 0.5) * 3,
-    color: () => niceColor(),
-  },
-  {
-    title: "Horizontal",
-    wallCollision: true,
-    particleCount: () => 20,
-    radius: () => 30,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => (Math.random() > 0.5 ? 5 : -5),
-    dy: () => 0,
-    color: () => `hsl(${randInt(0, 50)}deg, 100%, 50%)`,
-  },
-  {
-    title: "Vertical",
-    wallCollision: true,
-    particleCount: () => 20,
-    radius: () => 30,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => 0,
-    dy: () => (Math.random() > 0.5 ? 5 : -5),
-    color: () => `hsl(${randInt(180, 230)}deg, 100%, 50%)`,
-  },
-  {
-    title: "Three",
-    wallCollision: true,
-    particleCount: () => randInt(3, 10),
-    radius: () => Math.random() * 100 + 15,
-    x: getRandomX,
-    y: getRandomY,
-    dx: () => (Math.random() - 0.5) * 5,
-    dy: () => (Math.random() - 0.5) * 5,
-    color: () => `hsl(${randInt(0, 360)}deg, 100%, 50%)`,
+    pattern: "orbit",
+    behaviors: [
+      { type: "wall", mode: "collide" },
+      {
+        type: "orbit",
+        // centerPoint will be calculated in ParticleSystem
+        radius: 200,
+        speed: 1,
+      },
+    ],
+    particleCount: 100,
   },
 ];

@@ -1,4 +1,5 @@
 import { Goal, ParticleSystem, Player } from "./game-objects";
+import { levels, LevelConfig } from "./level-configs";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -13,6 +14,7 @@ export class Game {
   frameRequest: number;
   time: number;
   lastTime: number;
+  currentLevel: number;
 
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -35,51 +37,25 @@ export class Game {
     this.frameRequest = 0;
     this.time = 0;
     this.lastTime = 0;
-    this.setupControls();
-    this.recreateSystem();
+    this.currentLevel = 0;
+    this.loadLevel();
   }
 
-  setupControls() {
-    const patternSelector = document.createElement("select");
-    patternSelector.style.position = "absolute";
-    patternSelector.style.top = "10px";
-    patternSelector.style.left = "10px";
-    document.body.appendChild(patternSelector);
-
-    const patterns = ["random", "spiral", "star", "circle", "waves", "orbit"];
-    for (const pattern of patterns) {
-      const option = document.createElement("option");
-      option.value = pattern;
-      option.text = pattern;
-      patternSelector.appendChild(option);
+  loadLevel() {
+    const levelConfig = levels[this.currentLevel];
+    if (!levelConfig) {
+      console.error("Level not found:", this.currentLevel);
+      return;
     }
-    patternSelector.addEventListener("change", () => this.recreateSystem());
+    this.recreateSystem(levelConfig);
+  }
 
-    const wallBehaviorSelector = document.createElement("select");
-    wallBehaviorSelector.style.position = "absolute";
-    wallBehaviorSelector.style.top = "40px";
-    wallBehaviorSelector.style.left = "10px";
-    document.body.appendChild(wallBehaviorSelector);
-
-    const wallBehaviors = ["collide", "wrap", "none"];
-    for (const behavior of wallBehaviors) {
-      const option = document.createElement("option");
-      option.value = behavior;
-      option.text = behavior;
-      wallBehaviorSelector.appendChild(option);
-    }
-    wallBehaviorSelector.addEventListener("change", () =>
-      this.recreateSystem()
+  recreateSystem(levelConfig: LevelConfig) {
+    this.particleSystem.createPattern(
+      levelConfig.pattern,
+      levelConfig.behaviors,
+      levelConfig.particleCount
     );
-  }
-
-  recreateSystem() {
-    const patternSelector = document.querySelector("select");
-    const wallBehaviorSelector = document.querySelectorAll("select")[1];
-    const pattern = patternSelector?.value || "random";
-    const wallBehavior =
-      (wallBehaviorSelector?.value as "collide" | "wrap" | "none") || "collide";
-    this.particleSystem.createPattern(pattern, wallBehavior);
   }
 
   reset() {
@@ -91,7 +67,7 @@ export class Game {
     this.fadeAlpha = 0;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.recreateSystem();
+    this.loadLevel();
 
     this.draw();
   }
@@ -127,7 +103,13 @@ export class Game {
   update(deltaTime: number) {
     this.player.update(this.ctx, this.gameRunning, this.mouse);
     this.particleSystem.update(deltaTime, this.time);
-    this.goal.update(this.ctx, this.player);
+    if (this.goal.update(this.ctx, this.player)) {
+      this.currentLevel++;
+      if (this.currentLevel >= levels.length) {
+        this.currentLevel = 0; // Loop back to the first level
+      }
+      this.reset();
+    }
 
     if (
       this.player.detectCollision(this.particleSystem.getParticles()) &&

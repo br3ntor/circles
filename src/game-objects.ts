@@ -9,6 +9,7 @@ import {
   CollisionBehavior,
   WallBehavior,
 } from "./particle-behaviors.ts";
+import { BehaviorConfig } from "./level-configs.ts";
 
 /**
  * Particles move through space at a given velocity
@@ -596,7 +597,10 @@ export class ParticleSystem {
   private canvas: HTMLCanvasElement;
   private particles: Particle_2[];
   private patterns: {
-    [key: string]: (wallBehaviorMode: "collide" | "wrap" | "none") => void;
+    [key: string]: (
+      behaviors: ParticleBehavior[],
+      particleCount: number
+    ) => void;
   };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -640,27 +644,56 @@ export class ParticleSystem {
 
   createPattern(
     patternName: string,
-    wallBehaviorMode: "collide" | "wrap" | "none" = "collide"
+    behaviorConfigs: BehaviorConfig[] = [],
+    particleCount: number = 100
   ): void {
     this.clearParticles();
     if (this.patterns[patternName]) {
-      this.patterns[patternName](wallBehaviorMode);
+      const behaviors = this._createBehaviorsFromConfig(behaviorConfigs);
+      this.patterns[patternName](behaviors, particleCount);
     }
   }
 
+  private _createBehaviorsFromConfig(
+    configs: BehaviorConfig[]
+  ): ParticleBehavior[] {
+    const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+    return configs.map((config) => {
+      switch (config.type) {
+        case "wall":
+          return new WallBehavior(this.canvas, config.mode);
+        case "collision":
+          return new CollisionBehavior(this.particles);
+        case "orbit":
+          return new OrbitBehavior(center, config.radius, config.speed);
+        case "spiral":
+          return new SpiralBehavior(
+            center,
+            config.initialRadius,
+            config.growthRate,
+            config.rotationSpeed
+          );
+        case "wave":
+          return new WaveBehavior(
+            config.amplitude,
+            config.frequency,
+            config.speed
+          );
+        case "randomMovement":
+          return new RandomMovement(config.intensity);
+        default:
+          throw new Error(`Unknown behavior type: ${config.type}`);
+      }
+    });
+  }
+
   private createRandomPattern(
-    wallBehaviorMode: "collide" | "wrap" | "none"
+    behaviors: ParticleBehavior[],
+    particleCount: number
   ): void {
     const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
 
-    for (let i = 0; i < 10; i++) {
-      const behaviors: ParticleBehavior[] = [
-        new CollisionBehavior(this.particles),
-      ];
-      if (wallBehaviorMode !== "none") {
-        behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
-      }
-
+    for (let i = 0; i < particleCount; i++) {
       const radius = Math.random() * 5 + 120;
       let x = getRandomX(radius, 105, this.canvas);
       let y = getRandomY(radius, this.canvas);
@@ -696,28 +729,17 @@ export class ParticleSystem {
   }
 
   private createSpiralPattern(
-    wallBehaviorMode: "collide" | "wrap" | "none"
+    behaviors: ParticleBehavior[],
+    particleCount: number
   ): void {
-    const numParticles = 200;
     const spiralDensity = 0.5;
     const angleStep = (Math.PI * 2) / 50;
 
-    for (let i = 0; i < numParticles; i++) {
+    for (let i = 0; i < particleCount; i++) {
       const angle = i * angleStep;
       const distance = i * spiralDensity;
       const x = this.canvas.width / 2 + Math.cos(angle) * distance;
       const y = this.canvas.height / 2 + Math.sin(angle) * distance;
-      const behaviors: ParticleBehavior[] = [
-        new SpiralBehavior(
-          new Vector2(this.canvas.width / 2, this.canvas.height / 2),
-          0.5,
-          0.01
-        ),
-        new CollisionBehavior(this.particles),
-      ];
-      if (wallBehaviorMode !== "none") {
-        behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
-      }
 
       const particle = new Particle_2(x, y, {
         radius: 3,
@@ -731,24 +753,18 @@ export class ParticleSystem {
   }
 
   private createStarPattern(
-    wallBehaviorMode: "collide" | "wrap" | "none"
+    behaviors: ParticleBehavior[],
+    particleCount: number
   ): void {
-    const numParticles = 100;
     const numArms = 5;
     const armLength = 200;
 
-    for (let i = 0; i < numParticles; i++) {
+    for (let i = 0; i < particleCount; i++) {
       const armIndex = i % numArms;
       const angle = (armIndex * (Math.PI * 2)) / numArms;
-      const distance = (i / numParticles) * armLength;
+      const distance = (i / particleCount) * armLength;
       const x = this.canvas.width / 2 + Math.cos(angle) * distance;
       const y = this.canvas.height / 2 + Math.sin(angle) * distance;
-      const behaviors: ParticleBehavior[] = [
-        new CollisionBehavior(this.particles),
-      ];
-      if (wallBehaviorMode !== "none") {
-        behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
-      }
 
       const particle = new Particle_2(x, y, {
         radius: 2,
@@ -762,30 +778,19 @@ export class ParticleSystem {
   }
 
   private createCirclePattern(
-    wallBehaviorMode: "collide" | "wrap" | "none"
+    behaviors: ParticleBehavior[],
+    particleCount: number
   ): void {
-    const numParticles = 100;
     const radius = 150;
 
-    for (let i = 0; i < numParticles; i++) {
-      const angle = (i / numParticles) * (Math.PI * 2);
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (i / particleCount) * (Math.PI * 2);
       const x = this.canvas.width / 2 + Math.cos(angle) * radius;
       const y = this.canvas.height / 2 + Math.sin(angle) * radius;
-      const behaviors: ParticleBehavior[] = [
-        new OrbitBehavior(
-          new Vector2(this.canvas.width / 2, this.canvas.height / 2),
-          radius,
-          0.01
-        ),
-        new CollisionBehavior(this.particles),
-      ];
-      if (wallBehaviorMode !== "none") {
-        behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
-      }
 
       const particle = new Particle_2(x, y, {
         radius: 4,
-        color: `hsl(${(i / numParticles) * 360}, 100%, 50%)`,
+        color: `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
         life: 3.0,
         fadeRate: 0.003,
         behaviors,
@@ -795,66 +800,47 @@ export class ParticleSystem {
   }
 
   private createWavePattern(
-    wallBehaviorMode: "collide" | "wrap" | "none"
+    behaviors: ParticleBehavior[],
+    particleCount: number
   ): void {
-    const numParticles = 200;
     const waveAmplitude = 100;
     const waveFrequency = 0.1;
 
-    for (let i = 0; i < numParticles; i++) {
-      const x = (i / numParticles) * this.canvas.width;
+    for (let i = 0; i < particleCount; i++) {
+      const x = (i / particleCount) * this.canvas.width;
       const y =
         this.canvas.height / 2 + Math.sin(i * waveFrequency) * waveAmplitude;
-      const behaviors: ParticleBehavior[] = [
-        new WaveBehavior(waveAmplitude, waveFrequency),
-        new CollisionBehavior(this.particles),
-      ];
-      if (wallBehaviorMode !== "none") {
-        behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
-      }
 
       const particle = new Particle_2(x, y, {
         radius: 3,
-        color: `hsl(${(i / numParticles) * 360}, 100%, 50%)`,
+        color: `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
         life: 2.5,
         fadeRate: 0.008,
-        behaviors,
+        behaviors: behaviors,
       });
       this.addParticle(particle);
     }
   }
 
   private createOrbitPattern(
-    wallBehaviorMode: "collide" | "wrap" | "none"
-  ): void {
-    const numParticles = 50;
-    const center_x = this.canvas.width / 2;
-    const center_y = this.canvas.height / 2;
-
-    for (let i = 0; i < numParticles; i++) {
-      const distance = Math.random() * 150 + 50;
+    behaviors: ParticleBehavior[],
+    particleCount: number
+  ) {
+    const centerX = this.canvas.width / 2;
+    const centerY = this.canvas.height / 2;
+    for (let i = 0; i < particleCount; i++) {
+      const radius = Math.random() * 200 + 50;
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 0.02 + 0.01;
-      const behaviors: ParticleBehavior[] = [
-        new OrbitBehavior(new Vector2(center_x, center_y), distance, speed),
-        new CollisionBehavior(this.particles),
-      ];
-      if (wallBehaviorMode !== "none") {
-        behaviors.push(new WallBehavior(this.canvas, wallBehaviorMode));
-      }
-
       const particle = new Particle_2(
-        center_x + Math.cos(angle) * distance,
-        center_y + Math.sin(angle) * distance,
+        centerX + Math.cos(angle) * radius,
+        centerY + Math.sin(angle) * radius,
         {
-          radius: 2,
-          color: "white",
-          life: 4.0,
-          fadeRate: 0.002,
-          behaviors,
+          radius: 5,
+          behaviors: behaviors,
         }
       );
-      this.addParticle(particle);
+      this.particles.push(particle);
     }
   }
 }
