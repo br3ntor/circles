@@ -159,7 +159,7 @@ export class CollisionBehavior implements ParticleBehavior {
   }
 }
 
-export type WallBehaviorMode = "collide" | "wrap";
+export type WallBehaviorMode = "collide" | "wrap" | "none";
 
 export class WallBehavior implements ParticleBehavior {
   canvas: HTMLCanvasElement;
