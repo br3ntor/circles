@@ -8,6 +8,8 @@ export class Game {
   goal: Goal;
   particleSystem: ParticleSystem;
   gameRunning: boolean;
+  gameOver: boolean;
+  fadeAlpha: number;
   frameRequest: number;
   time: number;
   lastTime: number;
@@ -28,11 +30,19 @@ export class Game {
       120
     );
     this.gameRunning = false;
+    this.gameOver = false;
+    this.fadeAlpha = 0;
     this.frameRequest = 0;
     this.time = 0;
     this.lastTime = 0;
     this.setupControls();
     this.recreateSystem();
+
+    this.canvas.addEventListener("click", () => {
+      if (this.gameOver) {
+        this.reset();
+      }
+    });
   }
 
   setupControls() {
@@ -83,6 +93,8 @@ export class Game {
     this.particleSystem.clearParticles();
     this.player = new Player(50, this.player.y, 30, "red");
     this.gameRunning = false;
+    this.gameOver = false;
+    this.fadeAlpha = 0;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.recreateSystem();
@@ -105,8 +117,14 @@ export class Game {
     this.frameRequest = requestAnimationFrame(() => this.animate());
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.update(deltaTime);
+    if (!this.gameOver) {
+      this.update(deltaTime);
+    }
     this.draw();
+
+    if (this.gameOver) {
+      this.drawGameOver();
+    }
   }
 
   update(deltaTime: number) {
@@ -117,19 +135,17 @@ export class Game {
       this.player.detectCollision(this.particleSystem.getParticles()) &&
       this.gameRunning
     ) {
-      this.draw();
-      alert("You lose!");
-      this.reset();
-
-      // setTimeout(() => {
-      //   this.reset();
-      //   alert("You lose!");
-      // });
+      this.gameRunning = false;
+      this.gameOver = true;
     }
   }
 
   draw() {
-    if (!this.gameRunning) {
+    this.particleSystem.draw(this.ctx);
+    this.player.draw(this.ctx);
+    this.goal.draw(this.ctx);
+
+    if (!this.gameRunning && !this.gameOver) {
       // Draw left start area barrier
       this.ctx.beginPath();
       this.ctx.moveTo(100, 0);
@@ -149,9 +165,34 @@ export class Game {
         this.canvas.height - 200
       );
     }
+  }
 
-    this.particleSystem.draw(this.ctx);
-    this.player.draw(this.ctx);
-    this.goal.draw(this.ctx);
+  drawGameOver() {
+    if (this.fadeAlpha < 2) {
+      this.fadeAlpha += 0.01;
+      this.fadeAlpha = Math.min(this.fadeAlpha, 2);
+    }
+
+    this.ctx.fillStyle = `rgba(0, 0, 0, ${this.fadeAlpha})`;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    if (this.fadeAlpha >= 1) {
+      this.ctx.fillStyle = "red";
+      this.ctx.font = "100px 'Times New Roman'";
+      this.ctx.textAlign = "center";
+      this.ctx.fillText(
+        "YOU DIED",
+        this.canvas.width / 2,
+        this.canvas.height / 2
+      );
+
+      this.ctx.fillStyle = "white";
+      this.ctx.font = "24px 'Times New Roman'";
+      this.ctx.fillText(
+        "Click to restart",
+        this.canvas.width / 2,
+        this.canvas.height / 2 + 60
+      );
+    }
   }
 }
