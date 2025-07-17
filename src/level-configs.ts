@@ -1,3 +1,5 @@
+import { balls } from "./utils";
+
 export type Pattern =
   | "random"
   | "spiral"
@@ -19,7 +21,13 @@ export interface BehaviorConfig {
   [key: string]: any;
 }
 
-const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
+const colors = [
+  "hsl(0, 100%, 71%)",
+  "hsl(177, 56%, 58%)",
+  "hsl(190, 56%, 58%)",
+  "hsl(152, 44%, 67%)",
+  "hsl(45, 100%, 85%)",
+];
 
 export interface LevelConfig {
   pattern: Pattern;
@@ -40,8 +48,8 @@ export const levels: LevelConfig[] = [
   {
     pattern: "random",
     behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
-    particleCount: 10,
-    radius: () => Math.random() * 120 + 10,
+    particleCount: balls(),
+    radius: () => Math.random() * 30 + 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
   },
   // {
