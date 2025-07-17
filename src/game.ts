@@ -1,4 +1,10 @@
-import { Goal, ParticleSystem, Player } from "./game-objects";
+import {
+  Goal,
+  Guardian,
+  ParticleSystem,
+  Player,
+  Vector2,
+} from "./game-objects";
 import { levels, LevelConfig } from "./level-configs";
 
 export class Game {
@@ -8,8 +14,10 @@ export class Game {
   player: Player;
   goal: Goal;
   particleSystem: ParticleSystem;
+  guardians: Guardian[];
   gameRunning: boolean;
   gameOver: boolean;
+  levelComplete: boolean;
   fadeAlpha: number;
   frameRequest: number;
   time: number;
@@ -25,6 +33,7 @@ export class Game {
     this.mouse = { x: 0, y: 0 };
     this.particleSystem = new ParticleSystem(this.canvas);
     this.player = new Player(50, this.canvas.height / 2, 30, "red");
+    this.guardians = [];
     this.goal = new Goal(
       this.canvas.width / 1.2 - 60,
       this.canvas.height / 2 - 60,
@@ -33,6 +42,7 @@ export class Game {
     );
     this.gameRunning = false;
     this.gameOver = false;
+    this.levelComplete = false;
     this.fadeAlpha = 0;
     this.frameRequest = 0;
     this.time = 0;
@@ -48,6 +58,7 @@ export class Game {
       return;
     }
     this.recreateSystem(levelConfig);
+    this.createGuardians();
   }
 
   recreateSystem(levelConfig: LevelConfig) {
@@ -60,13 +71,44 @@ export class Game {
     );
   }
 
+  createGuardians() {
+    const particleCount = 6;
+    const spaceBetween = 1 / particleCount;
+    let angle = 0;
+
+    for (let i = 0; i < particleCount; i++) {
+      const radians = angle * Math.PI * 2;
+      const radius = 50;
+      const distance = radius;
+      const x =
+        this.goal.x + this.goal.width / 2 + Math.cos(radians) * distance;
+      const y =
+        this.goal.y + this.goal.height / 2 + Math.sin(radians) * distance;
+      const newGuardian = new Guardian(
+        x,
+        y,
+        radius,
+        radians,
+        "hsl(0deg, 0%, 100%)"
+      );
+      newGuardian.target = new Vector2(
+        this.goal.x + this.goal.width / 2,
+        this.goal.y + this.goal.height / 2
+      );
+      this.guardians.push(newGuardian);
+      angle += spaceBetween;
+    }
+  }
+
   reset() {
     cancelAnimationFrame(this.frameRequest);
     // this.goal.fill = false;
     this.particleSystem.clearParticles();
+    this.guardians = [];
     this.player = new Player(50, this.canvas.height / 2, 30, "red");
     this.gameRunning = false;
     this.gameOver = false;
+    this.levelComplete = false;
     this.fadeAlpha = 0;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -104,14 +146,37 @@ export class Game {
   }
 
   update(deltaTime: number) {
-    this.player.update(this.ctx, this.gameRunning, this.mouse);
-    this.particleSystem.update(deltaTime, this.time);
-    if (this.goal.update(this.ctx, this.player)) {
-      this.currentLevel++;
-      if (this.currentLevel >= levels.length) {
-        this.currentLevel = 0; // Loop back to the first level
+    if (this.levelComplete) {
+      this.guardians.forEach((guardian) => {
+        guardian.update(this.ctx, [], this.goal);
+      });
+
+      if (this.guardians.every((g) => g.velocity.magnitude() === 0)) {
+        this.currentLevel++;
+        if (this.currentLevel >= levels.length) {
+          this.currentLevel = 0; // Loop back to the first level
+        }
+        this.reset();
       }
-      this.reset();
+      return;
+    }
+
+    this.player.update(this.gameRunning, this.mouse);
+    this.particleSystem.update(deltaTime, this.time);
+    this.guardians.forEach((guardian) =>
+      guardian.update(this.ctx, this.particleSystem.getParticles(), this.goal)
+    );
+
+    for (const guardian of this.guardians) {
+      if (guardian.detectPlayerCollision(this.player) && this.gameRunning) {
+        this.gameRunning = false;
+        this.gameOver = true;
+        break;
+      }
+    }
+
+    if (this.goal.update(this.ctx, this.player)) {
+      this.startLevelCompletion();
     }
 
     if (
@@ -123,10 +188,16 @@ export class Game {
     }
   }
 
+  startLevelCompletion() {
+    this.levelComplete = true;
+    this.guardians.forEach((g) => (g.isReturning = true));
+  }
+
   draw() {
     this.particleSystem.draw(this.ctx);
     this.player.draw(this.ctx);
     this.goal.draw(this.ctx);
+    this.guardians.forEach((guardian) => guardian.draw(this.ctx));
 
     if (!this.gameRunning && !this.gameOver) {
       // Draw left start area barrier
