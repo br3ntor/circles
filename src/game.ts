@@ -54,12 +54,15 @@ export class Game {
     this.particleSystem.createPattern(
       levelConfig.pattern,
       levelConfig.behaviors,
-      levelConfig.particleCount
+      levelConfig.particleCount,
+      levelConfig.radius,
+      levelConfig.color
     );
   }
 
   reset() {
     cancelAnimationFrame(this.frameRequest);
+    // this.goal.fill = false;
     this.particleSystem.clearParticles();
     this.player = new Player(50, this.canvas.height / 2, 30, "red");
     this.gameRunning = false;
