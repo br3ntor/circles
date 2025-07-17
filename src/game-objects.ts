@@ -599,7 +599,9 @@ export class ParticleSystem {
   private patterns: {
     [key: string]: (
       behaviors: ParticleBehavior[],
-      particleCount: number
+      particleCount: number,
+      radius: () => number,
+      color: () => string
     ) => void;
   };
 
@@ -645,12 +647,14 @@ export class ParticleSystem {
   createPattern(
     patternName: string,
     behaviorConfigs: BehaviorConfig[] = [],
-    particleCount: number = 100
+    particleCount: number = 100,
+    radius: () => number,
+    color: () => string
   ): void {
     this.clearParticles();
     if (this.patterns[patternName]) {
       const behaviors = this._createBehaviorsFromConfig(behaviorConfigs);
-      this.patterns[patternName](behaviors, particleCount);
+      this.patterns[patternName](behaviors, particleCount, radius, color);
     }
   }
 
@@ -689,14 +693,16 @@ export class ParticleSystem {
 
   private createRandomPattern(
     behaviors: ParticleBehavior[],
-    particleCount: number
+    particleCount: number,
+    radius: () => number,
+    color: () => string
   ): void {
-    const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
+    // const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
 
     for (let i = 0; i < particleCount; i++) {
-      const radius = Math.random() * 5 + 120;
-      let x = getRandomX(radius, 105, this.canvas);
-      let y = getRandomY(radius, this.canvas);
+      const r = radius();
+      let x = getRandomX(r, 105, this.canvas);
+      let y = getRandomY(r, this.canvas);
 
       if (i !== 0) {
         let retries = 0;
@@ -706,9 +712,9 @@ export class ParticleSystem {
             break;
           }
           const dist = distance(x, y, this.particles[j].x, this.particles[j].y);
-          if (dist - radius - this.particles[j].radius < 0) {
-            x = getRandomX(radius, 105, this.canvas);
-            y = getRandomY(radius, this.canvas);
+          if (dist - r - this.particles[j].radius < 0) {
+            x = getRandomX(r, 105, this.canvas);
+            y = getRandomY(r, this.canvas);
             j = -1; // restart the check
             retries++;
           }
@@ -718,8 +724,8 @@ export class ParticleSystem {
       const particle = new Particle_2(x, y, {
         vx: (Math.random() - 0.5) * 100,
         vy: (Math.random() - 0.5) * 100,
-        radius,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        radius: r,
+        color: color(),
         life: 1.0,
         fadeRate: 0,
         behaviors,
