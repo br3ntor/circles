@@ -18,6 +18,11 @@ export class Game {
   gameRunning: boolean;
   gameOver: boolean;
   levelComplete: boolean;
+  transitioning: boolean;
+  transitionPhase: number; // 0: none, 1: wipe in, 2: wipe out
+  transitionRadius: number;
+  transitionCenter: Vector2;
+  transitionSpeed: number;
   fadeAlpha: number;
   frameRequest: number;
   time: number;
@@ -43,6 +48,11 @@ export class Game {
     this.gameRunning = false;
     this.gameOver = false;
     this.levelComplete = false;
+    this.transitioning = false;
+    this.transitionPhase = 0;
+    this.transitionRadius = 0;
+    this.transitionCenter = new Vector2(0, 0);
+    this.transitionSpeed = 1500; // Pixels per second
     this.fadeAlpha = 0;
     this.frameRequest = 0;
     this.time = 0;
@@ -90,10 +100,6 @@ export class Game {
         radius,
         radians,
         "hsl(0deg, 0%, 100%)"
-      );
-      newGuardian.target = new Vector2(
-        this.goal.x + this.goal.width / 2,
-        this.goal.y + this.goal.height / 2
       );
       this.guardians.push(newGuardian);
       angle += spaceBetween;
@@ -151,12 +157,43 @@ export class Game {
         guardian.update(this.ctx, [], this.goal);
       });
 
-      if (this.guardians.every((g) => g.velocity.magnitude() === 0)) {
-        this.currentLevel++;
-        if (this.currentLevel >= levels.length) {
-          this.currentLevel = 0; // Loop back to the first level
+      if (this.guardians.every((g) => !g.isReturning) && !this.transitioning) {
+        // Guardians have returned, start wipe in
+        this.transitioning = true;
+        this.transitionPhase = 1; // Wipe in
+        this.transitionCenter = new Vector2(
+          this.goal.x + this.goal.width / 2,
+          this.goal.y + this.goal.height / 2
+        );
+        this.transitionRadius = 0;
+      }
+
+      if (this.transitioning) {
+        if (this.transitionPhase === 1) {
+          // Wipe in
+          this.transitionRadius += this.transitionSpeed * deltaTime;
+          const maxRadius =
+            Math.max(this.canvas.width, this.canvas.height) * 1.5; // Ensure it covers the screen
+          if (this.transitionRadius >= maxRadius) {
+            this.transitionRadius = maxRadius;
+            this.transitionPhase = 2; // Switch to wipe out
+            this.currentLevel++;
+            if (this.currentLevel >= levels.length) {
+              this.currentLevel = 0; // Loop back to the first level
+            }
+            this.reset(); // Load next level
+            this.transitionCenter = new Vector2(this.player.x, this.player.y); // Center on player for wipe out
+          }
+        } else if (this.transitionPhase === 2) {
+          // Wipe out
+          this.transitionRadius -= this.transitionSpeed * deltaTime;
+          if (this.transitionRadius <= 0) {
+            this.transitionRadius = 0;
+            this.transitioning = false;
+            this.transitionPhase = 0; // Transition complete
+            this.levelComplete = false; // Reset level complete flag
+          }
         }
-        this.reset();
       }
       return;
     }
@@ -199,7 +236,7 @@ export class Game {
     this.goal.draw(this.ctx);
     this.guardians.forEach((guardian) => guardian.draw(this.ctx));
 
-    if (!this.gameRunning && !this.gameOver) {
+    if (!this.gameRunning && !this.gameOver && !this.transitioning) {
       // Draw left start area barrier
       this.ctx.beginPath();
       this.ctx.moveTo(100, 0);
@@ -218,6 +255,27 @@ export class Game {
         this.canvas.width / 2,
         this.canvas.height - 200
       );
+    }
+
+    if (this.transitioning) {
+      this.ctx.fillStyle = "black";
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.arc(
+        this.transitionCenter.x,
+        this.transitionCenter.y,
+        this.transitionRadius,
+        0,
+        Math.PI * 2
+      );
+      this.ctx.clip();
+      this.particleSystem.draw(this.ctx);
+      this.player.draw(this.ctx);
+      this.goal.draw(this.ctx);
+      this.guardians.forEach((guardian) => guardian.draw(this.ctx));
+      this.ctx.restore();
     }
   }
 
