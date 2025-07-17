@@ -162,7 +162,7 @@ export class Guardian {
   distanceFromCenter: number;
   mass: number;
   isReturning: boolean;
-  target: Vector2 | null; // Make target nullable
+  startPosition: Vector2;
 
   constructor(
     x: number,
@@ -170,7 +170,7 @@ export class Guardian {
     radius: number,
     radians = 0,
     color: string,
-    distanceFromCenter = 40 // Default to 40
+    distanceFromCenter = 50 // Default to 40
   ) {
     this.position = new Vector2(x, y);
     this.velocity = new Vector2(0, 0);
@@ -182,7 +182,7 @@ export class Guardian {
     this.distanceFromCenter = distanceFromCenter;
     this.mass = 1;
     this.isReturning = false;
-    this.target = null; // Initialize as null
+    this.startPosition = new Vector2(x, y);
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -211,38 +211,35 @@ export class Guardian {
   update(ctx: CanvasRenderingContext2D, particles: Particle_2[], goal: Goal) {
     const lastPosition = new Vector2(this.position.x, this.position.y);
 
-    if (this.isReturning && this.target) {
-      // Check if target is not null
-      const direction = this.target
-        .add(new Vector2(-this.position.x, -this.position.y))
-        .normalize();
-      this.velocity = direction.multiply(2);
-      this.position = this.position.add(this.velocity);
+    // Circular Motion
+    this.radians += this.circlVelocity;
 
-      const distToTarget = distance(
-        this.position.x,
-        this.position.y,
-        this.target.x,
-        this.target.y
-      );
-      if (distToTarget < 5) {
-        this.velocity = new Vector2(0, 0);
+    // Update position based on current distanceFromCenter and initial radians
+    this.position.x =
+      goal.x +
+      goal.width / 2 +
+      Math.cos(this.radians) * this.distanceFromCenter;
+    this.position.y =
+      goal.y +
+      goal.height / 2 +
+      Math.sin(this.radians) * this.distanceFromCenter;
+
+    if (this.isReturning) {
+      // Inverse circular motion: return to startPosition
+      const initialDistanceFromCenter = 50; // Assuming this is the initial distance from createGuardians
+      const returnSpeed = 1; // Adjust as needed
+
+      if (this.distanceFromCenter > initialDistanceFromCenter) {
+        this.distanceFromCenter = Math.max(
+          initialDistanceFromCenter,
+          this.distanceFromCenter - returnSpeed
+        );
+      } else {
+        this.distanceFromCenter = initialDistanceFromCenter; // Ensure it doesn't go below initial
+        this.isReturning = false; // Stop returning
+        this.velocity = new Vector2(0, 0); // Set velocity to zero
       }
-    } else if (!this.isReturning) {
-      // Only move in circular motion if not returning
-      // Move points over time
-      this.radians += this.circlVelocity;
-
-      // Circular Motion
-      this.position.x =
-        goal.x +
-        goal.width / 2 +
-        Math.cos(this.radians) * this.distanceFromCenter;
-      this.position.y =
-        goal.y +
-        goal.height / 2 +
-        Math.sin(this.radians) * this.distanceFromCenter;
-
+    } else {
       // Expand the circle over time
       if (this.distanceFromCenter < 300) {
         this.distanceFromCenter += 0.5;
@@ -283,8 +280,11 @@ export class Guardian {
       this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
     }
 
-    this.velocity.x = (this.position.x - lastPosition.x) * 3;
-    this.velocity.y = (this.position.y - lastPosition.y) * 3;
+    // Only update velocity if not returning and stopped
+    if (!this.isReturning) {
+      this.velocity.x = (this.position.x - lastPosition.x) * 3;
+      this.velocity.y = (this.position.y - lastPosition.y) * 3;
+    }
   }
 
   detectPlayerCollision(player: Player): boolean {
