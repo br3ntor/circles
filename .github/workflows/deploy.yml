@@ -35,19 +35,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # We don't specify 'cache: "pnpm"' here because pnpm/action-setup handles its own caching.
-          # Or, you can keep `cache: "pnpm"` if you want `setup-node` to also manage the cache for `pnpm-lock.yaml`
-          # in addition to pnpm/action-setup handling the pnpm tool cache.
-          # It's often fine to keep it for consistency.
-          cache: "pnpm"
       - name: Install pnpm
         uses: pnpm/action-setup@v3 # Use the official pnpm setup action
         with:
-          version: 8.x # Optional: specify a pnpm version, e.g., '8.x' or 'latest'
           # If you want it to run pnpm install automatically after setup:
-          # run_install: true # This can replace your 'Install dependencies' step
-      - name: Install dependencies # This step is only needed if run_install: true is NOT used above
-        run: pnpm install
+          run_install: true # This can replace your 'Install dependencies' step
       - name: Build
         run: pnpm run build
       - name: Setup Pages
