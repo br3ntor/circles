@@ -37,7 +37,6 @@ export class Game {
     this.canvas.style.background = "#0c0c0c";
     this.mouse = { x: 0, y: 0 };
     this.particleSystem = new ParticleSystem(this.canvas);
-    // Just a thought but maybe the player should just be responsible for settings its own color
     this.player = new Player(50, this.canvas.height / 2, 30);
     this.guardians = [];
     this.goal = new Goal(
@@ -60,6 +59,7 @@ export class Game {
     this.lastTime = 0;
     this.currentLevel = 0;
     this.loadLevel();
+    this.draw();
   }
 
   loadLevel() {
@@ -68,11 +68,23 @@ export class Game {
       console.error("Level not found:", this.currentLevel);
       return;
     }
-    this.recreateSystem(levelConfig);
+
+    this.guardians = [];
+    this.player = new Player(50, this.canvas.height / 2, 30);
+    this.goal.fill = false;
+    // this.gameRunning = false;
+    // this.gameOver = false;
+    // this.fadeAlpha = 0;
+
+    // The createParticles clears old particles but
+    // createGuardians does not...
+    this.createParticles(levelConfig);
     this.createGuardians();
+
+    // this.draw();
   }
 
-  recreateSystem(levelConfig: LevelConfig) {
+  createParticles(levelConfig: LevelConfig) {
     this.particleSystem.createPattern(
       levelConfig.pattern,
       levelConfig.behaviors,
@@ -95,22 +107,20 @@ export class Game {
         this.goal.x + this.goal.width / 2 + Math.cos(radians) * distance;
       const y =
         this.goal.y + this.goal.height / 2 + Math.sin(radians) * distance;
-      const newGuardian = new Guardian(
-        x,
-        y,
-        radius,
-        radians
-        // "hsl(0deg, 0%, 100%)"
-      );
+      const newGuardian = new Guardian(x, y, radius, radians);
       this.guardians.push(newGuardian);
       angle += spaceBetween;
     }
   }
 
   reset() {
-    // A "soft" reset. It just resets the game objects and state,
-    // but doesn't touch the animation frame or the canvas.
-    // this.particleSystem.clearParticles();
+    cancelAnimationFrame(this.frameRequest);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Should prob do this but not 100% sure why
+    this.time = 0;
+    this.lastTime = 0;
+
     this.guardians = [];
     this.player = new Player(50, this.canvas.height / 2, 30);
     this.goal.fill = false;
@@ -119,12 +129,10 @@ export class Game {
     this.fadeAlpha = 0;
     this.loadLevel();
     this.draw();
-    // cancelAnimationFrame(this.frameRequest);
   }
 
   start() {
     if (!this.gameOver) {
-      // Maybe set gameRunning true here?
       this.gameRunning = true;
       this.lastTime = performance.now();
       this.animate();
@@ -141,6 +149,8 @@ export class Game {
     this.frameRequest = requestAnimationFrame(() => this.animate());
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    // Update state if game is NOT over and IS running
+    // I'm prettyr sure we can get rid of gameRunning and just use gameOver
     if (!this.gameOver && this.gameRunning) {
       this.update(deltaTime);
     }
@@ -153,11 +163,14 @@ export class Game {
 
   update(deltaTime: number) {
     if (this.levelComplete) {
-      this.guardians.forEach((guardian) => {
-        // guardian.update(this.ctx, [], this.goal);
-        guardian.update([], this.goal);
-      });
+      if (this.transitionPhase === 0) {
+        this.guardians.forEach((guardian) => {
+          // guardian.update(this.ctx, [], this.goal);
+          guardian.update([], this.goal);
+        });
+      }
 
+      // Not sure if even need to check if transitioning here
       if (
         this.guardians.every((g) => g.state === "returned") &&
         !this.transitioning
@@ -184,7 +197,7 @@ export class Game {
             if (this.currentLevel >= levels.length) {
               this.currentLevel = 0; // Loop back to the first level
             }
-            this.reset(); // Load next level behind the curtain
+            this.loadLevel(); // Load next level behind the curtain
             // Update focus to player
             this.transitionCenter = new Vector2(this.player.x, this.player.y); // Center on player for wipe out
           }
@@ -198,6 +211,8 @@ export class Game {
             this.transitioning = false;
             this.transitionPhase = 0;
             this.levelComplete = false;
+            this.gameRunning = false;
+            cancelAnimationFrame(this.frameRequest);
           }
         }
       }
@@ -244,7 +259,8 @@ export class Game {
     this.guardians.forEach((guardian) => guardian.draw(this.ctx));
 
     // Game is NOT running NOT over and NOT transitioning.
-    if (!this.gameRunning && !this.gameOver && !this.transitioning) {
+    // if (!this.gameRunning && !this.gameOver && !this.transitioning) {
+    if ((!this.gameRunning && !this.gameOver) || this.transitionPhase === 2) {
       // Draw left start area barrier
       this.ctx.beginPath();
       this.ctx.moveTo(100, 0);
@@ -259,7 +275,7 @@ export class Game {
       this.ctx.font = "26px Arial";
       this.ctx.textAlign = "center";
       this.ctx.fillText(
-        "Click the red circle or press space bar to start the game",
+        "Click the white circle or press space bar to start the game",
         this.canvas.width / 2,
         this.canvas.height - 200
       );
