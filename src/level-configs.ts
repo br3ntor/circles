@@ -40,9 +40,9 @@ export interface LevelConfig {
 export const levels: LevelConfig[] = [
   {
     pattern: "random",
-    behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
+    behaviors: [{ type: "wall", mode: "wrap" }, { type: "collision" }],
     particleCount: 1,
-    radius: () => 220,
+    radius: () => 320,
     color: () => colors[Math.floor(Math.random() * colors.length)],
   },
   {
