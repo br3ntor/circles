@@ -16,8 +16,7 @@ export function setupEventListeners(game: Game) {
   });
 
   /**
-   * Left click event.
-   * Starts the game when player is clicked.
+   * Left click events
    */
   addEventListener("click", (event) => {
     // If the game is over and the fade-out is complete, reset the game
@@ -36,7 +35,7 @@ export function setupEventListeners(game: Game) {
       );
 
       if (clickDistance < game.player.radius) {
-        game.gameRunning = true;
+        // game.gameRunning = true;
         game.start();
       }
     }

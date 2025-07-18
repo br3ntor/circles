@@ -20,7 +20,7 @@ export function getRandomColor() {
 }
 
 /**
- * Random color from hue
+ * Random color from hue, hsl format
  */
 export function niceColor() {
   const r = randInt(0, 360);

@@ -32,7 +32,6 @@ export class Guardian {
     y: number,
     radius: number,
     radians = 0,
-    color: string,
     distanceFromCenter = 50 // Default to 40
   ) {
     this.position = new Vector2(x, y);
@@ -71,7 +70,8 @@ export class Guardian {
     ctx.closePath(); // Not sure if necessary
   }
 
-  update(ctx: CanvasRenderingContext2D, particles: Particle_2[], goal: Goal) {
+  // update(ctx: CanvasRenderingContext2D, particles: Particle_2[], goal: Goal) {
+  update(particles: Particle_2[], goal: Goal) {
     if (this.state === "returned") {
       return;
     }
@@ -177,12 +177,12 @@ export class Player {
   radius: number;
   color: string;
 
-  constructor(x: number, y: number, radius: number, color: string) {
+  constructor(x: number, y: number, radius: number, color?: string) {
     this.x = x;
     this.y = y;
     this.speed = 2;
     this.radius = radius;
-    this.color = color;
+    this.color = color ?? "#DEDEDE";
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -719,7 +719,7 @@ export class ParticleSystem {
     for (let i = 0; i < particleCount; i++) {
       const radius = Math.random() * 200 + 50;
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 0.02 + 0.01;
+      // const speed = Math.random() * 0.02 + 0.01;
       const particle = new Particle_2(
         centerX + Math.cos(angle) * radius,
         centerY + Math.sin(angle) * radius,
