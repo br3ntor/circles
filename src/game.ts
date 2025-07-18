@@ -38,7 +38,7 @@ export class Game {
     this.mouse = { x: 0, y: 0 };
     this.particleSystem = new ParticleSystem(this.canvas);
     // Just a thought but maybe the player should just be responsible for settings its own color
-    this.player = new Player(50, this.canvas.height / 2, 30, "#DEDEDE");
+    this.player = new Player(50, this.canvas.height / 2, 30);
     this.guardians = [];
     this.goal = new Goal(
       this.canvas.width / 1.2 - 60,
@@ -99,8 +99,8 @@ export class Game {
         x,
         y,
         radius,
-        radians,
-        "hsl(0deg, 0%, 100%)"
+        radians
+        // "hsl(0deg, 0%, 100%)"
       );
       this.guardians.push(newGuardian);
       angle += spaceBetween;
@@ -110,19 +110,22 @@ export class Game {
   reset() {
     // A "soft" reset. It just resets the game objects and state,
     // but doesn't touch the animation frame or the canvas.
-    this.particleSystem.clearParticles();
+    // this.particleSystem.clearParticles();
     this.guardians = [];
-    this.player = new Player(50, this.canvas.height / 2, 30, "red");
+    this.player = new Player(50, this.canvas.height / 2, 30);
     this.goal.fill = false;
     this.gameRunning = false;
     this.gameOver = false;
     this.fadeAlpha = 0;
     this.loadLevel();
+    this.draw();
+    // cancelAnimationFrame(this.frameRequest);
   }
 
   start() {
     if (!this.gameOver) {
       // Maybe set gameRunning true here?
+      this.gameRunning = true;
       this.lastTime = performance.now();
       this.animate();
     }
@@ -138,7 +141,7 @@ export class Game {
     this.frameRequest = requestAnimationFrame(() => this.animate());
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (!this.gameOver) {
+    if (!this.gameOver && this.gameRunning) {
       this.update(deltaTime);
     }
     this.draw();
@@ -151,7 +154,8 @@ export class Game {
   update(deltaTime: number) {
     if (this.levelComplete) {
       this.guardians.forEach((guardian) => {
-        guardian.update(this.ctx, [], this.goal);
+        // guardian.update(this.ctx, [], this.goal);
+        guardian.update([], this.goal);
       });
 
       if (
@@ -181,6 +185,7 @@ export class Game {
               this.currentLevel = 0; // Loop back to the first level
             }
             this.reset(); // Load next level behind the curtain
+            // Update focus to player
             this.transitionCenter = new Vector2(this.player.x, this.player.y); // Center on player for wipe out
           }
         } else if (this.transitionPhase === 2) {
@@ -199,12 +204,15 @@ export class Game {
       return;
     }
 
+    // Update state for all drawn objects
     this.player.update(this.gameRunning, this.mouse);
     this.particleSystem.update(deltaTime, this.time);
     this.guardians.forEach((guardian) =>
-      guardian.update(this.ctx, this.particleSystem.getParticles(), this.goal)
+      // guardian.update(this.ctx, this.particleSystem.getParticles(), this.goal)
+      guardian.update(this.particleSystem.getParticles(), this.goal)
     );
 
+    // Guardian collision check
     for (const guardian of this.guardians) {
       if (guardian.detectPlayerCollision(this.player) && this.gameRunning) {
         this.gameRunning = false;
@@ -213,10 +221,12 @@ export class Game {
       }
     }
 
+    // Goal is reached! Level Complete!
     if (this.goal.update(this.ctx, this.player)) {
       this.startLevelCompletion();
     }
 
+    // Player collided with particles and DIED!
     if (
       this.player.detectCollision(this.particleSystem.getParticles()) &&
       this.gameRunning
@@ -224,12 +234,7 @@ export class Game {
       this.gameRunning = false;
       this.gameOver = true;
     }
-  }
-
-  startLevelCompletion() {
-    this.levelComplete = true;
-    this.guardians.forEach((g) => (g.state = "returning"));
-  }
+  } // Main Loop End
 
   draw() {
     // Draw all game objects
@@ -238,6 +243,7 @@ export class Game {
     this.goal.draw(this.ctx);
     this.guardians.forEach((guardian) => guardian.draw(this.ctx));
 
+    // Game is NOT running NOT over and NOT transitioning.
     if (!this.gameRunning && !this.gameOver && !this.transitioning) {
       // Draw left start area barrier
       this.ctx.beginPath();
@@ -249,7 +255,7 @@ export class Game {
       this.ctx.closePath();
 
       // Draw startup message
-      this.ctx.fillStyle = "white";
+      this.ctx.fillStyle = "#DEDEDE";
       this.ctx.font = "26px Arial";
       this.ctx.textAlign = "center";
       this.ctx.fillText(
@@ -262,6 +268,11 @@ export class Game {
     if (this.transitioning) {
       this.drawIrisWipe();
     }
+  }
+
+  startLevelCompletion() {
+    this.levelComplete = true;
+    this.guardians.forEach((g) => (g.state = "returning"));
   }
 
   drawIrisWipe() {

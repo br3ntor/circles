@@ -1,6 +1,6 @@
 import { DynamicParticleConfig, ParticleProps } from "./types.ts";
-import { Particle_2 } from "./game-objects.ts";
-import { distance, getRandomColor } from "./utils.ts";
+import { Particle_2 } from "../game-objects.ts";
+import { distance, getRandomColor } from "../utils.ts";
 
 const wallEnd = 105;
 

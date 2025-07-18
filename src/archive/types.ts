@@ -1,4 +1,4 @@
-import { Particle } from "./game-objects";
+import { Particle } from "../game-objects";
 
 export type ParticleProps = {
   // Position
