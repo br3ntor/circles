@@ -1,6 +1,4 @@
-import resolveCollision from "./elastic-collision.ts";
 import { distance, getHSL, getRandomX, getRandomY } from "./utils.ts";
-import { ParticleProps } from "./types.ts";
 import {
   OrbitBehavior,
   RandomMovement,
@@ -12,144 +10,10 @@ import {
 import { BehaviorConfig } from "./level-configs.ts";
 
 /**
- * Particles move through space at a given velocity
- * until they collide with a wall, another particle,
- * or the player. Or perhaps manipulated with a function.
- */
-// export class Particle {
-//   x: number;
-//   y: number;
-//   radius: number;
-//   color: string;
-//   hue: number;
-//   velocity: { x: number; y: number };
-//   wallCollision: boolean;
-//   mass: number;
-//   opacity: number;
-//
-//   constructor(config: ParticleProps) {
-//     this.x = config.x;
-//     this.y = config.y;
-//     this.radius = config.radius;
-//     this.color = config.color;
-//     this.hue = parseFloat(this.color.slice(4, this.color.indexOf("d")));
-//     this.velocity = {
-//       x: config.dx,
-//       y: config.dy,
-//     };
-//     this.wallCollision = config.wallCollision;
-//     this.mass = 1; // Used in elastic collision
-//     this.opacity = 0.2;
-//   }
-//
-//   draw(ctx: CanvasRenderingContext2D) {
-//     ctx.beginPath();
-//     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-//     ctx.lineWidth = 2;
-//     ctx.fillStyle = this.color;
-//
-//     ctx.save();
-//     ctx.globalAlpha = this.opacity;
-//     ctx.fill();
-//     ctx.restore();
-//
-//     ctx.strokeStyle = this.color;
-//     ctx.stroke();
-//     ctx.closePath();
-//   }
-//
-//   /**
-//    * Propells particles through space
-//    * Collision with other particles,
-//    * optional wall collision
-//    * Can I abstract this to smaller
-//    * particle methods?
-//    */
-//   behavior: (particle: Particle) => void = () => {};
-//
-//   update(ctx: CanvasRenderingContext2D, particles: Particle[], player: Player) {
-//     this.draw(ctx);
-//     this.behavior(this);
-//
-//     const hasCollidedWithPlayer = this.detectCollision(
-//       ctx.canvas,
-//       particles,
-//       player
-//     );
-//     // If a collision with the player happened, exit early.
-//     if (hasCollidedWithPlayer) {
-//       return true;
-//     }
-//
-//     // Update color
-//     if (this.hue >= 360) {
-//       this.hue = 0;
-//     } else {
-//       this.color = `hsl(${this.hue}deg, 100%, 50%)`;
-//       this.hue += 0.4;
-//     }
-//   }
-//
-//   detectCollision(
-//     canvas: HTMLCanvasElement,
-//     particles: Particle[],
-//     player: Player
-//   ) {
-//     // Loop over particles for collision detection
-//     for (let i = 0; i < particles.length; i++) {
-//       // Never compare particle to itself, skips if true.
-//       if (this === particles[i]) continue;
-//
-//       const dist = distance(this.x, this.y, particles[i].x, particles[i].y);
-//
-//       if (dist - this.radius - particles[i].radius < 0) {
-//         // Elastic collision
-//         resolveCollision(this, particles[i]);
-//
-//         // Light up particles on collision
-//         this.opacity = 0.6;
-//         particles[i].opacity = 0.6;
-//       }
-//     }
-//
-//     // Reset back to transparent after collision
-//     if (this.opacity > 0.02) {
-//       this.opacity -= 0.02;
-//       this.opacity = Math.max(0, this.opacity);
-//     }
-//
-//     // Particles collide with walls if option set true
-//     if (this.wallCollision) {
-//       if (this.x - this.radius < 0 || this.x + this.radius >= canvas.width) {
-//         this.velocity.x = -this.velocity.x;
-//       }
-//       if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
-//         this.velocity.y = -this.velocity.y;
-//       }
-//       // Else the particles come back on other side if they travel offscreen
-//     } else {
-//       const space = 0; // Extra space offscreen
-//       if (this.x - this.radius > canvas.width + space) this.x = 0 - this.radius;
-//       if (this.x + this.radius < 0 - space) this.x = canvas.width + this.radius;
-//       if (this.y - this.radius > canvas.height + space)
-//         this.y = 0 - this.radius;
-//       if (this.y + this.radius < 0 - space)
-//         this.y = canvas.height + this.radius;
-//     }
-//
-//     // Player object collision (should I handle in player class?)
-//     const playerDistance = distance(this.x, this.y, player.x, player.y);
-//
-//     if (playerDistance - this.radius - player.radius <= 0) {
-//       this.opacity = 1;
-//       return true;
-//     }
-//   }
-// }
-
-/**
  * Guardians protect and guard the goal
  */
+
+export type GuardianState = "orbiting" | "returning" | "returned";
 
 export class Guardian {
   position: Vector2;
@@ -161,8 +25,7 @@ export class Guardian {
   circlVelocity: number;
   distanceFromCenter: number;
   mass: number;
-  isReturning: boolean;
-  startPosition: Vector2;
+  state: GuardianState;
 
   constructor(
     x: number,
@@ -176,13 +39,13 @@ export class Guardian {
     this.velocity = new Vector2(0, 0);
     this.radius = radius;
     this.radians = radians;
-    this.color = "hsl(0deg, 0%, 100%)";
+    // this.color = "hsl(0deg, 0%, 100%)";
+    this.color = "hsl(56deg, 0%, 87%)";
     this.opacity = 0.2;
     this.circlVelocity = 0.005;
     this.distanceFromCenter = distanceFromCenter;
     this.mass = 1;
-    this.isReturning = false;
-    this.startPosition = new Vector2(x, y);
+    this.state = "orbiting";
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -209,6 +72,9 @@ export class Guardian {
   }
 
   update(ctx: CanvasRenderingContext2D, particles: Particle_2[], goal: Goal) {
+    if (this.state === "returned") {
+      return;
+    }
     const lastPosition = new Vector2(this.position.x, this.position.y);
 
     // Circular Motion
@@ -224,19 +90,20 @@ export class Guardian {
       goal.height / 2 +
       Math.sin(this.radians) * this.distanceFromCenter;
 
-    if (this.isReturning) {
+    if (this.state === "returning") {
       // Inverse circular motion: return to startPosition
       const initialDistanceFromCenter = 50; // Assuming this is the initial distance from createGuardians
-      const returnSpeed = 1; // Adjust as needed
+      const returnSpeed = 3; // Adjust as needed
 
       if (this.distanceFromCenter > initialDistanceFromCenter) {
+        // Srink the circle over time
         this.distanceFromCenter = Math.max(
           initialDistanceFromCenter,
           this.distanceFromCenter - returnSpeed
         );
       } else {
         this.distanceFromCenter = initialDistanceFromCenter; // Ensure it doesn't go below initial
-        this.isReturning = false; // Stop returning
+        this.state = "returned";
         this.velocity = new Vector2(0, 0); // Set velocity to zero
       }
     } else {
@@ -281,7 +148,7 @@ export class Guardian {
     }
 
     // Only update velocity if not returning and stopped
-    if (!this.isReturning) {
+    if (this.state !== "returning") {
       this.velocity.x = (this.position.x - lastPosition.x) * 3;
       this.velocity.y = (this.position.y - lastPosition.y) * 3;
     }

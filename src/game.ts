@@ -37,7 +37,8 @@ export class Game {
     this.canvas.style.background = "#0c0c0c";
     this.mouse = { x: 0, y: 0 };
     this.particleSystem = new ParticleSystem(this.canvas);
-    this.player = new Player(50, this.canvas.height / 2, 30, "red");
+    // Just a thought but maybe the player should just be responsible for settings its own color
+    this.player = new Player(50, this.canvas.height / 2, 30, "#DEDEDE");
     this.guardians = [];
     this.goal = new Goal(
       this.canvas.width / 1.2 - 60,
@@ -107,20 +108,16 @@ export class Game {
   }
 
   reset() {
-    cancelAnimationFrame(this.frameRequest);
-    // this.goal.fill = false;
+    // A "soft" reset. It just resets the game objects and state,
+    // but doesn't touch the animation frame or the canvas.
     this.particleSystem.clearParticles();
     this.guardians = [];
     this.player = new Player(50, this.canvas.height / 2, 30, "red");
+    this.goal.fill = false;
     this.gameRunning = false;
     this.gameOver = false;
-    this.levelComplete = false;
     this.fadeAlpha = 0;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
     this.loadLevel();
-
-    this.draw();
   }
 
   start() {
@@ -157,7 +154,10 @@ export class Game {
         guardian.update(this.ctx, [], this.goal);
       });
 
-      if (this.guardians.every((g) => !g.isReturning) && !this.transitioning) {
+      if (
+        this.guardians.every((g) => g.state === "returned") &&
+        !this.transitioning
+      ) {
         // Guardians have returned, start wipe in
         this.transitioning = true;
         this.transitionPhase = 1; // Wipe in
@@ -165,33 +165,34 @@ export class Game {
           this.goal.x + this.goal.width / 2,
           this.goal.y + this.goal.height / 2
         );
-        this.transitionRadius = 0;
+        this.transitionRadius =
+          Math.max(this.canvas.width, this.canvas.height) * 1.5;
       }
 
       if (this.transitioning) {
         if (this.transitionPhase === 1) {
-          // Wipe in
-          this.transitionRadius += this.transitionSpeed * deltaTime;
-          const maxRadius =
-            Math.max(this.canvas.width, this.canvas.height) * 1.5; // Ensure it covers the screen
-          if (this.transitionRadius >= maxRadius) {
-            this.transitionRadius = maxRadius;
+          // Wipe in (shrinking circle)
+          this.transitionRadius -= this.transitionSpeed * deltaTime;
+          if (this.transitionRadius <= 0) {
+            this.transitionRadius = 0;
             this.transitionPhase = 2; // Switch to wipe out
             this.currentLevel++;
             if (this.currentLevel >= levels.length) {
               this.currentLevel = 0; // Loop back to the first level
             }
-            this.reset(); // Load next level
+            this.reset(); // Load next level behind the curtain
             this.transitionCenter = new Vector2(this.player.x, this.player.y); // Center on player for wipe out
           }
         } else if (this.transitionPhase === 2) {
-          // Wipe out
-          this.transitionRadius -= this.transitionSpeed * deltaTime;
-          if (this.transitionRadius <= 0) {
-            this.transitionRadius = 0;
+          // Wipe out (expanding circle)
+          this.transitionRadius += this.transitionSpeed * deltaTime;
+          const maxRadius =
+            Math.max(this.canvas.width, this.canvas.height) * 1.5;
+          if (this.transitionRadius >= maxRadius) {
+            // End of transition
             this.transitioning = false;
-            this.transitionPhase = 0; // Transition complete
-            this.levelComplete = false; // Reset level complete flag
+            this.transitionPhase = 0;
+            this.levelComplete = false;
           }
         }
       }
@@ -227,10 +228,11 @@ export class Game {
 
   startLevelCompletion() {
     this.levelComplete = true;
-    this.guardians.forEach((g) => (g.isReturning = true));
+    this.guardians.forEach((g) => (g.state = "returning"));
   }
 
   draw() {
+    // Draw all game objects
     this.particleSystem.draw(this.ctx);
     this.player.draw(this.ctx);
     this.goal.draw(this.ctx);
@@ -242,7 +244,7 @@ export class Game {
       this.ctx.moveTo(100, 0);
       this.ctx.lineTo(100, this.canvas.height);
       this.ctx.lineWidth = 10;
-      this.ctx.strokeStyle = "#eeeeee";
+      this.ctx.strokeStyle = "#DEDEDE";
       this.ctx.stroke();
       this.ctx.closePath();
 
@@ -258,25 +260,32 @@ export class Game {
     }
 
     if (this.transitioning) {
-      this.ctx.fillStyle = "black";
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-      this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.arc(
-        this.transitionCenter.x,
-        this.transitionCenter.y,
-        this.transitionRadius,
-        0,
-        Math.PI * 2
-      );
-      this.ctx.clip();
-      this.particleSystem.draw(this.ctx);
-      this.player.draw(this.ctx);
-      this.goal.draw(this.ctx);
-      this.guardians.forEach((guardian) => guardian.draw(this.ctx));
-      this.ctx.restore();
+      this.drawIrisWipe();
     }
+  }
+
+  drawIrisWipe() {
+    this.ctx.save();
+    this.ctx.fillStyle = "#DEDEDE";
+
+    // Outer rectangle path
+    this.ctx.beginPath();
+    this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Inner circle path (counter-clockwise)
+    this.ctx.arc(
+      this.transitionCenter.x,
+      this.transitionCenter.y,
+      this.transitionRadius,
+      0,
+      Math.PI * 2,
+      true // Counter-clockwise
+    );
+
+    // Fill the path using the even-odd rule to create a hole
+    this.ctx.fill("evenodd");
+
+    this.ctx.restore();
   }
 
   drawGameOver() {
