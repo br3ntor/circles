@@ -38,6 +38,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v3 # Use the official pnpm setup action
         with:
+          version: latest
           # If you want it to run pnpm install automatically after setup:
           run_install: true # This can replace your 'Install dependencies' step
       - name: Build
