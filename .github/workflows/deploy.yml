@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"] # Or "master", depending on your repo
+    branches: ["master"] # Or "master", depending on your repo
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
