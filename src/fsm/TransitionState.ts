@@ -58,6 +58,7 @@ export class TransitionState extends State {
       this.game.player.draw(ctx);
       this.game.goal.draw(ctx);
       this.game.guardians.forEach((guardian) => guardian.draw(ctx));
+      this.drawReadyUI(ctx);
     }
 
     this.drawIrisWipe(ctx);
