@@ -1,10 +1,4 @@
-import {
-  Goal,
-  Guardian,
-  ParticleSystem,
-  Player,
-  Vector2,
-} from "./game-objects";
+import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
 import { levels } from "./level-configs";
 import { StateMachine } from "./fsm/StateMachine";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
@@ -109,7 +103,7 @@ export class Game {
 
   update(deltaTime: number) {
     this.stateMachine.update(deltaTime);
-  } // Main Loop End
+  }
 
   draw() {
     this.stateMachine.draw(this.ctx);
