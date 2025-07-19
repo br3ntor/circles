@@ -1,3 +1,9 @@
+# Circles
+
+Experimental canvas game, still doesn't know what it is, but it will get there, wherever that might be.
+
+## Old Readme
+
 # Avoid the Circles
 
 Two Game Modes:
