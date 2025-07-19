@@ -33,17 +33,39 @@ export interface LevelConfig {
   pattern: Pattern;
   behaviors: BehaviorConfig[];
   particleCount?: number;
-  radius: () => number;
-  color: () => string;
+  radius?: () => number;
+  color?: () => string;
+  vx?: () => number;
+  vy?: () => number;
 }
 
 export const levels: LevelConfig[] = [
   {
     pattern: "random",
-    behaviors: [{ type: "wall", mode: "wrap" }, { type: "collision" }],
-    particleCount: 1,
-    radius: () => 320,
+    behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
+    particleCount: balls() + 20,
+    radius: () => 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => 220,
+    vy: () => 0,
+  },
+  {
+    pattern: "random",
+    behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
+    particleCount: 7,
+    radius: () => 200,
+    color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => (Math.random() - 0.5) * 100,
+    vy: () => (Math.random() - 0.5) * 100,
+  },
+  {
+    pattern: "random",
+    behaviors: [{ type: "wall", mode: "wrap" }, { type: "collision" }],
+    particleCount: balls() + 50,
+    radius: () => 20,
+    color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => (Math.random() - 0.5) * 200,
+    vy: () => (Math.random() - 0.5) * 200,
   },
   {
     pattern: "random",
@@ -51,7 +73,10 @@ export const levels: LevelConfig[] = [
     particleCount: balls(),
     radius: () => Math.random() * 30 + 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => (Math.random() - 0.5) * 100,
+    vy: () => (Math.random() - 0.5) * 100,
   },
+
   // {
   //   pattern: "spiral",
   //   behaviors: [

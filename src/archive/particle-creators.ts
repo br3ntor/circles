@@ -1,5 +1,5 @@
 import { DynamicParticleConfig, ParticleProps } from "./types.ts";
-import { Particle_2 } from "../game-objects.ts";
+import { Particle } from "../game-objects.ts";
 import { distance, getRandomColor } from "../utils.ts";
 
 const wallEnd = 105;
@@ -63,7 +63,7 @@ export function gridPattern(
         dy: config.velocity.y,
         wallCollision: false,
       };
-      const p = new Particle_2(c.x, c.y, {
+      const p = new Particle(c.x, c.y, {
         radius: c.radius,
         color: c.color,
         vx: c.dx,
@@ -125,7 +125,7 @@ export function dynamicParticleCreator(
     }
 
     particles.push(
-      new Particle_2(x, y, {
+      new Particle(x, y, {
         radius,
         color,
         vx: dx,
@@ -163,7 +163,7 @@ export function starPatternCreator(canvas: HTMLCanvasElement) {
         wallCollision: false,
       };
       particles.push(
-        new Particle_2(p.x, p.y, {
+        new Particle(p.x, p.y, {
           radius: p.radius,
           color: p.color,
           vx: p.dx,

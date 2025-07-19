@@ -1,32 +1,6 @@
-import {
-  // Particle,
-  Particle_2,
-  ParticleBehavior,
-  Vector2,
-} from "./game-objects";
+import { Particle, ParticleBehavior, Vector2 } from "./game-objects";
 import { distance } from "./utils";
 import resolveCollision from "./elastic-collision";
-
-// export function rotationBehavior(
-//   centerX: number,
-//   centerY: number,
-//   rotationSpeed: number
-// ): (particle: Particle) => void {
-//   return function (particle: Particle) {
-//     const dx = particle.x - centerX;
-//     const dy = particle.y - centerY;
-//     const distance = Math.sqrt(dx * dx + dy * dy);
-//     const originalAngle = Math.atan2(dy, dx);
-//     const newAngle = originalAngle + rotationSpeed;
-//     particle.x = centerX + Math.cos(newAngle) * distance;
-//     particle.y = centerY + Math.sin(newAngle) * distance;
-//   };
-// }
-
-// export function velocityBehavior(particle: Particle) {
-//   particle.x += particle.velocity.x;
-//   particle.y += particle.velocity.y;
-// }
 
 export class RandomMovement implements ParticleBehavior {
   intensity: number;
@@ -35,7 +9,7 @@ export class RandomMovement implements ParticleBehavior {
     this.intensity = intensity;
   }
 
-  update(particle: Particle_2, deltaTime: number, time: number): void {
+  update(particle: Particle, deltaTime: number, time: number): void {
     const randomForce = new Vector2(
       (Math.random() - 0.5) * this.intensity,
       (Math.random() - 0.5) * this.intensity
@@ -55,7 +29,7 @@ export class OrbitBehavior implements ParticleBehavior {
     this.speed = speed;
   }
 
-  update(particle: Particle_2, deltaTime: number, time: number): void {
+  update(particle: Particle, deltaTime: number, time: number): void {
     particle.angle += this.speed * deltaTime;
     particle.position = new Vector2(
       this.centerPoint.x + Math.cos(particle.angle) * this.radius,
@@ -82,7 +56,7 @@ export class SpiralBehavior implements ParticleBehavior {
     this.rotationSpeed = rotationSpeed;
   }
 
-  update(particle: Particle_2, deltaTime: number, time: number): void {
+  update(particle: Particle, deltaTime: number, time: number): void {
     particle.angle += this.rotationSpeed * deltaTime;
     const currentRadius = this.initialRadius + time * this.growthRate;
     particle.position = new Vector2(
@@ -109,7 +83,7 @@ export class WaveBehavior implements ParticleBehavior {
     this.baseY = 0;
   }
 
-  update(particle: Particle_2, deltaTime: number, time: number): void {
+  update(particle: Particle, deltaTime: number, time: number): void {
     if (this.baseY === 0) this.baseY = particle.position.y;
 
     particle.position.x += this.speed * deltaTime;
@@ -125,13 +99,13 @@ export class WaveBehavior implements ParticleBehavior {
 }
 
 export class CollisionBehavior implements ParticleBehavior {
-  particles: Particle_2[];
+  particles: Particle[];
 
-  constructor(particles: Particle_2[]) {
+  constructor(particles: Particle[]) {
     this.particles = particles;
   }
 
-  update(particle: Particle_2): void {
+  update(particle: Particle): void {
     for (let i = 0; i < this.particles.length; i++) {
       const otherParticle = this.particles[i];
       if (particle === otherParticle) continue;
@@ -170,7 +144,7 @@ export class WallBehavior implements ParticleBehavior {
     this.mode = mode;
   }
 
-  update(particle: Particle_2): void {
+  update(particle: Particle): void {
     if (this.mode === "collide") {
       if (
         particle.position.x - particle.radius < 0 ||

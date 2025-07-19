@@ -7,7 +7,7 @@ import {
   CollisionBehavior,
   WallBehavior,
 } from "./particle-behaviors.ts";
-import { BehaviorConfig } from "./level-configs.ts";
+import { BehaviorConfig, LevelConfig, Pattern } from "./level-configs.ts";
 
 /**
  * Guardians protect and guard the goal
@@ -38,7 +38,6 @@ export class Guardian {
     this.velocity = new Vector2(0, 0);
     this.radius = radius;
     this.radians = radians;
-    // this.color = "hsl(0deg, 0%, 100%)";
     this.color = "hsl(56deg, 0%, 87%)";
     this.opacity = 0.2;
     this.circlVelocity = 0.005;
@@ -71,7 +70,7 @@ export class Guardian {
   }
 
   // update(ctx: CanvasRenderingContext2D, particles: Particle_2[], goal: Goal) {
-  update(particles: Particle_2[], goal: Goal) {
+  update(particles: Particle[], goal: Goal) {
     if (this.state === "returned") {
       return;
     }
@@ -81,14 +80,8 @@ export class Guardian {
     this.radians += this.circlVelocity;
 
     // Update position based on current distanceFromCenter and initial radians
-    this.position.x =
-      goal.x +
-      goal.width / 2 +
-      Math.cos(this.radians) * this.distanceFromCenter;
-    this.position.y =
-      goal.y +
-      goal.height / 2 +
-      Math.sin(this.radians) * this.distanceFromCenter;
+    this.position.x = goal.x + Math.cos(this.radians) * this.distanceFromCenter;
+    this.position.y = goal.y + Math.sin(this.radians) * this.distanceFromCenter;
 
     if (this.state === "returning") {
       // Inverse circular motion: return to startPosition
@@ -139,11 +132,26 @@ export class Guardian {
       this.opacity = Math.max(0, this.opacity);
     }
 
-    if (this.color !== "hsl(0deg, 0%, 100%)") {
+    // Changes back to original color
+    if (this.color !== "hsl(56deg, 0%, 87%)") {
       const hsl = getHSL(this.color);
-      const h = Math.max(0, hsl.H - 1);
+
+      let h = hsl.H;
+      if (h > 56) {
+        h = Math.max(56, h - 1);
+      } else if (h < 56) {
+        h = Math.min(56, h + 1);
+      }
+
       const s = Math.max(0, hsl.S - 1);
-      const l = Math.min(100, hsl.L + 1);
+
+      let l = hsl.L;
+      if (l > 87) {
+        l = Math.max(87, l - 1);
+      } else if (l < 87) {
+        l = Math.min(87, l + 1);
+      }
+
       this.color = `hsl(${h}deg, ${s}%, ${l}%)`;
     }
 
@@ -228,7 +236,7 @@ export class Player {
     );
   }
 
-  detectCollision(particles: Particle_2[]): boolean {
+  detectCollision(particles: Particle[]): boolean {
     for (const particle of particles) {
       const dist = distance(this.x, this.y, particle.x, particle.y);
       if (dist - this.radius - particle.radius <= 0) {
@@ -244,41 +252,40 @@ export class Player {
 export class Goal {
   x: number;
   y: number;
-  width: number;
-  height: number;
+  radius: number;
   fill: boolean;
 
-  constructor(x: number, y: number, width: number, height: number) {
+  constructor(x: number, y: number, radius: number) {
     this.x = x;
     this.y = y;
-    this.width = width;
-    this.height = height;
+    this.radius = radius;
     this.fill = false;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     if (this.fill === true) {
-      ctx.fillStyle = "#7bf977";
-      ctx.fillRect(this.x, this.y, this.width, this.height);
+      ctx.fillStyle = "#DEDEDE";
+      ctx.fill();
     } else {
-      ctx.strokeStyle = "#7bf977";
-      ctx.strokeRect(this.x, this.y, this.width, this.height);
+      ctx.strokeStyle = "#DEDEDE";
+      ctx.stroke();
     }
+    ctx.closePath();
   }
 
   update(ctx: CanvasRenderingContext2D, player: Player) {
+    // Collision detection for player entering goal
     this.draw(ctx);
-    if (
-      player.x - player.radius > this.x &&
-      player.x + player.radius < this.x + this.width &&
-      player.y - player.radius > this.y &&
-      player.y + player.radius < this.y + this.height
-    ) {
+    const dist = distance(this.x, this.y, player.x, player.y);
+    if (dist < this.radius - player.radius) {
       this.fill = true;
       return true;
     } else {
       this.fill = false;
+      return false;
     }
   }
 }
@@ -366,7 +373,7 @@ export class Vector2 {
 }
 
 export interface ParticleBehavior {
-  update(particle: Particle_2, deltaTime: number, time: number): void;
+  update(particle: Particle, deltaTime: number, time: number): void;
 }
 
 export interface ParticleOptions {
@@ -387,7 +394,7 @@ export interface ParticleOptions {
   opacity?: number;
 }
 
-export class Particle_2 {
+export class Particle {
   position: Vector2;
   velocity: Vector2;
   acceleration: Vector2;
@@ -474,17 +481,22 @@ export class Particle_2 {
     return this.life > 0;
   }
 }
+interface PatternCreatorInput {
+  behaviors: ParticleBehavior[];
+  particleCount: number;
+  radius?: () => number;
+  color?: () => string;
+  vx?: () => number;
+  vy?: () => number;
+}
+
+type PatternCreator = (input: PatternCreatorInput) => void;
 
 export class ParticleSystem {
   private canvas: HTMLCanvasElement;
-  private particles: Particle_2[];
+  private particles: Particle[];
   private patterns: {
-    [key: string]: (
-      behaviors: ParticleBehavior[],
-      particleCount: number,
-      radius: () => number,
-      color: () => string
-    ) => void;
+    [key in Pattern]?: PatternCreator;
   };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -514,7 +526,7 @@ export class ParticleSystem {
     });
   }
 
-  addParticle(particle: Particle_2): void {
+  addParticle(particle: Particle): void {
     this.particles.push(particle);
   }
 
@@ -522,21 +534,23 @@ export class ParticleSystem {
     this.particles = [];
   }
 
-  getParticles(): Particle_2[] {
+  getParticles(): Particle[] {
     return this.particles;
   }
 
-  createPattern(
-    patternName: string,
-    behaviorConfigs: BehaviorConfig[] = [],
-    particleCount: number = 100,
-    radius: () => number,
-    color: () => string
-  ): void {
+  createPattern(config: LevelConfig): void {
     this.clearParticles();
-    if (this.patterns[patternName]) {
-      const behaviors = this._createBehaviorsFromConfig(behaviorConfigs);
-      this.patterns[patternName](behaviors, particleCount, radius, color);
+    const patternCreator = this.patterns[config.pattern];
+    if (patternCreator) {
+      const behaviors = this._createBehaviorsFromConfig(config.behaviors);
+      patternCreator({
+        behaviors,
+        particleCount: config.particleCount ?? 100,
+        radius: config.radius,
+        color: config.color,
+        vx: config.vx,
+        vy: config.vy,
+      });
     }
   }
 
@@ -573,16 +587,16 @@ export class ParticleSystem {
     });
   }
 
-  private createRandomPattern(
-    behaviors: ParticleBehavior[],
-    particleCount: number,
-    radius: () => number,
-    color: () => string
-  ): void {
-    // const colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7"];
-
+  private createRandomPattern({
+    behaviors,
+    particleCount,
+    radius,
+    color,
+    vx,
+    vy,
+  }: PatternCreatorInput): void {
     for (let i = 0; i < particleCount; i++) {
-      const r = radius();
+      const r = radius ? radius() : 10;
       let x = getRandomX(r, 105, this.canvas);
       let y = getRandomY(r, this.canvas);
 
@@ -603,11 +617,11 @@ export class ParticleSystem {
         }
       }
 
-      const particle = new Particle_2(x, y, {
-        vx: (Math.random() - 0.5) * 100,
-        vy: (Math.random() - 0.5) * 100,
+      const particle = new Particle(x, y, {
+        vx: vx ? vx() : 0,
+        vy: vy ? vy() : 0,
         radius: r,
-        color: color(),
+        color: color ? color() : "white",
         life: 1.0,
         fadeRate: 0,
         behaviors,
@@ -616,10 +630,10 @@ export class ParticleSystem {
     }
   }
 
-  private createSpiralPattern(
-    behaviors: ParticleBehavior[],
-    particleCount: number
-  ): void {
+  private createSpiralPattern({
+    behaviors,
+    particleCount,
+  }: PatternCreatorInput): void {
     const spiralDensity = 0.5;
     const angleStep = (Math.PI * 2) / 50;
 
@@ -629,7 +643,7 @@ export class ParticleSystem {
       const x = this.canvas.width / 2 + Math.cos(angle) * distance;
       const y = this.canvas.height / 2 + Math.sin(angle) * distance;
 
-      const particle = new Particle_2(x, y, {
+      const particle = new Particle(x, y, {
         radius: 3,
         color: `hsl(${i * 2}, 100%, 50%)`,
         life: 2.0,
@@ -640,10 +654,10 @@ export class ParticleSystem {
     }
   }
 
-  private createStarPattern(
-    behaviors: ParticleBehavior[],
-    particleCount: number
-  ): void {
+  private createStarPattern({
+    behaviors,
+    particleCount,
+  }: PatternCreatorInput): void {
     const numArms = 5;
     const armLength = 200;
 
@@ -654,7 +668,7 @@ export class ParticleSystem {
       const x = this.canvas.width / 2 + Math.cos(angle) * distance;
       const y = this.canvas.height / 2 + Math.sin(angle) * distance;
 
-      const particle = new Particle_2(x, y, {
+      const particle = new Particle(x, y, {
         radius: 2,
         color: "white",
         life: 1.5,
@@ -665,10 +679,10 @@ export class ParticleSystem {
     }
   }
 
-  private createCirclePattern(
-    behaviors: ParticleBehavior[],
-    particleCount: number
-  ): void {
+  private createCirclePattern({
+    behaviors,
+    particleCount,
+  }: PatternCreatorInput): void {
     const radius = 150;
 
     for (let i = 0; i < particleCount; i++) {
@@ -676,7 +690,7 @@ export class ParticleSystem {
       const x = this.canvas.width / 2 + Math.cos(angle) * radius;
       const y = this.canvas.height / 2 + Math.sin(angle) * radius;
 
-      const particle = new Particle_2(x, y, {
+      const particle = new Particle(x, y, {
         radius: 4,
         color: `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
         life: 3.0,
@@ -687,10 +701,10 @@ export class ParticleSystem {
     }
   }
 
-  private createWavePattern(
-    behaviors: ParticleBehavior[],
-    particleCount: number
-  ): void {
+  private createWavePattern({
+    behaviors,
+    particleCount,
+  }: PatternCreatorInput): void {
     const waveAmplitude = 100;
     const waveFrequency = 0.1;
 
@@ -699,7 +713,7 @@ export class ParticleSystem {
       const y =
         this.canvas.height / 2 + Math.sin(i * waveFrequency) * waveAmplitude;
 
-      const particle = new Particle_2(x, y, {
+      const particle = new Particle(x, y, {
         radius: 3,
         color: `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
         life: 2.5,
@@ -710,17 +724,17 @@ export class ParticleSystem {
     }
   }
 
-  private createOrbitPattern(
-    behaviors: ParticleBehavior[],
-    particleCount: number
-  ) {
+  private createOrbitPattern({
+    behaviors,
+    particleCount,
+  }: PatternCreatorInput) {
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
     for (let i = 0; i < particleCount; i++) {
       const radius = Math.random() * 200 + 50;
       const angle = Math.random() * Math.PI * 2;
       // const speed = Math.random() * 0.02 + 0.01;
-      const particle = new Particle_2(
+      const particle = new Particle(
         centerX + Math.cos(angle) * radius,
         centerY + Math.sin(angle) * radius,
         {

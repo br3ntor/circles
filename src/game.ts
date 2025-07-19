@@ -5,7 +5,7 @@ import {
   Player,
   Vector2,
 } from "./game-objects";
-import { levels, LevelConfig } from "./level-configs";
+import { levels } from "./level-configs";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -39,12 +39,7 @@ export class Game {
     this.particleSystem = new ParticleSystem(this.canvas);
     this.player = new Player(50, this.canvas.height / 2, 30);
     this.guardians = [];
-    this.goal = new Goal(
-      this.canvas.width / 1.2 - 60,
-      this.canvas.height / 2 - 60,
-      120,
-      120
-    );
+    this.goal = new Goal(this.canvas.width / 1.2, this.canvas.height / 2, 60);
     this.gameRunning = false;
     this.gameOver = false;
     this.levelComplete = false;
@@ -78,20 +73,10 @@ export class Game {
 
     // The createParticles clears old particles but
     // createGuardians does not...
-    this.createParticles(levelConfig);
+    this.particleSystem.createPattern(levelConfig);
     this.createGuardians();
 
     // this.draw();
-  }
-
-  createParticles(levelConfig: LevelConfig) {
-    this.particleSystem.createPattern(
-      levelConfig.pattern,
-      levelConfig.behaviors,
-      levelConfig.particleCount,
-      levelConfig.radius,
-      levelConfig.color
-    );
   }
 
   createGuardians() {
@@ -103,10 +88,8 @@ export class Game {
       const radians = angle * Math.PI * 2;
       const radius = 50;
       const distance = radius;
-      const x =
-        this.goal.x + this.goal.width / 2 + Math.cos(radians) * distance;
-      const y =
-        this.goal.y + this.goal.height / 2 + Math.sin(radians) * distance;
+      const x = this.goal.x + Math.cos(radians) * distance;
+      const y = this.goal.y + Math.sin(radians) * distance;
       const newGuardian = new Guardian(x, y, radius, radians);
       this.guardians.push(newGuardian);
       angle += spaceBetween;
@@ -178,10 +161,7 @@ export class Game {
         // Guardians have returned, start wipe in
         this.transitioning = true;
         this.transitionPhase = 1; // Wipe in
-        this.transitionCenter = new Vector2(
-          this.goal.x + this.goal.width / 2,
-          this.goal.y + this.goal.height / 2
-        );
+        this.transitionCenter = new Vector2(this.goal.x, this.goal.y);
         this.transitionRadius =
           Math.max(this.canvas.width, this.canvas.height) * 1.5;
       }
