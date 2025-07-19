@@ -15,11 +15,4 @@ export class LevelCompleteState extends State {
       this.game.stateMachine.transitionTo(new TransitionState(this.game));
     }
   }
-
-  public draw(ctx: CanvasRenderingContext2D): void {
-    this.game.particleSystem.draw(ctx);
-    this.game.player.draw(ctx);
-    this.game.goal.draw(ctx);
-    this.game.guardians.forEach((guardian) => guardian.draw(ctx));
-  }
 }

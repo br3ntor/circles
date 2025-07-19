@@ -20,10 +20,4 @@ export class StateMachine {
       this._currentState.update(deltaTime);
     }
   }
-
-  public draw(ctx: CanvasRenderingContext2D): void {
-    if (this._currentState) {
-      this._currentState.draw(ctx);
-    }
-  }
 }
