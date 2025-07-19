@@ -3,6 +3,7 @@ import { StateMachine } from "./fsm/StateMachine";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { LevelManager } from "./LevelManager";
 import { Renderer } from "./Renderer";
+import { gameConfig } from "./game-config";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -28,7 +29,11 @@ export class Game {
     this.mouse = { x: 0, y: 0 };
     this.particleSystem = new ParticleSystem(this.canvas);
     this.guardians = [];
-    this.goal = new Goal(this.canvas.width / 1.2, this.canvas.height / 2, 60);
+    this.goal = new Goal(
+      this.canvas.width / 1.2,
+      this.canvas.height / 2,
+      gameConfig.goal.radius
+    );
     this.stateMachine = new StateMachine();
     this.levelManager = new LevelManager(this);
     this.renderer = new Renderer(this);

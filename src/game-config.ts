@@ -3,8 +3,7 @@ export const gameConfig = {
     radius: 30,
   },
   goal: {
-    width: 120,
-    height: 120,
+    radius: 60,
   },
   guardians: {
     count: 6,
