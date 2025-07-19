@@ -61,6 +61,9 @@ export function setupEventListeners(game: Game) {
    */
   addEventListener("contextmenu", (event: MouseEvent) => {
     event.preventDefault();
-    game.reset();
+    const currentState = game.stateMachine.currentState;
+    if (currentState instanceof ReadyToStartState) {
+      game.reset();
+    }
   });
 }
