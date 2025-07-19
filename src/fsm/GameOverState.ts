@@ -1,5 +1,4 @@
 import { State } from "./State";
-import { ReadyToStartState } from "./ReadyToStartState";
 
 export class GameOverState extends State {
   public fadeAlpha: number = 0;
