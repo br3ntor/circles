@@ -200,7 +200,7 @@ export class Player {
     ctx.fill();
   }
 
-  update(gameRunning: boolean, mouse: { x: number; y: number }) {
+  update(mouse: { x: number; y: number }) {
     const dx = mouse.x - this.x;
     const dy = mouse.y - this.y;
 
@@ -214,13 +214,7 @@ export class Player {
     const xVelocity = Math.cos(angle) * this.speed;
     const yVelocity = Math.sin(angle) * this.speed;
 
-    // Handle X movement with wall constraint when game not running
-    if (!gameRunning && this.x + this.radius >= 95 && dx > 2) {
-      this.x = 95 - this.radius;
-    } else {
-      this.x += xVelocity;
-    }
-
+    this.x += xVelocity;
     this.y += yVelocity;
     this.constrainToBounds();
   }

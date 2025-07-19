@@ -1,5 +1,8 @@
 import { Game } from "./game";
 import { distance } from "./utils";
+import { ReadyToStartState } from "./fsm/ReadyToStartState";
+import { PlayingState } from "./fsm/PlayingState";
+import { GameOverState } from "./fsm/GameOverState";
 
 export function setupEventListeners(game: Game) {
   // Updates mouse state
@@ -19,14 +22,17 @@ export function setupEventListeners(game: Game) {
    * Left click events
    */
   addEventListener("click", (event) => {
-    // If the game is over and the fade-out is complete, reset the game
-    if (game.gameOver && game.fadeAlpha >= 1) {
-      game.reset();
+    const currentState = game.stateMachine.currentState;
+
+    if (currentState instanceof GameOverState) {
+      // Only allow restart after the fade-in is mostly complete
+      if (currentState.fadeAlpha >= 0.8) {
+        game.reset();
+      }
       return;
     }
 
-    // If the game is not running, check if the player is clicked to start the game
-    if (!game.gameRunning) {
+    if (currentState instanceof ReadyToStartState) {
       const clickDistance = distance(
         event.clientX,
         event.clientY,
@@ -35,17 +41,16 @@ export function setupEventListeners(game: Game) {
       );
 
       if (clickDistance < game.player.radius) {
-        // game.gameRunning = true;
-        game.start();
+        game.stateMachine.transitionTo(new PlayingState(game));
       }
     }
   });
 
   addEventListener("keydown", (event) => {
+    const currentState = game.stateMachine.currentState;
     if (event.key === " " || event.code === "Space") {
-      if (!game.gameRunning) {
-        game.gameRunning = true;
-        game.start();
+      if (currentState instanceof ReadyToStartState) {
+        game.stateMachine.transitionTo(new PlayingState(game));
       }
     }
   });
