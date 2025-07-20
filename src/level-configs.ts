@@ -14,7 +14,8 @@ export type BehaviorType =
   | "orbit"
   | "spiral"
   | "wave"
-  | "randomMovement";
+  | "randomMovement"
+  | "fadeOut";
 
 export interface BehaviorConfig {
   type: BehaviorType;
@@ -43,20 +44,24 @@ export const levels: LevelConfig[] = [
   {
     pattern: "spiral",
     behaviors: [
-      { type: "wall", mode: "wrap" },
+      // { type: "wall", mode: "wrap" },
       {
         type: "spiral",
-        // centerPoint will be calculated in ParticleSystem
-        initialRadius: 50,
+        initialRadius: 100,
         growthRate: 10,
         rotationSpeed: 2,
       },
+      // { type: "fadeOut", lifespan: 10 },
     ],
+    radius: () => 20,
     particleCount: 150,
   },
   {
     pattern: "random",
-    behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
+    behaviors: [
+      { type: "wall", mode: "collide" },
+      { type: "collision", mode: "lightUp" },
+    ],
     particleCount: balls() + 20,
     radius: () => 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
@@ -90,7 +95,6 @@ export const levels: LevelConfig[] = [
     vx: () => (Math.random() - 0.5) * 100,
     vy: () => (Math.random() - 0.5) * 100,
   },
-
   {
     pattern: "waves",
     behaviors: [

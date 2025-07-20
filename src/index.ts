@@ -5,5 +5,4 @@ import { setupEventListeners } from "./event-listeners";
 (function initGame() {
   const game = new Game();
   setupEventListeners(game);
-  game.animate();
 })();

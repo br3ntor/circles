@@ -39,9 +39,10 @@ export class Game {
     this.renderer = new Renderer(this);
     this.frameRequest = 0;
     this.time = 0;
-    this.lastTime = 0;
+    this.lastTime = performance.now();
     this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
+    this.animate();
   }
 
   reset() {
@@ -51,12 +52,19 @@ export class Game {
     this.time = 0;
     this.lastTime = performance.now();
 
+    this.goal = new Goal(
+      this.canvas.width / 1.2,
+      this.canvas.height / 2,
+      gameConfig.goal.radius
+    );
+
     this.levelManager.reset();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
   }
 
   // Main loop
   animate() {
+    // console.log("Animate Called!");
     const now = performance.now();
     const deltaTime = (now - this.lastTime) / 1000;
     this.time += deltaTime;

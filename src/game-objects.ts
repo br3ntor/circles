@@ -6,6 +6,7 @@ import {
   WaveBehavior,
   CollisionBehavior,
   WallBehavior,
+  FadeOutBehavior,
 } from "./particle-behaviors.ts";
 import { BehaviorConfig, LevelConfig, Pattern } from "./level-configs.ts";
 
@@ -24,7 +25,6 @@ export class Guardian {
   opacity: number;
   circlVelocity: number;
   distanceFromCenter: number;
-  mass: number;
   state: GuardianState;
 
   constructor(
@@ -42,7 +42,6 @@ export class Guardian {
     this.opacity = 0.2;
     this.circlVelocity = 0.005;
     this.distanceFromCenter = distanceFromCenter;
-    this.mass = 1;
     this.state = "orbiting";
   }
 
@@ -121,8 +120,8 @@ export class Guardian {
 
         // Light up particles and guardian on collision
         this.opacity = 0.6;
-        particles[i].opacity = 0.6;
         this.color = particles[i].color;
+        particles[i].fillOpacity = 1;
       }
     }
 
@@ -234,8 +233,7 @@ export class Player {
     for (const particle of particles) {
       const dist = distance(this.x, this.y, particle.x, particle.y);
       if (dist - this.radius - particle.radius <= 0) {
-        particle.opacity = 0.6;
-        // this.color = "blue";
+        particle.fillOpacity = 1;
         return true;
       }
     }
@@ -375,13 +373,8 @@ export interface ParticleOptions {
   vy?: number;
   radius?: number;
   color?: string;
-  life?: number;
-  maxLife?: number;
-  fadeRate?: number;
-  isDynamic?: boolean;
   behaviors?: ParticleBehavior[];
   angle?: number;
-  angularVelocity?: number;
   centerPoint?: Vector2;
   distance?: number;
   mass?: number;
@@ -394,35 +387,31 @@ export class Particle {
   acceleration: Vector2;
   radius: number;
   color: string;
-  life: number;
-  maxLife: number;
-  fadeRate: number;
-  isDynamic: boolean;
   behaviors: ParticleBehavior[];
   angle: number;
-  angularVelocity: number;
   centerPoint?: Vector2;
   distance?: number;
   mass: number;
   opacity: number;
+  age: number;
+  shouldRemove: boolean;
+  fillOpacity: number;
 
   constructor(x: number, y: number, options: ParticleOptions = {}) {
+    this.age = 0;
     this.position = new Vector2(x, y);
     this.velocity = new Vector2(options.vx, options.vy);
     this.acceleration = new Vector2(0, 0);
     this.radius = options.radius ?? 10;
     this.color = options.color ?? "white";
-    this.life = options.life ?? 1;
-    this.maxLife = options.maxLife ?? 1;
-    this.fadeRate = options.fadeRate ?? 0.01;
-    this.isDynamic = options.isDynamic ?? false;
     this.behaviors = options.behaviors ?? [];
     this.angle = options.angle ?? 0;
-    this.angularVelocity = options.angularVelocity ?? 0;
     this.centerPoint = options.centerPoint;
     this.distance = options.distance;
     this.mass = options.mass ?? 1;
-    this.opacity = options.opacity ?? 0.5;
+    this.opacity = options.opacity ?? 1;
+    this.shouldRemove = false;
+    this.fillOpacity = 0.2;
   }
 
   get x() {
@@ -434,13 +423,21 @@ export class Particle {
   }
 
   update(deltaTime: number, time: number): void {
-    this.life -= this.fadeRate;
+    this.age += deltaTime;
+
+    // Fade out the fill opacity
+    if (this.fillOpacity > 0.2) {
+      this.fillOpacity = Math.max(0.2, this.fillOpacity - 2 * deltaTime);
+    }
+
+    // Apply acceleration before behaviors
+    this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
+    this.acceleration = new Vector2(0, 0);
 
     this.behaviors.forEach((behavior) =>
       behavior.update(this, deltaTime, time)
     );
 
-    this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
     this.position = this.position.add(this.velocity.multiply(deltaTime));
   }
 
@@ -448,7 +445,6 @@ export class Particle {
     ctx.save();
     ctx.globalAlpha = this.opacity;
     ctx.fillStyle = this.color;
-    ctx.globalAlpha = Math.max(0, this.life);
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
@@ -456,23 +452,32 @@ export class Particle {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.lineWidth = 2;
-    ctx.fillStyle = this.color;
-
     ctx.save();
     ctx.globalAlpha = this.opacity;
-    ctx.fill();
-    ctx.restore();
 
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+
+    // Draw fill if it's visible
+    if (this.fillOpacity > 0) {
+      ctx.save();
+      ctx.globalAlpha = this.fillOpacity;
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Always draw stroke
+    ctx.lineWidth = 2;
     ctx.strokeStyle = this.color;
     ctx.stroke();
+
     ctx.closePath();
+    ctx.restore();
   }
 
   isAlive(): boolean {
-    return this.life > 0;
+    return !this.shouldRemove;
   }
 }
 interface PatternCreatorInput {
@@ -508,10 +513,8 @@ export class ParticleSystem {
 
   update(deltaTime: number, time: number): void {
     // Update particles
-    this.particles = this.particles.filter((particle) => {
-      particle.update(deltaTime, time);
-      return particle.isAlive();
-    });
+    this.particles.forEach((p) => p.update(deltaTime, time));
+    this.particles = this.particles.filter((p) => p.isAlive());
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
@@ -557,7 +560,7 @@ export class ParticleSystem {
         case "wall":
           return new WallBehavior(this.canvas, config.mode);
         case "collision":
-          return new CollisionBehavior(this.particles);
+          return new CollisionBehavior(this.particles, config.mode);
         case "orbit":
           return new OrbitBehavior(center, config.radius, config.speed);
         case "spiral":
@@ -575,6 +578,8 @@ export class ParticleSystem {
           );
         case "randomMovement":
           return new RandomMovement(config.intensity);
+        case "fadeOut":
+          return new FadeOutBehavior(config.lifespan);
         default:
           throw new Error(`Unknown behavior type: ${config.type}`);
       }
@@ -616,8 +621,6 @@ export class ParticleSystem {
         vy: vy ? vy() : 0,
         radius: r,
         color: color ? color() : "white",
-        life: 1.0,
-        fadeRate: 0,
         behaviors,
       });
       this.addParticle(particle);
@@ -632,8 +635,8 @@ export class ParticleSystem {
     vx,
     vy,
   }: PatternCreatorInput): void {
-    const spiralDensity = 0.5;
-    const angleStep = (Math.PI * 2) / 50;
+    const spiralDensity = 1.5;
+    const angleStep = (Math.PI * 2) / 20;
 
     for (let i = 0; i < particleCount; i++) {
       const angle = i * angleStep;
@@ -646,8 +649,6 @@ export class ParticleSystem {
         vy: vy ? vy() : 0,
         radius: radius ? radius() : 3,
         color: color ? color() : `hsl(${i * 2}, 100%, 50%)`,
-        life: 2.0,
-        fadeRate: 0.005,
         behaviors,
         angle,
         distance,
@@ -679,8 +680,6 @@ export class ParticleSystem {
         vy: vy ? vy() : 0,
         radius: radius ? radius() : 2,
         color: color ? color() : "white",
-        life: 1.5,
-        fadeRate: 0.01,
         behaviors,
       });
       this.addParticle(particle);
@@ -707,8 +706,6 @@ export class ParticleSystem {
         vy: vy ? vy() : 0,
         radius: radius ? radius() : 4,
         color: color ? color() : `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
-        life: 3.0,
-        fadeRate: 0.003,
         behaviors,
       });
       this.addParticle(particle);
@@ -736,8 +733,6 @@ export class ParticleSystem {
         vy: vy ? vy() : 0,
         radius: radius ? radius() : 3,
         color: color ? color() : `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
-        life: 2.5,
-        fadeRate: 0.008,
         behaviors: behaviors,
       });
       this.addParticle(particle);

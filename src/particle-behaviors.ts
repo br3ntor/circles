@@ -57,20 +57,26 @@ export class SpiralBehavior implements ParticleBehavior {
   }
 
   update(particle: Particle, deltaTime: number, time: number): void {
+    // Ensure initial angle and distance are set.
     if (particle.distance === undefined) {
-      // Fallback to calculate distance if not set
       const dx = particle.position.x - this.centerPoint.x;
       const dy = particle.position.y - this.centerPoint.y;
       particle.distance = Math.sqrt(dx * dx + dy * dy);
     }
+    if (particle.angle === undefined || particle.angle === 0) {
+      const dx = particle.position.x - this.centerPoint.x;
+      const dy = particle.position.y - this.centerPoint.y;
+      particle.angle = Math.atan2(dy, dx);
+    }
 
-    particle.angle += this.rotationSpeed * deltaTime;
-    particle.distance += this.growthRate * deltaTime;
+    // Calculate current state based on particle's age, not global time
+    const currentAngle = particle.angle + particle.age * this.rotationSpeed;
+    const currentRadius = particle.distance + particle.age * this.growthRate;
 
-    particle.position = new Vector2(
-      this.centerPoint.x + Math.cos(particle.angle) * particle.distance,
-      this.centerPoint.y + Math.sin(particle.angle) * particle.distance
-    );
+    particle.position.x =
+      this.centerPoint.x + Math.cos(currentAngle) * currentRadius;
+    particle.position.y =
+      this.centerPoint.y + Math.sin(currentAngle) * currentRadius;
   }
 }
 
@@ -106,11 +112,15 @@ export class WaveBehavior implements ParticleBehavior {
   }
 }
 
+export type CollisionBehaviorMode = "none" | "lightUp";
+
 export class CollisionBehavior implements ParticleBehavior {
   particles: Particle[];
+  mode: CollisionBehaviorMode;
 
-  constructor(particles: Particle[]) {
+  constructor(particles: Particle[], mode: CollisionBehaviorMode = "none") {
     this.particles = particles;
+    this.mode = mode;
   }
 
   update(particle: Particle): void {
@@ -127,16 +137,11 @@ export class CollisionBehavior implements ParticleBehavior {
 
       if (dist - particle.radius - otherParticle.radius < 0) {
         resolveCollision(particle, otherParticle);
-        // Light up particles on collision
-        particle.opacity = 0.6;
-        otherParticle.opacity = 0.6;
+        if (this.mode === "lightUp") {
+          particle.fillOpacity = 1;
+          otherParticle.fillOpacity = 1;
+        }
       }
-    }
-
-    // Reset back to transparent after collision
-    if (particle.opacity > 0.02) {
-      particle.opacity -= 0.02;
-      particle.opacity = Math.max(0, particle.opacity);
     }
   }
 }
@@ -154,17 +159,21 @@ export class WallBehavior implements ParticleBehavior {
 
   update(particle: Particle): void {
     if (this.mode === "collide") {
-      if (
-        particle.position.x - particle.radius < 0 ||
-        particle.position.x + particle.radius > this.canvas.width
-      ) {
+      if (particle.position.x - particle.radius < 0) {
         particle.velocity.x = -particle.velocity.x;
+        particle.position.x = particle.radius; // Correct position
       }
-      if (
-        particle.position.y - particle.radius < 0 ||
-        particle.position.y + particle.radius > this.canvas.height
-      ) {
+      if (particle.position.x + particle.radius > this.canvas.width) {
+        particle.velocity.x = -particle.velocity.x;
+        particle.position.x = this.canvas.width - particle.radius; // Correct position
+      }
+      if (particle.position.y - particle.radius < 0) {
         particle.velocity.y = -particle.velocity.y;
+        particle.position.y = particle.radius; // Correct position
+      }
+      if (particle.position.y + particle.radius > this.canvas.height) {
+        particle.velocity.y = -particle.velocity.y;
+        particle.position.y = this.canvas.height - particle.radius; // Correct position
       }
     } else if (this.mode === "wrap") {
       if (particle.position.x - particle.radius > this.canvas.width) {
@@ -179,6 +188,23 @@ export class WallBehavior implements ParticleBehavior {
       if (particle.position.y + particle.radius < 0) {
         particle.position.y = this.canvas.height + particle.radius;
       }
+    }
+  }
+}
+
+export class FadeOutBehavior implements ParticleBehavior {
+  lifespan: number;
+
+  constructor(lifespan: number = 5) {
+    this.lifespan = lifespan;
+  }
+
+  update(particle: Particle): void {
+    const progress = particle.age / this.lifespan;
+    if (progress >= 1) {
+      particle.shouldRemove = true;
+    } else {
+      particle.opacity = 1 - progress;
     }
   }
 }
