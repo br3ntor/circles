@@ -627,6 +627,10 @@ export class ParticleSystem {
   private createSpiralPattern({
     behaviors,
     particleCount,
+    radius,
+    color,
+    vx,
+    vy,
   }: PatternCreatorInput): void {
     const spiralDensity = 0.5;
     const angleStep = (Math.PI * 2) / 50;
@@ -638,8 +642,10 @@ export class ParticleSystem {
       const y = this.canvas.height / 2 + Math.sin(angle) * distance;
 
       const particle = new Particle(x, y, {
-        radius: 3,
-        color: `hsl(${i * 2}, 100%, 50%)`,
+        vx: vx ? vx() : 0,
+        vy: vy ? vy() : 0,
+        radius: radius ? radius() : 3,
+        color: color ? color() : `hsl(${i * 2}, 100%, 50%)`,
         life: 2.0,
         fadeRate: 0.005,
         behaviors,
@@ -651,6 +657,10 @@ export class ParticleSystem {
   private createStarPattern({
     behaviors,
     particleCount,
+    radius,
+    color,
+    vx,
+    vy,
   }: PatternCreatorInput): void {
     const numArms = 5;
     const armLength = 200;
@@ -663,8 +673,10 @@ export class ParticleSystem {
       const y = this.canvas.height / 2 + Math.sin(angle) * distance;
 
       const particle = new Particle(x, y, {
-        radius: 2,
-        color: "white",
+        vx: vx ? vx() : 0,
+        vy: vy ? vy() : 0,
+        radius: radius ? radius() : 2,
+        color: color ? color() : "white",
         life: 1.5,
         fadeRate: 0.01,
         behaviors,
@@ -676,17 +688,23 @@ export class ParticleSystem {
   private createCirclePattern({
     behaviors,
     particleCount,
+    radius,
+    color,
+    vx,
+    vy,
   }: PatternCreatorInput): void {
-    const radius = 150;
+    const circleRadius = 150;
 
     for (let i = 0; i < particleCount; i++) {
       const angle = (i / particleCount) * (Math.PI * 2);
-      const x = this.canvas.width / 2 + Math.cos(angle) * radius;
-      const y = this.canvas.height / 2 + Math.sin(angle) * radius;
+      const x = this.canvas.width / 2 + Math.cos(angle) * circleRadius;
+      const y = this.canvas.height / 2 + Math.sin(angle) * circleRadius;
 
       const particle = new Particle(x, y, {
-        radius: 4,
-        color: `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
+        vx: vx ? vx() : 0,
+        vy: vy ? vy() : 0,
+        radius: radius ? radius() : 4,
+        color: color ? color() : `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
         life: 3.0,
         fadeRate: 0.003,
         behaviors,
@@ -698,6 +716,10 @@ export class ParticleSystem {
   private createWavePattern({
     behaviors,
     particleCount,
+    radius,
+    color,
+    vx,
+    vy,
   }: PatternCreatorInput): void {
     const waveAmplitude = 100;
     const waveFrequency = 0.1;
@@ -708,8 +730,10 @@ export class ParticleSystem {
         this.canvas.height / 2 + Math.sin(i * waveFrequency) * waveAmplitude;
 
       const particle = new Particle(x, y, {
-        radius: 3,
-        color: `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
+        vx: vx ? vx() : 0,
+        vy: vy ? vy() : 0,
+        radius: radius ? radius() : 3,
+        color: color ? color() : `hsl(${(i / particleCount) * 360}, 100%, 50%)`,
         life: 2.5,
         fadeRate: 0.008,
         behaviors: behaviors,
@@ -721,18 +745,25 @@ export class ParticleSystem {
   private createOrbitPattern({
     behaviors,
     particleCount,
+    radius,
+    color,
+    vx,
+    vy,
   }: PatternCreatorInput) {
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
     for (let i = 0; i < particleCount; i++) {
-      const radius = Math.random() * 200 + 50;
+      const r = Math.random() * 200 + 50;
       const angle = Math.random() * Math.PI * 2;
       // const speed = Math.random() * 0.02 + 0.01;
       const particle = new Particle(
-        centerX + Math.cos(angle) * radius,
-        centerY + Math.sin(angle) * radius,
+        centerX + Math.cos(angle) * r,
+        centerY + Math.sin(angle) * r,
         {
-          radius: 5,
+          vx: vx ? vx() : 0,
+          vy: vy ? vy() : 0,
+          radius: radius ? radius() : 5,
+          color: color ? color() : "white",
           behaviors: behaviors,
         }
       );

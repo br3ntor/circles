@@ -41,6 +41,20 @@ export interface LevelConfig {
 
 export const levels: LevelConfig[] = [
   {
+    pattern: "spiral",
+    behaviors: [
+      { type: "wall", mode: "wrap" },
+      {
+        type: "spiral",
+        // centerPoint will be calculated in ParticleSystem
+        initialRadius: 50,
+        growthRate: 10,
+        rotationSpeed: 2,
+      },
+    ],
+    particleCount: 150,
+  },
+  {
     pattern: "random",
     behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
     particleCount: balls() + 20,
@@ -77,39 +91,25 @@ export const levels: LevelConfig[] = [
     vy: () => (Math.random() - 0.5) * 100,
   },
 
-  // {
-  //   pattern: "spiral",
-  //   behaviors: [
-  //     { type: "wall", mode: "wrap" },
-  //     {
-  //       type: "spiral",
-  //       // centerPoint will be calculated in ParticleSystem
-  //       initialRadius: 50,
-  //       growthRate: 10,
-  //       rotationSpeed: 2,
-  //     },
-  //   ],
-  //   particleCount: 150,
-  // },
-  // {
-  //   pattern: "waves",
-  //   behaviors: [
-  //     { type: "wall", mode: "wrap" },
-  //     { type: "wave", amplitude: 50, frequency: 0.02, speed: 100 },
-  //   ],
-  //   particleCount: 200,
-  // },
-  // {
-  //   pattern: "orbit",
-  //   behaviors: [
-  //     { type: "wall", mode: "collide" },
-  //     {
-  //       type: "orbit",
-  //       // centerPoint will be calculated in ParticleSystem
-  //       radius: 200,
-  //       speed: 1,
-  //     },
-  //   ],
-  //   particleCount: 100,
-  // },
+  {
+    pattern: "waves",
+    behaviors: [
+      { type: "wall", mode: "wrap" },
+      { type: "wave", amplitude: 50, frequency: 0.02, speed: 100 },
+    ],
+    particleCount: 200,
+  },
+  {
+    pattern: "orbit",
+    behaviors: [
+      { type: "wall", mode: "collide" },
+      {
+        type: "orbit",
+        // centerPoint will be calculated in ParticleSystem
+        radius: 200,
+        speed: 1,
+      },
+    ],
+    particleCount: 100,
+  },
 ];
