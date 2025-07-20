@@ -57,11 +57,19 @@ export class SpiralBehavior implements ParticleBehavior {
   }
 
   update(particle: Particle, deltaTime: number, time: number): void {
+    if (particle.distance === undefined) {
+      // Fallback to calculate distance if not set
+      const dx = particle.position.x - this.centerPoint.x;
+      const dy = particle.position.y - this.centerPoint.y;
+      particle.distance = Math.sqrt(dx * dx + dy * dy);
+    }
+
     particle.angle += this.rotationSpeed * deltaTime;
-    const currentRadius = this.initialRadius + time * this.growthRate;
+    particle.distance += this.growthRate * deltaTime;
+
     particle.position = new Vector2(
-      this.centerPoint.x + Math.cos(particle.angle) * currentRadius,
-      this.centerPoint.y + Math.sin(particle.angle) * currentRadius
+      this.centerPoint.x + Math.cos(particle.angle) * particle.distance,
+      this.centerPoint.y + Math.sin(particle.angle) * particle.distance
     );
   }
 }

@@ -649,6 +649,8 @@ export class ParticleSystem {
         life: 2.0,
         fadeRate: 0.005,
         behaviors,
+        angle,
+        distance,
       });
       this.addParticle(particle);
     }
