@@ -1,3 +1,4 @@
+import { CollisionBehaviorMode, WallBehaviorMode } from "./particle-behaviors";
 import { balls, niceColor } from "./utils";
 
 export type Pattern =
@@ -16,8 +17,6 @@ export type BehaviorType =
   | "wave"
   | "randomMovement"
   | "fadeOut";
-
-import { CollisionBehaviorMode, WallBehaviorMode } from "./particle-behaviors";
 
 export type WallBehaviorConfig = {
   type: "wall";
@@ -62,14 +61,6 @@ export type BehaviorConfig =
   | RandomMovementBehaviorConfig
   | FadeOutBehaviorConfig;
 
-const colors = [
-  "hsl(0, 100%, 71%)",
-  "hsl(177, 56%, 58%)",
-  "hsl(190, 56%, 58%)",
-  "hsl(152, 44%, 67%)",
-  "hsl(45, 100%, 85%)",
-];
-
 // Pattern Configurations
 export type SpiralPatternConfig = {
   spiralDensity?: number;
@@ -96,7 +87,24 @@ export interface LevelConfig<P extends Pattern = Pattern> {
   vy?: () => number;
 }
 
+const colors = [
+  "hsl(0, 100%, 71%)",
+  "hsl(177, 56%, 58%)",
+  "hsl(190, 56%, 58%)",
+  "hsl(152, 44%, 67%)",
+  "hsl(45, 100%, 85%)",
+];
+
 export const levels: LevelConfig[] = [
+  {
+    pattern: "random",
+    behaviors: [{ type: "wall", mode: "wrap" }],
+    particleCount: balls() + 30,
+    radius: () => 10,
+    color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => 0,
+    vy: () => 120,
+  },
   {
     pattern: "spiral",
     patternConfig: {

@@ -9,7 +9,7 @@ This document outlines the future plans and desired features for the game.
 - [ ] **Player Abilities/Power-ups**: Add special abilities for the player, such as a temporary speed boost or invisibility.
 - [ ] **Enhanced Guardian-Particle Interactions**: Make guardian collisions with particles more dynamic, causing different effects beyond just lighting up.
 - [ ] **Life System**: Implement a life system to track player lives.
-- [ ] **Guardian Abilities** Implement different abilities for guardians. Manipulate particles, shoot particles, attract particles.
+- [ ] **Guardian Abilities** Implement different abilities for guardians. Manipulate particles, shoot particles, attract particles. Oh what if maybe particles bestowed abilities on the guardians when they collide?
 
 ## UI/UX Improvements
 
