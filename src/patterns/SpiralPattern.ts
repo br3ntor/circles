@@ -1,6 +1,6 @@
 import { Particle } from "../game-objects";
 import { SpiralPatternConfig } from "../level-configs";
-import { IPattern, PatternCreatorInput } from "./Pattern";
+import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class SpiralPattern implements IPattern {
   create(
@@ -18,7 +18,6 @@ export class SpiralPattern implements IPattern {
 
       const particle = new Particle(x, y, {
         ...options,
-        color: options.color,
         behaviors,
         angle,
         distance,

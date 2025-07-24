@@ -1,5 +1,5 @@
 import { Particle } from "../game-objects";
-import { IPattern, PatternCreatorInput } from "./Pattern";
+import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class OrbitPattern implements IPattern {
   create({
@@ -19,7 +19,6 @@ export class OrbitPattern implements IPattern {
         centerY + Math.sin(angle) * r,
         {
           ...options,
-          color: options.color,
           behaviors,
         }
       );

@@ -1,5 +1,5 @@
 import { Particle } from "../game-objects";
-import { IPattern, PatternCreatorInput } from "./Pattern";
+import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class WavePattern implements IPattern {
   create({
@@ -18,7 +18,6 @@ export class WavePattern implements IPattern {
 
       const particle = new Particle(x, y, {
         ...options,
-        color: options.color,
         behaviors,
       });
       particles.push(particle);

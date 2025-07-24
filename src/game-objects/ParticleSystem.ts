@@ -10,7 +10,7 @@ import {
 import { BehaviorConfig, LevelConfig, Pattern } from "../level-configs.js";
 import { CirclePattern } from "../patterns/CirclePattern.js";
 import { OrbitPattern } from "../patterns/OrbitPattern.js";
-import { IPattern } from "../patterns/Pattern.js";
+import { IPattern } from "../patterns/types.js";
 import { RandomPattern } from "../patterns/RandomPattern.js";
 import { SpiralPattern } from "../patterns/SpiralPattern.js";
 import { StarPattern } from "../patterns/StarPattern.js";

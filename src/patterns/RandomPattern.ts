@@ -1,6 +1,6 @@
 import { Particle } from "../game-objects";
 import { distance, getRandomX, getRandomY } from "../utils";
-import { IPattern, PatternCreatorInput } from "./Pattern";
+import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class RandomPattern implements IPattern {
   create({
@@ -34,7 +34,6 @@ export class RandomPattern implements IPattern {
 
       const particle = new Particle(x, y, {
         ...options,
-        color: options.color,
         behaviors,
       });
       particles.push(particle);
