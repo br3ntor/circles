@@ -1,4 +1,4 @@
-import { balls } from "./utils";
+import { balls, niceColor } from "./utils";
 
 export type Pattern =
   | "random"
@@ -17,10 +17,50 @@ export type BehaviorType =
   | "randomMovement"
   | "fadeOut";
 
-export interface BehaviorConfig {
-  type: BehaviorType;
-  [key: string]: any;
-}
+import { CollisionBehaviorMode, WallBehaviorMode } from "./particle-behaviors";
+
+export type WallBehaviorConfig = {
+  type: "wall";
+  mode: WallBehaviorMode;
+};
+export type CollisionBehaviorConfig = {
+  type: "collision";
+  mode?: CollisionBehaviorMode;
+};
+export type OrbitBehaviorConfig = {
+  type: "orbit";
+  radius: number;
+  speed: number;
+};
+export type SpiralBehaviorConfig = {
+  type: "spiral";
+  initialRadius: number;
+  growthRate: number;
+  rotationSpeed: number;
+};
+export type WaveBehaviorConfig = {
+  type: "wave";
+  amplitude: number;
+  frequency: number;
+  speed: number;
+};
+export type RandomMovementBehaviorConfig = {
+  type: "randomMovement";
+  intensity: number;
+};
+export type FadeOutBehaviorConfig = {
+  type: "fadeOut";
+  lifespan: number;
+};
+
+export type BehaviorConfig =
+  | WallBehaviorConfig
+  | CollisionBehaviorConfig
+  | OrbitBehaviorConfig
+  | SpiralBehaviorConfig
+  | WaveBehaviorConfig
+  | RandomMovementBehaviorConfig
+  | FadeOutBehaviorConfig;
 
 const colors = [
   "hsl(0, 100%, 71%)",
@@ -30,9 +70,24 @@ const colors = [
   "hsl(45, 100%, 85%)",
 ];
 
-export interface LevelConfig {
-  pattern: Pattern;
-  patternConfig?: { [key: string]: any };
+// Pattern Configurations
+export type SpiralPatternConfig = {
+  spiralDensity?: number;
+  angleStep?: number;
+};
+
+export type PatternConfigMap = {
+  spiral: SpiralPatternConfig;
+  random: never;
+  star: never;
+  circle: never;
+  waves: never;
+  orbit: never;
+};
+
+export interface LevelConfig<P extends Pattern = Pattern> {
+  pattern: P;
+  patternConfig?: PatternConfigMap[P];
   behaviors: BehaviorConfig[];
   particleCount?: number;
   radius?: () => number;
@@ -60,6 +115,7 @@ export const levels: LevelConfig[] = [
     ],
     radius: () => 20,
     particleCount: 10,
+    color: niceColor,
   },
   {
     pattern: "random",

@@ -49,10 +49,17 @@ export function balls() {
  * @return Object | HSL values
  */
 export function getHSL(hsl: string) {
-  const H = parseFloat(hsl.slice(4, hsl.indexOf("d")));
-  const S = parseFloat(hsl.split(",")[1]);
-  const L = parseFloat(hsl.split(",")[2].slice(0, -1));
-  return { H, S, L };
+  const hslRegex = /hsl\((\d+)deg,\s*([\d.]+)%,\s*([\d.]+)%\)/;
+  const match = hsl.match(hslRegex);
+
+  if (match) {
+    const H = parseFloat(match[1]);
+    const S = parseFloat(match[2]);
+    const L = parseFloat(match[3]);
+    return { H, S, L };
+  }
+
+  return null;
 }
 
 /**
