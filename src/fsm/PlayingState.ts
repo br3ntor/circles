@@ -3,7 +3,9 @@ import { GameOverState } from "./GameOverState";
 import { LevelCompleteState } from "./LevelCompleteState";
 
 export class PlayingState extends State {
-  public enter(): void {}
+  public enter(): void {
+    this.game.timer.start();
+  }
 
   public update(deltaTime: number): void {
     this.game.player.update(this.game.mouse);

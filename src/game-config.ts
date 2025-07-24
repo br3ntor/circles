@@ -18,5 +18,12 @@ export const gameConfig = {
     gameOverFont: "100px 'Times New Roman'",
     restartFont: "24px 'Times New Roman'",
     primaryColor: "#DEDEDE",
+    timerFont:
+      "64px Consolas, Monaco, 'Lucida Console', 'Courier New', monospace",
+    finalScoreWinFont: "72px Arial",
+    finalScoreWinColor: "green",
+    finalScoreDetailFont:
+      "32px Consolas, Monaco, 'Lucida Console', 'Courier New', monospace",
+    finalScoreOverlayColor: "rgba(0, 0, 0, 0.7)",
   },
 };

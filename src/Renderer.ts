@@ -5,14 +5,18 @@ import { GameOverState } from "./fsm/GameOverState";
 import { LevelCompleteState } from "./fsm/LevelCompleteState";
 import { TransitionState } from "./fsm/TransitionState";
 import { Vector2 } from "./game-objects";
+import { UIManager } from "./UIManager";
+import { GameCompleteState } from "./fsm/GameCompleteState";
 
 export class Renderer {
   game: Game;
   ctx: CanvasRenderingContext2D;
+  uiManager: UIManager;
 
   constructor(game: Game) {
     this.game = game;
     this.ctx = game.ctx;
+    this.uiManager = UIManager.getInstance();
   }
 
   draw() {
@@ -28,7 +32,7 @@ export class Renderer {
     if (state instanceof ReadyToStartState) {
       this.drawReadyUI();
     } else if (state instanceof PlayingState) {
-      // Draw score or other UI during play
+      this.uiManager.drawTimer(this.ctx);
     } else if (state instanceof GameOverState) {
       const fadeAlpha = (state as GameOverState).fadeAlpha;
       // Fade out the game world
@@ -59,6 +63,8 @@ export class Renderer {
         this.drawReadyUI();
       }
       state.draw();
+    } else if (state instanceof GameCompleteState) {
+      this.uiManager.drawFinalScore(this.ctx);
     }
   }
 

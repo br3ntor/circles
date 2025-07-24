@@ -44,3 +44,6 @@ This document outlines the future plans and desired features for the game.
 - [ ] **Robust Input Handler**: Develop a central `InputManager` to process raw browser inputs (keyboard, mouse) and translate them into game-specific actions, simplifying input handling throughout the application.
 - [ ] **Audio Manager**: Create a simple `AudioManager` to control loading and playback of sound effects and music, centralizing all audio-related functionality.
 - [ ] **Decouple Particle Creation with Emitters**: Refactor the particle creation logic by introducing an "Emitter" or "Generator" system. Each pattern (e.g., spiral, wave) will have its own Emitter class responsible for generating particle positions and initial properties. This will decouple the `ParticleSystem` from the specific creation logic, making the architecture more modular, flexible, and easier to extend with new patterns.
+
+- [ ] **Runtime Debug Panel**: Create a debug panel to modify patterns and behaviors at runtime.
+- [ ] **Dynamic Behavior Chaining**: Allow behaviors to be chained or stacked dynamically at runtime for more complex interactions.

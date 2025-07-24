@@ -4,7 +4,7 @@ export class GameOverState extends State {
   public fadeAlpha: number = 0;
 
   public enter(): void {
-    // The logic to fade in the game over screen will be handled in the draw method.
+    this.game.timer.stop();
   }
 
   public update(deltaTime: number): void {

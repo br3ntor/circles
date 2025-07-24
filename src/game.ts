@@ -4,6 +4,11 @@ import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { LevelManager } from "./LevelManager";
 import { Renderer } from "./Renderer";
 import { gameConfig } from "./game-config";
+import { Timer } from "./game-objects/Timer";
+import { ScoreManager } from "./ScoreManager";
+import { UIManager } from "./UIManager";
+// import { PlayingState } from "./fsm/PlayingState";
+// import { GameOverState } from "./fsm/GameOverState";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -19,6 +24,9 @@ export class Game {
   frameRequest: number;
   time: number;
   lastTime: number;
+  timer: Timer;
+  scoreManager: ScoreManager;
+  uiManager: UIManager;
 
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -40,6 +48,10 @@ export class Game {
     this.frameRequest = 0;
     this.time = 0;
     this.lastTime = performance.now();
+    this.timer = new Timer();
+    this.scoreManager = ScoreManager.getInstance();
+    this.uiManager = UIManager.getInstance();
+    this.uiManager.setTimer(this.timer);
     this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
     this.animate();
@@ -59,6 +71,8 @@ export class Game {
     );
 
     this.levelManager.reset();
+    this.scoreManager.reset();
+    this.timer.reset();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
   }
 
