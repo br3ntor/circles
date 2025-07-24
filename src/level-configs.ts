@@ -32,6 +32,7 @@ const colors = [
 
 export interface LevelConfig {
   pattern: Pattern;
+  patternConfig?: { [key: string]: any };
   behaviors: BehaviorConfig[];
   particleCount?: number;
   radius?: () => number;
@@ -43,18 +44,22 @@ export interface LevelConfig {
 export const levels: LevelConfig[] = [
   {
     pattern: "spiral",
+    patternConfig: {
+      spiralDensity: 2,
+      angleStep: 0.5,
+    },
     behaviors: [
       // { type: "wall", mode: "wrap" },
       {
         type: "spiral",
-        initialRadius: 100,
+        initialRadius: 20,
         growthRate: 10,
-        rotationSpeed: 2,
+        rotationSpeed: 1,
       },
       // { type: "fadeOut", lifespan: 10 },
     ],
     radius: () => 20,
-    particleCount: 150,
+    particleCount: 10,
   },
   {
     pattern: "random",

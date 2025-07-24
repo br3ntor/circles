@@ -489,7 +489,10 @@ interface PatternCreatorInput {
   vy?: () => number;
 }
 
-type PatternCreator = (input: PatternCreatorInput) => void;
+type PatternCreator = (
+  input: PatternCreatorInput,
+  patternConfig?: { [key: string]: any }
+) => void;
 
 export class ParticleSystem {
   private canvas: HTMLCanvasElement;
@@ -540,14 +543,17 @@ export class ParticleSystem {
     const patternCreator = this.patterns[config.pattern];
     if (patternCreator) {
       const behaviors = this._createBehaviorsFromConfig(config.behaviors);
-      patternCreator({
-        behaviors,
-        particleCount: config.particleCount ?? 100,
-        radius: config.radius,
-        color: config.color,
-        vx: config.vx,
-        vy: config.vy,
-      });
+      patternCreator(
+        {
+          behaviors,
+          particleCount: config.particleCount ?? 100,
+          radius: config.radius,
+          color: config.color,
+          vx: config.vx,
+          vy: config.vy,
+        },
+        config.patternConfig
+      );
     }
   }
 
@@ -627,16 +633,11 @@ export class ParticleSystem {
     }
   }
 
-  private createSpiralPattern({
-    behaviors,
-    particleCount,
-    radius,
-    color,
-    vx,
-    vy,
-  }: PatternCreatorInput): void {
-    const spiralDensity = 1.5;
-    const angleStep = (Math.PI * 2) / 20;
+  private createSpiralPattern(
+    { behaviors, particleCount, radius, color, vx, vy }: PatternCreatorInput,
+    patternConfig: { [key: string]: any } = {}
+  ): void {
+    const { spiralDensity = 4, angleStep = (Math.PI * 2) / 50 } = patternConfig;
 
     for (let i = 0; i < particleCount; i++) {
       const angle = i * angleStep;

@@ -4,7 +4,7 @@ This document outlines the future plans and desired features for the game.
 
 ## Gameplay Enhancements
 
-- [X] **Re-enable Particle Patterns**: Restore the `createSpiralPattern`, `createStarPattern`, `createCirclePattern`, `createWavePattern`, and `createOrbitPattern` functions in `src/game-objects.ts` to enable more complex and visually interesting levels.
+- [x] **Re-enable Particle Patterns**: Restore the `createSpiralPattern`, `createStarPattern`, `createCirclePattern`, `createWavePattern`, and `createOrbitPattern` functions in `src/game-objects.ts` to enable more complex and visually interesting levels.
 - [ ] **Points System**: Implement a scoring system based on the speed of level completion.
 - [ ] **Player Abilities/Power-ups**: Add special abilities for the player, such as a temporary speed boost or invisibility.
 - [ ] **Enhanced Guardian-Particle Interactions**: Make guardian collisions with particles more dynamic, causing different effects beyond just lighting up.
@@ -14,8 +14,8 @@ This document outlines the future plans and desired features for the game.
 
 - [ ] **Start Screen**: Create a dedicated start screen for the game.
 - [ ] **Heads-Up Display (HUD)**:
-    - [ ] Display the current level number.
-    - [ ] Show the player's remaining lives.
+  - [ ] Display the current level number.
+  - [ ] Show the player's remaining lives.
 - [ ] **Level Transition Display**: Show the level number in the center of the screen during the transition animation.
 
 ## Game Modes
@@ -42,3 +42,4 @@ This document outlines the future plans and desired features for the game.
 - [ ] **Centralized Event System (Event Bus)**: Implement an event bus to decouple systems. This allows objects to communicate through events (e.g., `PLAYER_DIED`, `LEVEL_COMPLETE`) without direct dependencies, making the codebase more modular and easier to extend.
 - [ ] **Robust Input Handler**: Develop a central `InputManager` to process raw browser inputs (keyboard, mouse) and translate them into game-specific actions, simplifying input handling throughout the application.
 - [ ] **Audio Manager**: Create a simple `AudioManager` to control loading and playback of sound effects and music, centralizing all audio-related functionality.
+- [ ] **Decouple Particle Creation with Emitters**: Refactor the particle creation logic by introducing an "Emitter" or "Generator" system. Each pattern (e.g., spiral, wave) will have its own Emitter class responsible for generating particle positions and initial properties. This will decouple the `ParticleSystem` from the specific creation logic, making the architecture more modular, flexible, and easier to extend with new patterns.

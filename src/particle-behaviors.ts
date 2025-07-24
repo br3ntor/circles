@@ -30,11 +30,28 @@ export class OrbitBehavior implements ParticleBehavior {
   }
 
   update(particle: Particle, deltaTime: number, time: number): void {
-    particle.angle += this.speed * deltaTime;
-    particle.position = new Vector2(
-      this.centerPoint.x + Math.cos(particle.angle) * this.radius,
-      this.centerPoint.y + Math.sin(particle.angle) * this.radius
+    // Ensure angle is initialized
+    if (particle.angle === undefined) {
+      const dx = particle.position.x - this.centerPoint.x;
+      const dy = particle.position.y - this.centerPoint.y;
+      particle.angle = Math.atan2(dy, dx);
+    }
+
+    // Calculate the particle's target position in the next frame.
+    const nextAngle = particle.angle + this.speed * deltaTime;
+    const nextPosition = new Vector2(
+      this.centerPoint.x + Math.cos(nextAngle) * this.radius,
+      this.centerPoint.y + Math.sin(nextAngle) * this.radius
     );
+
+    // Calculate the required velocity to move from the current to the next position.
+    const velocity = new Vector2(
+      (nextPosition.x - particle.position.x) / deltaTime,
+      (nextPosition.y - particle.position.y) / deltaTime
+    );
+
+    particle.velocity = velocity;
+    particle.angle = nextAngle; // Update angle for the next frame
   }
 }
 
@@ -57,26 +74,33 @@ export class SpiralBehavior implements ParticleBehavior {
   }
 
   update(particle: Particle, deltaTime: number, time: number): void {
-    // Ensure initial angle and distance are set.
+    // Initialize properties on the first run
     if (particle.distance === undefined) {
-      const dx = particle.position.x - this.centerPoint.x;
-      const dy = particle.position.y - this.centerPoint.y;
-      particle.distance = Math.sqrt(dx * dx + dy * dy);
+      particle.distance = this.initialRadius;
     }
-    if (particle.angle === undefined || particle.angle === 0) {
+    if (particle.angle === undefined) {
       const dx = particle.position.x - this.centerPoint.x;
       const dy = particle.position.y - this.centerPoint.y;
       particle.angle = Math.atan2(dy, dx);
     }
 
-    // Calculate current state based on particle's age, not global time
-    const currentAngle = particle.angle + particle.age * this.rotationSpeed;
-    const currentRadius = particle.distance + particle.age * this.growthRate;
+    // Calculate the particle's position in the next frame.
+    const nextAngle =
+      particle.angle + (particle.age + deltaTime) * this.rotationSpeed;
+    const nextRadius =
+      particle.distance + (particle.age + deltaTime) * this.growthRate;
+    const nextPosition = new Vector2(
+      this.centerPoint.x + Math.cos(nextAngle) * nextRadius,
+      this.centerPoint.y + Math.sin(nextAngle) * nextRadius
+    );
 
-    particle.position.x =
-      this.centerPoint.x + Math.cos(currentAngle) * currentRadius;
-    particle.position.y =
-      this.centerPoint.y + Math.sin(currentAngle) * currentRadius;
+    // Calculate the required velocity to move from the current to the next position.
+    const velocity = new Vector2(
+      (nextPosition.x - particle.position.x) / deltaTime,
+      (nextPosition.y - particle.position.y) / deltaTime
+    );
+
+    particle.velocity = velocity;
   }
 }
 
@@ -100,15 +124,25 @@ export class WaveBehavior implements ParticleBehavior {
   update(particle: Particle, deltaTime: number, time: number): void {
     if (this.baseY === 0) this.baseY = particle.position.y;
 
-    particle.position.x += this.speed * deltaTime;
-    particle.position.y =
-      this.baseY +
-      Math.sin(particle.position.x * this.frequency) * this.amplitude;
+    // Calculate the target position for the next frame
+    let nextX = particle.position.x + this.speed * deltaTime;
+    const nextY =
+      this.baseY + Math.sin(nextX * this.frequency) * this.amplitude;
 
     // Wrap around screen
-    if (particle.position.x > 850) {
-      particle.position.x = -50;
+    if (nextX > 850) {
+      nextX = -50;
     }
+
+    const nextPosition = new Vector2(nextX, nextY);
+
+    // Calculate the required velocity
+    const velocity = new Vector2(
+      (nextPosition.x - particle.position.x) / deltaTime,
+      (nextPosition.y - particle.position.y) / deltaTime
+    );
+
+    particle.velocity = velocity;
   }
 }
 
