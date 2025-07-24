@@ -6,7 +6,7 @@ import {
   CollisionBehavior,
   WallBehavior,
   FadeOutBehavior,
-} from "../particle-behaviors.js";
+} from "../particle-behaviors";
 import { BehaviorConfig, LevelConfig, Pattern } from "../level-configs.js";
 import { CirclePattern } from "../patterns/CirclePattern.js";
 import { OrbitPattern } from "../patterns/OrbitPattern.js";
