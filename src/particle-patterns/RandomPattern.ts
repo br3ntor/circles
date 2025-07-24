@@ -1,5 +1,5 @@
-import { Particle } from "../game-objects";
-import { distance, getRandomX, getRandomY } from "../utils";
+import { Particle } from "../game-objects/index.js";
+import { distance, getRandomX, getRandomY } from "../utils.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class RandomPattern implements IPattern {

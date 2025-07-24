@@ -1,4 +1,4 @@
-import { Particle } from "../game-objects";
+import { Particle } from "../game-objects/index.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class CirclePattern implements IPattern {

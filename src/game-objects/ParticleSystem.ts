@@ -8,13 +8,13 @@ import {
   FadeOutBehavior,
 } from "../particle-behaviors";
 import { BehaviorConfig, LevelConfig, Pattern } from "../level-configs.js";
-import { CirclePattern } from "../patterns/CirclePattern.js";
-import { OrbitPattern } from "../patterns/OrbitPattern.js";
-import { IPattern } from "../patterns/types.js";
-import { RandomPattern } from "../patterns/RandomPattern.js";
-import { SpiralPattern } from "../patterns/SpiralPattern.js";
-import { StarPattern } from "../patterns/StarPattern.js";
-import { WavePattern } from "../patterns/WavePattern.js";
+import { CirclePattern } from "../particle-patterns/CirclePattern.js";
+import { OrbitPattern } from "../particle-patterns/OrbitPattern.js";
+import { IPattern } from "../particle-patterns/types.js";
+import { RandomPattern } from "../particle-patterns/RandomPattern.js";
+import { SpiralPattern } from "../particle-patterns/SpiralPattern.js";
+import { StarPattern } from "../particle-patterns/StarPattern.js";
+import { WavePattern } from "../particle-patterns/WavePattern.js";
 import { Particle } from "./Particle.js";
 import { Vector2 } from "./Vector2.js";
 import { ParticleBehavior } from "./types.js";
