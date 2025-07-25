@@ -1,7 +1,6 @@
 import { State } from "./State";
 import { ReadyToStartState } from "./ReadyToStartState";
 import TransitionManager from "../TransitionManager";
-import { levels } from "../level-configs";
 import { Vector2 } from "../game-objects";
 
 export class TransitionState extends State {
@@ -30,13 +29,7 @@ export class TransitionState extends State {
       // --- The "in" phase is over, now we start the "out" phase ---
       this.transitionPhase = "out";
 
-      // 1. Move to the next level
-      this.game.levelManager.currentLevel++;
-      if (this.game.levelManager.currentLevel >= levels.length) {
-        this.game.levelManager.currentLevel = 0; // Loop back
-      }
-
-      // 2. Load the new level data (player position, etc.)
+      // 1. Load the new level data (player position, etc.)
       this.game.levelManager.loadLevel();
 
       // 3. Start the "out" transition, centered on the new player position

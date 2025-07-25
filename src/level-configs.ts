@@ -97,34 +97,34 @@ const colors = [
 
 export const levels: LevelConfig[] = [
   {
+    pattern: "spiral",
+    patternConfig: {
+      spiralDensity: 2,
+      angleStep: 0.5,
+    },
+    behaviors: [
+      // { type: "wall", mode: "wrap" },
+      {
+        type: "spiral",
+        initialRadius: 20,
+        growthRate: 10,
+        rotationSpeed: 1,
+      },
+      // { type: "fadeOut", lifespan: 10 },
+    ],
+    radius: () => 20,
+    particleCount: 10,
+    color: niceColor,
+  },
+  {
     pattern: "random",
     behaviors: [{ type: "wall", mode: "wrap" }],
     particleCount: balls() + 30,
     radius: () => 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
     vx: () => 0,
-    vy: () => 120,
+    vy: () => 20,
   },
-  // {
-  //   pattern: "spiral",
-  //   patternConfig: {
-  //     spiralDensity: 2,
-  //     angleStep: 0.5,
-  //   },
-  //   behaviors: [
-  //     // { type: "wall", mode: "wrap" },
-  //     {
-  //       type: "spiral",
-  //       initialRadius: 20,
-  //       growthRate: 10,
-  //       rotationSpeed: 1,
-  //     },
-  //     // { type: "fadeOut", lifespan: 10 },
-  //   ],
-  //   radius: () => 20,
-  //   particleCount: 10,
-  //   color: niceColor,
-  // },
   // {
   //   pattern: "random",
   //   behaviors: [

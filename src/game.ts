@@ -7,8 +7,6 @@ import { gameConfig } from "./game-config";
 import { Timer } from "./game-objects/Timer";
 import { ScoreManager } from "./ScoreManager";
 import { UIManager } from "./UIManager";
-// import { PlayingState } from "./fsm/PlayingState";
-// import { GameOverState } from "./fsm/GameOverState";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -78,7 +76,6 @@ export class Game {
 
   // Main loop
   animate() {
-    // console.log("Animate Called!");
     const now = performance.now();
     const deltaTime = (now - this.lastTime) / 1000;
     this.time += deltaTime;

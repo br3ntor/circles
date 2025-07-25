@@ -12,10 +12,14 @@ export class LevelCompleteState extends State {
   }
 
   public update(deltaTime: number): void {
+    // Iterates the data for the next frame in the animation
+    // which in this case the guardians will spiral back to the center
+    // ignoring any particle processing for collisions etc.
     this.game.guardians.forEach((guardian) => {
       guardian.update([], this.game.goal);
     });
 
+    // Once the animation is completed we can move on to the next state of the game.
     if (this.game.guardians.every((g) => g.state === "returned")) {
       if (this.game.levelManager.currentLevel >= levels.length - 1) {
         this.game.stateMachine.transitionTo(new GameCompleteState(this.game));
