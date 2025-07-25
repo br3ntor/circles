@@ -18,7 +18,7 @@ export class SpiralBehavior implements ParticleBehavior {
     this.rotationSpeed = rotationSpeed;
   }
 
-  update(particle: Particle, deltaTime: number, time: number): void {
+  update(particle: Particle, deltaTime: number): void {
     // Initialize properties on the first run
     if (particle.distance === undefined) {
       particle.distance = this.initialRadius;
@@ -29,22 +29,18 @@ export class SpiralBehavior implements ParticleBehavior {
       particle.angle = Math.atan2(dy, dx);
     }
 
-    // Calculate the particle's position in the next frame.
-    const nextAngle =
-      particle.angle + (particle.age + deltaTime) * this.rotationSpeed;
-    const nextRadius =
-      particle.distance + (particle.age + deltaTime) * this.growthRate;
-    const nextPosition = new Vector2(
-      this.centerPoint.x + Math.cos(nextAngle) * nextRadius,
-      this.centerPoint.y + Math.sin(nextAngle) * nextRadius
-    );
+    // Calculate current spiral properties
+    const r = particle.distance + particle.age * this.growthRate;
+    const theta = particle.angle + particle.age * this.rotationSpeed;
 
-    // Calculate the required velocity to move from the current to the next position.
-    const velocity = new Vector2(
-      (nextPosition.x - particle.position.x) / deltaTime,
-      (nextPosition.y - particle.position.y) / deltaTime
-    );
+    // Calculate radial and tangential velocities
+    const vr = this.growthRate; // Velocity of radius growth
+    const vt = r * this.rotationSpeed; // Tangential velocity
 
-    particle.velocity = velocity;
+    // Convert polar velocity to Cartesian velocity
+    const vx = vr * Math.cos(theta) - vt * Math.sin(theta);
+    const vy = vr * Math.sin(theta) + vt * Math.cos(theta);
+
+    particle.velocity = new Vector2(vx, vy);
   }
 }

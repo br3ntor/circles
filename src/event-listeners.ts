@@ -52,6 +52,13 @@ export function setupEventListeners(game: Game) {
       if (currentState instanceof ReadyToStartState) {
         game.stateMachine.transitionTo(new PlayingState(game));
       }
+      if (currentState instanceof GameOverState) {
+        // Only allow restart after the fade-in is mostly complete
+        if (currentState.fadeAlpha >= 0.8) {
+          game.reset();
+        }
+        return;
+      }
     }
   });
 

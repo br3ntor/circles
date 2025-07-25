@@ -103,17 +103,46 @@ export const levels: LevelConfig[] = [
       angleStep: 0.5,
     },
     behaviors: [
-      // { type: "wall", mode: "wrap" },
+      { type: "wall", mode: "wrap" },
+      { type: "randomMovement", intensity: 800 },
+      { type: "collision", mode: "lightUp" },
+    ],
+    radius: () => 20,
+    particleCount: 30,
+    color: niceColor,
+  },
+  {
+    pattern: "random",
+    behaviors: [
       {
         type: "spiral",
         initialRadius: 20,
-        growthRate: 10,
+        growthRate: 1,
         rotationSpeed: 1,
       },
-      // { type: "fadeOut", lifespan: 10 },
+      { type: "wall", mode: "wrap" },
     ],
     radius: () => 20,
-    particleCount: 10,
+    particleCount: 5,
+    color: niceColor,
+  },
+  {
+    pattern: "spiral",
+    patternConfig: {
+      spiralDensity: 8,
+      angleStep: 0.5,
+    },
+    behaviors: [
+      {
+        type: "spiral",
+        initialRadius: 200,
+        growthRate: 30,
+        rotationSpeed: 0.3,
+      },
+      { type: "wall", mode: "wrap" },
+    ],
+    radius: () => 20,
+    particleCount: 30,
     color: niceColor,
   },
   {
