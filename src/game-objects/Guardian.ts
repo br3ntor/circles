@@ -94,26 +94,6 @@ export class Guardian {
       }
     }
 
-    // Loop over particles to check for collision with guardians
-    for (let i = 0; i < particles.length; i++) {
-      const dist = distance(
-        this.position.x,
-        this.position.y,
-        particles[i].x,
-        particles[i].y
-      );
-
-      // Particles intersect with guardians here
-      if (dist - this.radius - particles[i].radius < 0) {
-        // resolveCollision(this, particles[i]);
-
-        // Light up particles and guardian on collision
-        this.opacity = 0.6;
-        this.color = particles[i].color;
-        particles[i].fillOpacity = 1;
-      }
-    }
-
     // Reset back to transparent after collision
     if (this.opacity > 0.02) {
       this.opacity -= 0.02;
@@ -150,18 +130,12 @@ export class Guardian {
     }
   }
 
-  detectPlayerCollision(player: Player): boolean {
-    const playerDistance = distance(
-      this.position.x,
-      this.position.y,
-      player.x,
-      player.y
-    );
-
-    if (playerDistance - this.radius - player.radius <= 0) {
-      this.opacity = 1;
-      return true;
+  handleCollision(collidingObject: Player | Particle) {
+    // Light up particles and guardian on collision
+    this.opacity = 0.6;
+    this.color = collidingObject.color;
+    if ("fillOpacity" in collidingObject) {
+      collidingObject.fillOpacity = 1;
     }
-    return false;
   }
 }

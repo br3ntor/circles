@@ -3,8 +3,47 @@ import { distance } from "./utils";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { PlayingState } from "./fsm/PlayingState";
 import { GameOverState } from "./fsm/GameOverState";
+import { Guardian, Particle, Player } from "./game-objects";
+import { CollisionBehavior } from "./particle-behaviors";
 
 export function setupEventListeners(game: Game) {
+  game.collisionManager.addEventListener("collision", (event: Event) => {
+    const customEvent = event as CustomEvent;
+    const { object1, object2 } = customEvent.detail;
+
+    if (object1 instanceof Player || object2 instanceof Player) {
+      game.stateMachine.transitionTo(new GameOverState(game));
+      return;
+    }
+
+    if (object1 instanceof Guardian || object2 instanceof Guardian) {
+      const guardian = (
+        object1 instanceof Guardian ? object1 : object2
+      ) as Guardian;
+      const other = object1 instanceof Guardian ? object2 : object1;
+      if (!(other instanceof Guardian)) {
+        guardian.handleCollision(other);
+      }
+    }
+
+    const p1 = object1 instanceof Particle ? object1 : null;
+    const p2 = object2 instanceof Particle ? object2 : null;
+
+    if (p1 && p2) {
+      const behavior1 = p1.behaviors.find(
+        (b): b is CollisionBehavior => b instanceof CollisionBehavior
+      );
+      const behavior2 = p2.behaviors.find(
+        (b): b is CollisionBehavior => b instanceof CollisionBehavior
+      );
+
+      if (behavior1) {
+        behavior1.handleCollision(p1, p2);
+      } else if (behavior2) {
+        behavior2.handleCollision(p2, p1);
+      }
+    }
+  });
   // Updates mouse state
   addEventListener("mousemove", (event: MouseEvent) => {
     game.mouse.x = event.clientX;

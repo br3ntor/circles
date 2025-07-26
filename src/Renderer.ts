@@ -34,7 +34,27 @@ export class Renderer {
     } else if (state instanceof PlayingState) {
       this.uiManager.drawTimer(this.ctx);
     } else if (state instanceof GameOverState) {
-      const fadeAlpha = (state as GameOverState).fadeAlpha;
+      const { fadeAlpha, collidedObject } = state;
+
+      // Draw a glowing effect around the collided object
+      if (collidedObject) {
+        this.ctx.save();
+        this.ctx.shadowBlur = 20;
+        this.ctx.shadowColor = "red";
+        this.ctx.strokeStyle = "red";
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(
+          collidedObject.position.x,
+          collidedObject.position.y,
+          collidedObject.radius + 5,
+          0,
+          Math.PI * 2
+        );
+        this.ctx.stroke();
+        this.ctx.restore();
+      }
+
       // Fade out the game world
       this.ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
       this.ctx.fillRect(0, 0, this.game.canvas.width, this.game.canvas.height);
@@ -68,14 +88,20 @@ export class Renderer {
     }
   }
 
-  drawText(text: string, x: number, y: number, font: string, color: string) {
+  private drawText(
+    text: string,
+    x: number,
+    y: number,
+    font: string,
+    color: string
+  ) {
     this.ctx.fillStyle = color;
     this.ctx.font = font;
     this.ctx.textAlign = "center";
     this.ctx.fillText(text, x, y);
   }
 
-  drawReadyUI() {
+  private drawReadyUI() {
     // Draw left start area barrier
     this.ctx.beginPath();
     this.ctx.moveTo(100, 0);
@@ -93,7 +119,7 @@ export class Renderer {
       "#DEDEDE"
     );
   }
-  drawIrisWipe(radius: number, center: Vector2) {
+  private drawIrisWipe(radius: number, center: Vector2) {
     // This creates a "mask" that covers everything *except* a circle
     this.ctx.save();
     this.ctx.fillStyle = "#DEDEDE"; // Use the canvas background color

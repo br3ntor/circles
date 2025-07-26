@@ -15,6 +15,7 @@ export class Goal {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    ctx.save();
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -26,6 +27,7 @@ export class Goal {
       ctx.stroke();
     }
     ctx.closePath();
+    ctx.restore();
   }
 
   update(ctx: CanvasRenderingContext2D, player: Player) {

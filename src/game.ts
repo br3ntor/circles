@@ -1,5 +1,6 @@
 import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
 import { StateMachine } from "./fsm/StateMachine";
+import { GameOverState } from "./fsm/GameOverState";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { LevelManager } from "./LevelManager";
 import { Renderer } from "./Renderer";
@@ -7,6 +8,7 @@ import { gameConfig } from "./game-config";
 import { Timer } from "./game-objects/Timer";
 import { ScoreManager } from "./ScoreManager";
 import { UIManager } from "./UIManager";
+import { CollisionManager } from "./CollisionManager";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -25,6 +27,7 @@ export class Game {
   timer: Timer;
   scoreManager: ScoreManager;
   uiManager: UIManager;
+  collisionManager: CollisionManager;
   paused = false;
 
   constructor() {
@@ -44,6 +47,7 @@ export class Game {
     this.stateMachine = new StateMachine();
     this.levelManager = new LevelManager(this);
     this.renderer = new Renderer(this);
+    this.collisionManager = new CollisionManager(this.canvas);
     this.frameRequest = 0;
     this.time = 0;
     this.lastTime = performance.now();
@@ -53,7 +57,16 @@ export class Game {
     this.uiManager.setTimer(this.timer);
     this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
+    this.setupEventListeners();
     this.animate();
+  }
+
+  private setupEventListeners() {
+    this.canvas.addEventListener("click", () => {
+      if (this.stateMachine.currentState instanceof GameOverState) {
+        this.reset();
+      }
+    });
   }
 
   reset() {
@@ -103,6 +116,12 @@ export class Game {
 
   update(deltaTime: number) {
     this.stateMachine.update(deltaTime);
+    const collidables = [
+      this.player,
+      ...this.particleSystem.getParticles(),
+      ...this.guardians,
+    ];
+    this.collisionManager.checkCollisions(collidables);
   }
 
   draw() {
