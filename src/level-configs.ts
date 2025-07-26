@@ -97,13 +97,33 @@ const colors = [
 
 export const levels: LevelConfig[] = [
   {
+    pattern: "random",
+    behaviors: [{ type: "wall", mode: "seamless" }],
+    radius: () => 150,
+    particleCount: 1,
+    color: niceColor,
+    vx: () => -100,
+  },
+  {
+    pattern: "random",
+    behaviors: [
+      { type: "wall", mode: "collide" },
+      { type: "collision", mode: "lightUp" },
+    ],
+    particleCount: balls() + 20,
+    radius: () => 10,
+    color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => 220,
+    vy: () => 0,
+  },
+  {
     pattern: "spiral",
     patternConfig: {
       spiralDensity: 2,
       angleStep: 0.5,
     },
     behaviors: [
-      { type: "wall", mode: "wrap" },
+      { type: "wall", mode: "teleport" },
       { type: "randomMovement", intensity: 800 },
       { type: "collision", mode: "lightUp" },
     ],
@@ -111,21 +131,7 @@ export const levels: LevelConfig[] = [
     particleCount: 30,
     color: niceColor,
   },
-  {
-    pattern: "random",
-    behaviors: [
-      {
-        type: "spiral",
-        initialRadius: 20,
-        growthRate: 1,
-        rotationSpeed: 1,
-      },
-      { type: "wall", mode: "wrap" },
-    ],
-    radius: () => 20,
-    particleCount: 5,
-    color: niceColor,
-  },
+
   {
     pattern: "spiral",
     patternConfig: {
@@ -139,7 +145,7 @@ export const levels: LevelConfig[] = [
         growthRate: 30,
         rotationSpeed: 0.3,
       },
-      { type: "wall", mode: "wrap" },
+      { type: "wall", mode: "teleport" },
     ],
     radius: () => 20,
     particleCount: 30,
@@ -147,25 +153,14 @@ export const levels: LevelConfig[] = [
   },
   {
     pattern: "random",
-    behaviors: [{ type: "wall", mode: "wrap" }],
+    behaviors: [{ type: "wall", mode: "teleport" }],
     particleCount: balls() + 30,
     radius: () => 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
     vx: () => 0,
     vy: () => 20,
   },
-  // {
-  //   pattern: "random",
-  //   behaviors: [
-  //     { type: "wall", mode: "collide" },
-  //     { type: "collision", mode: "lightUp" },
-  //   ],
-  //   particleCount: balls() + 20,
-  //   radius: () => 10,
-  //   color: () => colors[Math.floor(Math.random() * colors.length)],
-  //   vx: () => 220,
-  //   vy: () => 0,
-  // },
+
   // {
   //   pattern: "random",
   //   behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],

@@ -73,4 +73,12 @@ export function setupEventListeners(game: Game) {
       game.reset();
     }
   });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      game.pause();
+    } else {
+      game.resume();
+    }
+  });
 }

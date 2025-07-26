@@ -5,7 +5,7 @@ This document outlines the future plans and desired features for the game.
 ## Gameplay Enhancements
 
 - [x] **Re-enable Particle Patterns**: Restore the `createSpiralPattern`, `createStarPattern`, `createCirclePattern`, `createWavePattern`, and `createOrbitPattern` functions in `src/game-objects.ts` to enable more complex and visually interesting levels.
-- [ ] **Points System**: Implement a scoring system based on the speed of level completion.
+- [x] **Points System**: Implement a scoring system based on the speed of level completion.
 - [ ] **Player Abilities/Power-ups**: Add special abilities for the player, such as a temporary speed boost or invisibility.
 - [ ] **Enhanced Guardian-Particle Interactions**: Make guardian collisions with particles more dynamic, causing different effects beyond just lighting up.
 - [ ] **Life System**: Implement a life system to track player lives.

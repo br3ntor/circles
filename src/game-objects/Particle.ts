@@ -74,12 +74,18 @@ export class Particle {
     ctx.restore();
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    positionOverride?: { x: number; y: number }
+  ) {
+    const x = positionOverride?.x ?? this.x;
+    const y = positionOverride?.y ?? this.y;
+
     ctx.save();
     ctx.globalAlpha = this.opacity;
 
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.arc(x, y, this.radius, 0, Math.PI * 2, false);
 
     // Draw fill if it's visible
     if (this.fillOpacity > 0) {

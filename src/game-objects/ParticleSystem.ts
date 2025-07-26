@@ -48,6 +48,39 @@ export class ParticleSystem {
   draw(ctx: CanvasRenderingContext2D): void {
     this.particles.forEach((particle) => {
       particle.draw(ctx);
+
+      // Handle seamless wrapping
+      const wallBehavior = particle.behaviors.find(
+        (b) => b instanceof WallBehavior
+      ) as WallBehavior | undefined;
+
+      if (wallBehavior?.mode === "seamless") {
+        const { x, y } = particle.position;
+        const { radius } = particle;
+        const { width, height } = this.canvas;
+
+        // Draw ghost particle on the other side if it's wrapping
+        const isCrossingRight = x + radius > width;
+        const isCrossingLeft = x - radius < 0;
+        const isCrossingBottom = y + radius > height;
+        const isCrossingTop = y - radius < 0;
+
+        // Draw ghosts for edges
+        if (isCrossingRight) particle.draw(ctx, { x: x - width, y });
+        if (isCrossingLeft) particle.draw(ctx, { x: x + width, y });
+        if (isCrossingBottom) particle.draw(ctx, { x, y: y - height });
+        if (isCrossingTop) particle.draw(ctx, { x, y: y + height });
+
+        // Draw ghosts for corners
+        if (isCrossingRight && isCrossingTop)
+          particle.draw(ctx, { x: x - width, y: y + height });
+        if (isCrossingRight && isCrossingBottom)
+          particle.draw(ctx, { x: x - width, y: y - height });
+        if (isCrossingLeft && isCrossingTop)
+          particle.draw(ctx, { x: x + width, y: y + height });
+        if (isCrossingLeft && isCrossingBottom)
+          particle.draw(ctx, { x: x + width, y: y - height });
+      }
     });
   }
 

@@ -25,6 +25,7 @@ export class Game {
   timer: Timer;
   scoreManager: ScoreManager;
   uiManager: UIManager;
+  paused = false;
 
   constructor() {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -76,15 +77,28 @@ export class Game {
 
   // Main loop
   animate() {
+    this.frameRequest = requestAnimationFrame(() => this.animate());
+
+    if (this.paused) {
+      return;
+    }
+
     const now = performance.now();
     const deltaTime = (now - this.lastTime) / 1000;
     this.time += deltaTime;
     this.lastTime = now;
 
-    this.frameRequest = requestAnimationFrame(() => this.animate());
-
     this.update(deltaTime);
     this.draw();
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  resume() {
+    this.paused = false;
+    this.lastTime = performance.now();
   }
 
   update(deltaTime: number) {
