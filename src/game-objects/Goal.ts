@@ -1,13 +1,16 @@
+import { Vector2 } from "./Vector2.js";
 import { distance } from "../utils.js";
 import { Player } from "./Player.js";
 
 export class Goal {
+  position: Vector2;
   x: number;
   y: number;
   radius: number;
   fill: boolean;
 
   constructor(x: number, y: number, radius: number) {
+    this.position = new Vector2(x, y);
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -18,7 +21,14 @@ export class Goal {
     ctx.save();
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.arc(
+      this.position.x,
+      this.position.y,
+      this.radius,
+      0,
+      Math.PI * 2,
+      false
+    );
     if (this.fill === true) {
       ctx.fillStyle = "#DEDEDE";
       ctx.fill();
@@ -33,7 +43,7 @@ export class Goal {
   update(ctx: CanvasRenderingContext2D, player: Player) {
     // Collision detection for player entering goal
     this.draw(ctx);
-    const dist = distance(this.x, this.y, player.x, player.y);
+    const dist = distance(this.position.x, this.position.y, player.x, player.y);
     if (dist < this.radius - player.radius) {
       this.fill = true;
       return true;

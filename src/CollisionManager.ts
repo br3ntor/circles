@@ -1,9 +1,10 @@
+import type { Goal } from "./game-objects/Goal";
 import type { Particle } from "./game-objects/Particle";
 import type { Player } from "./game-objects/Player";
 import type { Guardian } from "./game-objects/Guardian";
 import { Vector2 } from "./game-objects/Vector2";
 
-type Collidable = Particle | Player | Guardian;
+type Collidable = Particle | Player | Guardian | Goal;
 
 export class CollisionManager extends EventTarget {
   private canvas: HTMLCanvasElement;
@@ -37,13 +38,21 @@ export class CollisionManager extends EventTarget {
     return positions;
   }
 
-  public checkCollisions(objects: Collidable[]): void {
+  public checkCollisions(
+    objects: (Particle | Player | Guardian)[],
+    goal: Goal
+  ): void {
     // Reset ghost collision flags at the beginning of the check
     for (const obj of objects) {
       if ("isGhostColliding" in obj) {
         obj.isGhostColliding = false;
       }
     }
+
+    this.checkParticleGoalCollisions(
+      objects.filter((obj) => "velocity" in obj) as Particle[],
+      goal
+    );
 
     pair_loop: for (let i = 0; i < objects.length; i++) {
       for (let j = i + 1; j < objects.length; j++) {
@@ -83,6 +92,23 @@ export class CollisionManager extends EventTarget {
             }
           }
         }
+      }
+    }
+  }
+
+  public checkParticleGoalCollisions(particles: Particle[], goal: Goal): void {
+    for (const particle of particles) {
+      const distance = particle.position.distanceTo(goal.position);
+      if (distance < particle.radius + goal.radius) {
+        // Collision detected, dispatch an event
+        this.dispatchEvent(
+          new CustomEvent("particle-goal-collision", {
+            detail: {
+              particle,
+              goal,
+            },
+          })
+        );
       }
     }
   }

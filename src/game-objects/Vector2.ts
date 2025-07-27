@@ -43,4 +43,8 @@ export class Vector2 {
       ? new Vector2(this.x / mag, this.y / mag)
       : new Vector2(0, 0);
   }
+
+  dot(other: Vector2) {
+    return this.x * other.x + this.y * other.y;
+  }
 }
