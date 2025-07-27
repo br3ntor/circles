@@ -54,10 +54,33 @@ export default class TransitionManager {
     }
   }
 
-  public draw() {
+  public draw(ctx: CanvasRenderingContext2D) {
     if (this.isTransitioning) {
-      this.renderer.drawIrisWipe(this.transitionRadius, this.transitionCenter);
+      this.drawIrisWipe(ctx, this.transitionRadius, this.transitionCenter);
     }
+  }
+
+  private drawIrisWipe(
+    ctx: CanvasRenderingContext2D,
+    radius: number,
+    center: Vector2
+  ) {
+    // This creates a "mask" that covers everything *except* a circle
+    ctx.save();
+    ctx.fillStyle = "#DEDEDE"; // Use the canvas background color
+
+    // 1. Draw a rectangle covering the whole screen
+    ctx.beginPath();
+    ctx.rect(0, 0, this.game.canvas.width, this.game.canvas.height);
+
+    // 2. Create a circular path for the "hole"
+    // The `true` for counter-clockwise is important for the 'evenodd' rule
+    ctx.arc(center.x, center.y, radius, 0, Math.PI * 2, true);
+
+    // 3. Fill the shape. "evenodd" creates a hole where paths overlap.
+    ctx.fill("evenodd");
+
+    ctx.restore();
   }
 
   public isFinished(): boolean {

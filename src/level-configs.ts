@@ -99,8 +99,8 @@ export const levels: LevelConfig[] = [
   {
     pattern: "random",
     behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
-    particleCount: 5,
-    radius: () => 200,
+    particleCount: 3,
+    radius: () => 100,
     color: () => colors[Math.floor(Math.random() * colors.length)],
     vx: () => (Math.random() - 0.5) * 100,
     vy: () => (Math.random() - 0.5) * 100,

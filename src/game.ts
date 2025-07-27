@@ -1,6 +1,5 @@
 import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
 import { StateMachine } from "./fsm/StateMachine";
-import { GameOverState } from "./fsm/GameOverState";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { LevelManager } from "./LevelManager";
 import { Renderer } from "./Renderer";
@@ -57,17 +56,7 @@ export class Game {
     this.uiManager.setTimer(this.timer);
     this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
-    this.setupEventListeners();
     this.animate();
-  }
-
-  private setupEventListeners() {
-    this.canvas.addEventListener("click", () => {
-      const state = this.stateMachine.currentState;
-      if (state instanceof GameOverState && state.fadeAlpha >= 1) {
-        this.reset();
-      }
-    });
   }
 
   reset() {

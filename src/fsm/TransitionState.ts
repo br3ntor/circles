@@ -45,6 +45,6 @@ export class TransitionState extends State {
   }
 
   public draw(): void {
-    this.transitionManager.draw();
+    this.transitionManager.draw(this.game.ctx);
   }
 }
