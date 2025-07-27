@@ -12,7 +12,10 @@ export function setupEventListeners(game: Game) {
     const { object1, object2 } = customEvent.detail;
 
     if (object1 instanceof Player || object2 instanceof Player) {
-      game.stateMachine.transitionTo(new GameOverState(game));
+      const collidedObject = (object1 instanceof Player ? object2 : object1) as
+        | Particle
+        | Guardian;
+      game.stateMachine.transitionTo(new GameOverState(game, collidedObject));
       return;
     }
 

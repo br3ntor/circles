@@ -1,4 +1,4 @@
-import { distance, getHSL } from "../utils.js";
+import { getHSL } from "../utils.js";
 import { Goal } from "./Goal.js";
 import { Particle } from "./Particle.js";
 import { Player } from "./Player.js";

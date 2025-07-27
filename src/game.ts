@@ -1,10 +1,4 @@
-import {
-  Goal,
-  Guardian,
-  Particle,
-  ParticleSystem,
-  Player,
-} from "./game-objects";
+import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
 import { StateMachine } from "./fsm/StateMachine";
 import { GameOverState } from "./fsm/GameOverState";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";

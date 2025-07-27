@@ -119,7 +119,7 @@ export class Renderer {
       "#DEDEDE"
     );
   }
-  private drawIrisWipe(radius: number, center: Vector2) {
+  public drawIrisWipe(radius: number, center: Vector2) {
     // This creates a "mask" that covers everything *except* a circle
     this.ctx.save();
     this.ctx.fillStyle = "#DEDEDE"; // Use the canvas background color
