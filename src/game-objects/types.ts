@@ -5,6 +5,7 @@ export type GuardianState = "orbiting" | "returning" | "returned";
 
 export interface ParticleBehavior {
   update(particle: Particle, deltaTime: number, time: number): void;
+  handleCollision?(particle: Particle, other: Particle): void;
 }
 
 export interface ParticleOptions {

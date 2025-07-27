@@ -33,10 +33,19 @@ export class PlayingState extends State {
       (other instanceof Particle || other instanceof Guardian)
     ) {
       this.game.stateMachine.transitionTo(new GameOverState(this.game, other));
+    } else if (object1 instanceof Particle && object2 instanceof Particle) {
+      object1.behaviors.forEach((b) => b.handleCollision?.(object1, object2));
+      object2.behaviors.forEach((b) => b.handleCollision?.(object2, object1));
     }
   };
 
   public update(deltaTime: number): void {
+    const collidables = [
+      this.game.player,
+      ...this.game.particleSystem.getParticles(),
+      ...this.game.guardians,
+    ];
+    this.game.collisionManager.checkCollisions(collidables);
     this.game.player.update(this.game.mouse);
     this.game.particleSystem.update(deltaTime, this.game.time);
     this.game.guardians.forEach((guardian) =>

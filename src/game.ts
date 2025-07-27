@@ -1,4 +1,10 @@
-import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
+import {
+  Goal,
+  Guardian,
+  Particle,
+  ParticleSystem,
+  Player,
+} from "./game-objects";
 import { StateMachine } from "./fsm/StateMachine";
 import { GameOverState } from "./fsm/GameOverState";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
@@ -63,7 +69,8 @@ export class Game {
 
   private setupEventListeners() {
     this.canvas.addEventListener("click", () => {
-      if (this.stateMachine.currentState instanceof GameOverState) {
+      const state = this.stateMachine.currentState;
+      if (state instanceof GameOverState && state.fadeAlpha >= 1) {
         this.reset();
       }
     });
@@ -116,12 +123,6 @@ export class Game {
 
   update(deltaTime: number) {
     this.stateMachine.update(deltaTime);
-    const collidables = [
-      this.player,
-      ...this.particleSystem.getParticles(),
-      ...this.guardians,
-    ];
-    this.collisionManager.checkCollisions(collidables);
   }
 
   draw() {

@@ -59,7 +59,7 @@ export class CollisionManager extends EventTarget {
               })
             );
             // Prevent dispatching multiple events for the same pair in one frame
-            return;
+            break;
           }
         }
       }

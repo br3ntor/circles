@@ -3,8 +3,8 @@ import { Game } from "../game";
 import { Guardian, Particle } from "../game-objects";
 
 export class GameOverState extends State {
-  public fadeAlpha: number = 0;
   public collidedObject: Particle | Guardian;
+  public fadeAlpha: number = 0;
 
   constructor(game: Game, collidedObject: Particle | Guardian) {
     super(game);
@@ -22,7 +22,5 @@ export class GameOverState extends State {
     }
   }
 
-  public exit(): void {
-    this.fadeAlpha = 0;
-  }
+  public exit(): void {}
 }

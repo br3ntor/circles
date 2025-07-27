@@ -25,7 +25,7 @@ export class WallBehavior implements ParticleBehavior {
   update(particle: Particle): void {
     switch (this.mode) {
       case "collide":
-        this.handleCollision(particle);
+        this.handleWallCollision(particle);
         break;
       case "teleport":
         this.handleTeleport(particle);
@@ -39,7 +39,7 @@ export class WallBehavior implements ParticleBehavior {
     }
   }
 
-  private handleCollision(particle: Particle): void {
+  private handleWallCollision(particle: Particle): void {
     if (particle.position.x - particle.radius < 0) {
       particle.velocity.x *= -1;
       particle.position.x = particle.radius;
