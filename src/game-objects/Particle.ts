@@ -20,7 +20,10 @@ export class Particle {
   constructor(x: number, y: number, options: ParticleOptions = {}) {
     this.age = 0;
     this.position = new Vector2(x, y);
-    this.velocity = new Vector2(options.vx, options.vy);
+    this.velocity = new Vector2(
+      typeof options.vx === "function" ? options.vx() : options.vx,
+      typeof options.vy === "function" ? options.vy() : options.vy
+    );
     this.acceleration = new Vector2(0, 0);
     this.radius = options.radius ?? 10;
     this.color =

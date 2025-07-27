@@ -8,8 +8,8 @@ export interface ParticleBehavior {
 }
 
 export interface ParticleOptions {
-  vx?: number;
-  vy?: number;
+  vx?: number | (() => number);
+  vy?: number | (() => number);
   radius?: number;
   color?: string | (() => string);
   behaviors?: ParticleBehavior[];

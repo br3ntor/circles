@@ -108,8 +108,8 @@ export class ParticleSystem {
           options: {
             radius: config.radius ? config.radius() : undefined,
             color: config.color,
-            vx: config.vx ? config.vx() : undefined,
-            vy: config.vy ? config.vy() : undefined,
+            vx: config.vx,
+            vy: config.vy,
           },
           canvas: this.canvas,
         },
@@ -128,7 +128,7 @@ export class ParticleSystem {
         case "wall":
           return new WallBehavior(this.canvas, config.mode);
         case "collision":
-          return new CollisionBehavior(this.particles, config.mode);
+          return new CollisionBehavior(config.mode);
         case "orbit":
           return new OrbitBehavior(center, config.radius, config.speed);
         case "spiral":

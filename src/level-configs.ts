@@ -98,6 +98,15 @@ const colors = [
 export const levels: LevelConfig[] = [
   {
     pattern: "random",
+    behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
+    particleCount: 5,
+    radius: () => 200,
+    color: () => colors[Math.floor(Math.random() * colors.length)],
+    vx: () => (Math.random() - 0.5) * 100,
+    vy: () => (Math.random() - 0.5) * 100,
+  },
+  {
+    pattern: "random",
     behaviors: [{ type: "wall", mode: "seamless" }],
     radius: () => 150,
     particleCount: 1,
@@ -161,15 +170,6 @@ export const levels: LevelConfig[] = [
     vy: () => 20,
   },
 
-  // {
-  //   pattern: "random",
-  //   behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
-  //   particleCount: 5,
-  //   radius: () => 200,
-  //   color: () => colors[Math.floor(Math.random() * colors.length)],
-  //   vx: () => (Math.random() - 0.5) * 100,
-  //   vy: () => (Math.random() - 0.5) * 100,
-  // },
   // {
   //   pattern: "random",
   //   behaviors: [{ type: "wall", mode: "wrap" }, { type: "collision" }],
