@@ -4,6 +4,7 @@ import { LevelCompleteState } from "./LevelCompleteState";
 import { Player } from "../game-objects/Player";
 import { Particle } from "../game-objects/Particle";
 import { Guardian } from "../game-objects/Guardian";
+import { CollisionBehavior } from "../particle-behaviors";
 
 export class PlayingState extends State {
   public enter(): void {
@@ -33,23 +34,48 @@ export class PlayingState extends State {
     const customEvent = event as CustomEvent;
     const { object1, object2, position1, position2 } = customEvent.detail;
 
-    const player = object1 instanceof Player ? object1 : object2;
-    const other = object1 instanceof Player ? object2 : object1;
-
-    if (
-      player instanceof Player &&
-      (other instanceof Particle || other instanceof Guardian)
-    ) {
+    if (object1 instanceof Player || object2 instanceof Player) {
+      const player = (object1 instanceof Player ? object1 : object2) as Player;
+      const collidedObject = (object1 instanceof Player ? object2 : object1) as
+        | Particle
+        | Guardian;
+      const collisionPosition = player === object1 ? position2 : position1;
       this.game.stateMachine.transitionTo(
-        new GameOverState(this.game, other, position1)
+        new GameOverState(this.game, collidedObject, collisionPosition)
       );
-    } else if (object1 instanceof Particle && object2 instanceof Particle) {
-      object1.behaviors.forEach((b) =>
-        b.handleCollision?.(object1, object2, position1, position2)
+      return;
+    }
+
+    const p1 = object1 instanceof Particle ? object1 : null;
+    const p2 = object2 instanceof Particle ? object2 : null;
+
+    if (p1 && p2) {
+      const behavior1 = p1.behaviors.find(
+        (b): b is CollisionBehavior => b instanceof CollisionBehavior
       );
-      object2.behaviors.forEach((b) =>
-        b.handleCollision?.(object2, object1, position2, position1)
+      const behavior2 = p2.behaviors.find(
+        (b): b is CollisionBehavior => b instanceof CollisionBehavior
       );
+
+      if (behavior1) {
+        behavior1.handleCollision(p1, p2, position1, position2);
+      } else if (behavior2) {
+        behavior2.handleCollision(p2, p1, position2, position1);
+      }
+    } else if (object1 instanceof Guardian || object2 instanceof Guardian) {
+      const guardian = (
+        object1 instanceof Guardian ? object1 : object2
+      ) as Guardian;
+      const other = object1 instanceof Guardian ? object2 : object1;
+      if (other instanceof Particle) {
+        const behavior = other.behaviors.find(
+          (b): b is CollisionBehavior => b instanceof CollisionBehavior
+        );
+        if (behavior?.mode === "lightUp") {
+          other.fillOpacity = 1;
+        }
+        guardian.handleCollision(other);
+      }
     }
   };
 

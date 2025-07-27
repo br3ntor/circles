@@ -4,7 +4,6 @@ import { PlayingState } from "./fsm/PlayingState";
 import { GameOverState } from "./fsm/GameOverState";
 import { LevelCompleteState } from "./fsm/LevelCompleteState";
 import { TransitionState } from "./fsm/TransitionState";
-import { Vector2 } from "./game-objects";
 import { UIManager } from "./UIManager";
 import { GameCompleteState } from "./fsm/GameCompleteState";
 
@@ -34,7 +33,7 @@ export class Renderer {
     } else if (state instanceof PlayingState) {
       this.uiManager.drawTimer(this.ctx);
     } else if (state instanceof GameOverState) {
-      const { fadeAlpha, collidedObject, collisionPosition } = state;
+      const { fadeAlpha, collidedObject } = state;
 
       // Draw a glowing effect around the collided object
       if (collidedObject) {
@@ -64,17 +63,5 @@ export class Renderer {
     } else if (state instanceof GameCompleteState) {
       this.uiManager.drawFinalScore(this.ctx);
     }
-  }
-
-  private drawGlow(position: Vector2, radius: number): void {
-    this.ctx.save();
-    this.ctx.shadowBlur = 20;
-    this.ctx.shadowColor = "red";
-    this.ctx.strokeStyle = "red";
-    this.ctx.lineWidth = 3;
-    this.ctx.beginPath();
-    this.ctx.arc(position.x, position.y, radius + 5, 0, Math.PI * 2);
-    this.ctx.stroke();
-    this.ctx.restore();
   }
 }
