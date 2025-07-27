@@ -14,6 +14,10 @@ export class Vector2 {
     return new Vector2(this.x * scalar, this.y * scalar);
   }
 
+  subtract(other: Vector2) {
+    return new Vector2(this.x - other.x, this.y - other.y);
+  }
+
   distanceTo(other: Vector2): number {
     const dx = this.x - other.x;
     const dy = this.y - other.y;

@@ -34,7 +34,7 @@ export class Renderer {
     } else if (state instanceof PlayingState) {
       this.uiManager.drawTimer(this.ctx);
     } else if (state instanceof GameOverState) {
-      const { fadeAlpha, collidedObject } = state;
+      const { fadeAlpha, collidedObject, collisionPosition } = state;
 
       // Draw a glowing effect around the collided object
       if (collidedObject) {
@@ -43,15 +43,13 @@ export class Renderer {
         this.ctx.shadowColor = "red";
         this.ctx.strokeStyle = "red";
         this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.arc(
-          collidedObject.position.x,
-          collidedObject.position.y,
-          collidedObject.radius + 5,
-          0,
-          Math.PI * 2
-        );
-        this.ctx.stroke();
+        const positions =
+          this.game.collisionManager.getWrappedPositions(collidedObject);
+        for (const pos of positions) {
+          this.ctx.beginPath();
+          this.ctx.arc(pos.x, pos.y, collidedObject.radius + 5, 0, Math.PI * 2);
+          this.ctx.stroke();
+        }
         this.ctx.restore();
       }
 
@@ -66,5 +64,17 @@ export class Renderer {
     } else if (state instanceof GameCompleteState) {
       this.uiManager.drawFinalScore(this.ctx);
     }
+  }
+
+  private drawGlow(position: Vector2, radius: number): void {
+    this.ctx.save();
+    this.ctx.shadowBlur = 20;
+    this.ctx.shadowColor = "red";
+    this.ctx.strokeStyle = "red";
+    this.ctx.lineWidth = 3;
+    this.ctx.beginPath();
+    this.ctx.arc(position.x, position.y, radius + 5, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.restore();
   }
 }

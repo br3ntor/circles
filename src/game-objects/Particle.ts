@@ -16,7 +16,6 @@ export class Particle {
   age: number;
   shouldRemove: boolean;
   fillOpacity: number;
-
   constructor(x: number, y: number, options: ParticleOptions = {}) {
     this.age = 0;
     this.position = new Vector2(x, y);

@@ -1,14 +1,20 @@
 import { State } from "./State";
 import { Game } from "../game";
-import { Guardian, Particle } from "../game-objects";
+import { Guardian, Particle, Vector2 } from "../game-objects";
 
 export class GameOverState extends State {
   public collidedObject: Particle | Guardian;
+  public collisionPosition: Vector2;
   public fadeAlpha: number = 0;
 
-  constructor(game: Game, collidedObject: Particle | Guardian) {
+  constructor(
+    game: Game,
+    collidedObject: Particle | Guardian,
+    collisionPosition: Vector2
+  ) {
     super(game);
     this.collidedObject = collidedObject;
+    this.collisionPosition = collisionPosition;
   }
 
   public enter(): void {

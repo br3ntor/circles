@@ -13,7 +13,7 @@ export class CollisionManager extends EventTarget {
     this.canvas = canvas;
   }
 
-  private getWrappedPositions(object: Collidable): Vector2[] {
+  public getWrappedPositions(object: Collidable): Vector2[] {
     const positions: Vector2[] = [object.position];
     const { width, height } = this.canvas;
     const { x, y } = object.position;
@@ -38,28 +38,49 @@ export class CollisionManager extends EventTarget {
   }
 
   public checkCollisions(objects: Collidable[]): void {
-    for (let i = 0; i < objects.length; i++) {
+    // Reset ghost collision flags at the beginning of the check
+    for (const obj of objects) {
+      if ("isGhostColliding" in obj) {
+        obj.isGhostColliding = false;
+      }
+    }
+
+    pair_loop: for (let i = 0; i < objects.length; i++) {
       for (let j = i + 1; j < objects.length; j++) {
         const obj1 = objects[i];
         const obj2 = objects[j];
 
         const obj1Positions = this.getWrappedPositions(obj1);
+        const obj2Positions = this.getWrappedPositions(obj2);
 
         for (const pos1 of obj1Positions) {
-          // No need to wrap obj2's main position, as obj1's ghosts cover all cases.
-          const distance = pos1.distanceTo(obj2.position);
+          for (const pos2 of obj2Positions) {
+            const distance = pos1.distanceTo(pos2);
 
-          if (distance < obj1.radius + obj2.radius) {
-            this.dispatchEvent(
-              new CustomEvent("collision", {
-                detail: {
-                  object1: obj1,
-                  object2: obj2,
-                },
-              })
-            );
-            // Prevent dispatching multiple events for the same pair in one frame
-            break;
+            if (distance < obj1.radius + obj2.radius) {
+              const isObj1Ghost = pos1 !== obj1.position;
+              const isObj2Ghost = pos2 !== obj2.position;
+
+              if (isObj1Ghost && "isGhostColliding" in obj1) {
+                obj1.isGhostColliding = true;
+              }
+              if (isObj2Ghost && "isGhostColliding" in obj2) {
+                obj2.isGhostColliding = true;
+              }
+
+              this.dispatchEvent(
+                new CustomEvent("collision", {
+                  detail: {
+                    object1: obj1,
+                    object2: obj2,
+                    position1: pos1,
+                    position2: pos2,
+                  },
+                })
+              );
+              // Prevent dispatching multiple events for the same pair in one frame
+              continue pair_loop;
+            }
           }
         }
       }

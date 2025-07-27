@@ -1,5 +1,5 @@
 import resolveCollision from "../elastic-collision";
-import type { Particle, ParticleBehavior } from "../game-objects";
+import type { Particle, ParticleBehavior, Vector2 } from "../game-objects";
 
 export type CollisionBehaviorMode = "none" | "lightUp";
 
@@ -14,8 +14,13 @@ export class CollisionBehavior implements ParticleBehavior {
     // Collision detection is now handled by the central CollisionManager
   }
 
-  handleCollision(particle: Particle, otherParticle: Particle) {
-    resolveCollision(particle, otherParticle);
+  handleCollision(
+    particle: Particle,
+    otherParticle: Particle,
+    position1: Vector2,
+    position2: Vector2
+  ) {
+    resolveCollision(particle, otherParticle, position1, position2);
     if (this.mode === "lightUp") {
       particle.fillOpacity = 1;
       otherParticle.fillOpacity = 1;

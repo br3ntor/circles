@@ -75,18 +75,20 @@ export class WallBehavior implements ParticleBehavior {
   }
 
   private handleSeamless(particle: Particle): void {
-    // This logic moves the particle to the other side of the canvas
-    // precisely where its "ghost" image would be, creating a smooth transition.
-    if (particle.position.x - particle.radius > this.canvas.width) {
-      particle.position.x -= this.canvas.width;
-    } else if (particle.position.x + particle.radius < 0) {
-      particle.position.x += this.canvas.width;
+    const { x, y } = particle.position;
+    const { radius } = particle;
+    const { width, height } = this.canvas;
+
+    if (x > width) {
+      particle.position.x = 0;
+    } else if (x < 0) {
+      particle.position.x = width;
     }
 
-    if (particle.position.y - particle.radius > this.canvas.height) {
-      particle.position.y -= this.canvas.height;
-    } else if (particle.position.y + particle.radius < 0) {
-      particle.position.y += this.canvas.height;
+    if (y > height) {
+      particle.position.y = 0;
+    } else if (y < 0) {
+      particle.position.y = height;
     }
   }
 
