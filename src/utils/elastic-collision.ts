@@ -1,4 +1,4 @@
-import { Vector2 } from "./game-objects";
+import { Vector2 } from "../game-objects";
 
 interface Collidable {
   velocity: Vector2;

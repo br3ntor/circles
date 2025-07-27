@@ -1,7 +1,7 @@
 import { State } from "./State";
 import { TransitionState } from "./TransitionState";
 import { GameCompleteState } from "./GameCompleteState";
-import { levels } from "../level-configs";
+import { levels } from "../config/level-configs";
 
 export class LevelCompleteState extends State {
   public enter(): void {

@@ -1,4 +1,4 @@
-import resolveCollision from "../elastic-collision";
+import resolveCollision from "../utils/elastic-collision";
 import type { Particle, ParticleBehavior, Vector2 } from "../game-objects";
 
 export type CollisionBehaviorMode = "none" | "lightUp";

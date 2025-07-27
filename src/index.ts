@@ -1,6 +1,6 @@
-import "./style.css";
+import "./styles/style.css";
 import { Game } from "./game";
-import { setupEventListeners } from "./event-listeners";
+import { setupEventListeners } from "./utils/event-listeners";
 
 (function initGame() {
   const game = new Game();

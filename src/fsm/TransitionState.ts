@@ -1,6 +1,6 @@
 import { State } from "./State";
 import { ReadyToStartState } from "./ReadyToStartState";
-import TransitionManager from "../TransitionManager";
+import TransitionManager from "../managers/TransitionManager";
 import { Vector2 } from "../game-objects";
 
 export class TransitionState extends State {
@@ -9,10 +9,7 @@ export class TransitionState extends State {
 
   constructor(game: any) {
     super(game);
-    this.transitionManager = new TransitionManager(
-      this.game,
-      this.game.renderer
-    );
+    this.transitionManager = new TransitionManager(this.game);
   }
 
   public enter(): void {

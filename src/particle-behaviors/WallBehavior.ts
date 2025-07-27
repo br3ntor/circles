@@ -76,7 +76,6 @@ export class WallBehavior implements ParticleBehavior {
 
   private handleSeamless(particle: Particle): void {
     const { x, y } = particle.position;
-    const { radius } = particle;
     const { width, height } = this.canvas;
 
     if (x > width) {

@@ -1,5 +1,6 @@
-import { CollisionBehaviorMode, WallBehaviorMode } from "./particle-behaviors";
-import { balls, niceColor } from "./utils";
+import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
+import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
+import { balls, niceColor } from "../utils/utils";
 
 export type Pattern =
   | "random"

@@ -1,20 +1,17 @@
-import { gameConfig } from "./game-config";
-import { Game } from "./game";
-import { Renderer } from "./Renderer";
-import { Vector2 } from "./game-objects";
+import { gameConfig } from "../config/game-config";
+import { Game } from "../game";
+import { Vector2 } from "../game-objects";
 
 export default class TransitionManager {
   private game: Game;
-  private renderer: Renderer;
   public isTransitioning: boolean = false;
   private transitionRadius: number = 0;
   private transitionDirection: "in" | "out" = "in";
   private transitionCenter: Vector2 = new Vector2(0, 0);
   private maxRadius: number;
 
-  constructor(game: Game, renderer: Renderer) {
+  constructor(game: Game) {
     this.game = game;
-    this.renderer = renderer;
     this.maxRadius =
       Math.max(this.game.canvas.width, this.game.canvas.height) * 1.5;
   }

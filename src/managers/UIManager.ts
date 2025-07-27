@@ -1,6 +1,6 @@
 import { ScoreManager } from "./ScoreManager";
-import { Timer } from "./game-objects/Timer";
-import { gameConfig } from "./game-config";
+import { Timer } from "../game-objects/Timer";
+import { gameConfig } from "../config/game-config";
 
 export class UIManager {
   private static instance: UIManager;

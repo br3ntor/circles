@@ -1,11 +1,11 @@
-import { Game } from "./game";
-import { ReadyToStartState } from "./fsm/ReadyToStartState";
-import { PlayingState } from "./fsm/PlayingState";
-import { GameOverState } from "./fsm/GameOverState";
-import { LevelCompleteState } from "./fsm/LevelCompleteState";
-import { TransitionState } from "./fsm/TransitionState";
-import { UIManager } from "./UIManager";
-import { GameCompleteState } from "./fsm/GameCompleteState";
+import { Game } from "../game";
+import { ReadyToStartState } from "../fsm/ReadyToStartState";
+import { PlayingState } from "../fsm/PlayingState";
+import { GameOverState } from "../fsm/GameOverState";
+import { LevelCompleteState } from "../fsm/LevelCompleteState";
+import { TransitionState } from "../fsm/TransitionState";
+import { UIManager } from "../managers/UIManager";
+import { GameCompleteState } from "../fsm/GameCompleteState";
 
 export class Renderer {
   game: Game;

@@ -1,5 +1,5 @@
 import { Particle } from "../game-objects/index.js";
-import { SpiralPatternConfig } from "../level-configs.js";
+import { SpiralPatternConfig } from "../config/level-configs.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class SpiralPattern implements IPattern {

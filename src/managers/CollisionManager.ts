@@ -1,8 +1,8 @@
-import type { Goal } from "./game-objects/Goal";
-import type { Particle } from "./game-objects/Particle";
-import type { Player } from "./game-objects/Player";
-import type { Guardian } from "./game-objects/Guardian";
-import { Vector2 } from "./game-objects/Vector2";
+import type { Goal } from "../game-objects/Goal";
+import type { Particle } from "../game-objects/Particle";
+import type { Player } from "../game-objects/Player";
+import type { Guardian } from "../game-objects/Guardian";
+import { Vector2 } from "../game-objects/Vector2";
 
 type Collidable = Particle | Player | Guardian | Goal;
 

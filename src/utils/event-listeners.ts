@@ -1,10 +1,8 @@
-import { Game } from "./game";
+import { Game } from "../game";
 import { distance } from "./utils";
-import { ReadyToStartState } from "./fsm/ReadyToStartState";
-import { PlayingState } from "./fsm/PlayingState";
-import { GameOverState } from "./fsm/GameOverState";
-import { Guardian, Particle, Player } from "./game-objects";
-import { CollisionBehavior } from "./particle-behaviors";
+import { ReadyToStartState } from "../fsm/ReadyToStartState";
+import { PlayingState } from "../fsm/PlayingState";
+import { GameOverState } from "../fsm/GameOverState";
 
 export function setupEventListeners(game: Game) {
   // Updates mouse state

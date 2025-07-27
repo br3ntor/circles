@@ -1,6 +1,6 @@
-import { Game } from "./game";
-import { Guardian, Player } from "./game-objects";
-import { levels } from "./level-configs";
+import { Game } from "../game";
+import { Guardian, Player } from "../game-objects";
+import { levels } from "../config/level-configs";
 
 export class LevelManager {
   game: Game;

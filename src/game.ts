@@ -1,13 +1,13 @@
 import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
 import { StateMachine } from "./fsm/StateMachine";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
-import { LevelManager } from "./LevelManager";
-import { Renderer } from "./Renderer";
-import { gameConfig } from "./game-config";
+import { LevelManager } from "./managers/LevelManager";
+import { Renderer } from "./managers/Renderer";
+import { gameConfig } from "./config/game-config";
 import { Timer } from "./game-objects/Timer";
-import { ScoreManager } from "./ScoreManager";
-import { UIManager } from "./UIManager";
-import { CollisionManager } from "./CollisionManager";
+import { ScoreManager } from "./managers/ScoreManager";
+import { UIManager } from "./managers/UIManager";
+import { CollisionManager } from "./managers/CollisionManager";
 
 export class Game {
   canvas: HTMLCanvasElement;

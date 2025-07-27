@@ -1,5 +1,5 @@
 import { Vector2 } from "./Vector2.js";
-import { distance } from "../utils.js";
+import { distance } from "../utils/utils.js";
 import { Player } from "./Player.js";
 
 export class Goal {

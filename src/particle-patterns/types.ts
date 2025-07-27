@@ -1,5 +1,5 @@
 import { Particle, ParticleBehavior, ParticleOptions } from "../game-objects";
-import { PatternConfigMap } from "../level-configs";
+import { PatternConfigMap } from "../config/level-configs";
 
 export interface PatternCreatorInput {
   particleCount: number;
