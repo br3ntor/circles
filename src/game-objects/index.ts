@@ -5,4 +5,3 @@ export * from "./Particle.js";
 export * from "./Player.js";
 export * from "./Goal.js";
 export * from "./Guardian.js";
-export * from "./ParticleSystem.js";

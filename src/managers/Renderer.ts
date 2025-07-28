@@ -23,7 +23,7 @@ export class Renderer {
 
     const state = this.game.stateMachine.currentState;
 
-    this.game.particleSystem.draw(this.ctx);
+    this.game.particleManager.draw(this.ctx);
     this.game.goal.draw(this.ctx);
     this.game.player.draw(this.ctx);
     this.game.guardians.forEach((g) => g.draw(this.ctx));

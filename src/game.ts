@@ -1,4 +1,5 @@
-import { Goal, Guardian, ParticleSystem, Player } from "./game-objects";
+import { Goal, Guardian, Player } from "./game-objects";
+import { ParticleManager } from "./managers/ParticleManager";
 import { StateMachine } from "./fsm/StateMachine";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { LevelManager } from "./managers/LevelManager";
@@ -15,7 +16,7 @@ export class Game {
   mouse: { x: number; y: number };
   player!: Player; // Initialized by LevelManager
   goal: Goal;
-  particleSystem: ParticleSystem;
+  particleManager: ParticleManager;
   guardians: Guardian[];
   stateMachine: StateMachine;
   levelManager: LevelManager;
@@ -36,7 +37,7 @@ export class Game {
     this.canvas.height = window.innerHeight;
     this.canvas.style.background = "#0c0c0c";
     this.mouse = { x: 0, y: 0 };
-    this.particleSystem = new ParticleSystem(this.canvas);
+    this.particleManager = new ParticleManager(this.canvas);
     this.guardians = [];
     this.goal = new Goal(
       this.canvas.width / 1.2,

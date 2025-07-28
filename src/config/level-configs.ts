@@ -211,7 +211,7 @@ export const levels: LevelConfig[] = [
   //     { type: "wall", mode: "collide" },
   //     {
   //       type: "orbit",
-  //       // centerPoint will be calculated in ParticleSystem
+  //       // centerPoint will be calculated in ParticleManager
   //       radius: 200,
   //       speed: 1,
   //     },

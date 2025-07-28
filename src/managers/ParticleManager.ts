@@ -19,11 +19,11 @@ import { RandomPattern } from "../particle-patterns/RandomPattern.js";
 import { SpiralPattern } from "../particle-patterns/SpiralPattern.js";
 import { StarPattern } from "../particle-patterns/StarPattern.js";
 import { WavePattern } from "../particle-patterns/WavePattern.js";
-import { Particle } from "./Particle.js";
-import { Vector2 } from "./Vector2.js";
-import { ParticleBehavior } from "./types.js";
+import { Particle } from "../game-objects/Particle.js";
+import { Vector2 } from "../game-objects/Vector2.js";
+import { ParticleBehavior } from "../game-objects/types.js";
 
-export class ParticleSystem {
+export class ParticleManager {
   private canvas: HTMLCanvasElement;
   private particles: Particle[];
   private patterns: {

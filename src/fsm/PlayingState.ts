@@ -108,14 +108,14 @@ export class PlayingState extends State {
   public update(deltaTime: number): void {
     const collidables = [
       this.game.player,
-      ...this.game.particleSystem.getParticles(),
+      ...this.game.particleManager.getParticles(),
       ...this.game.guardians,
     ];
     this.game.collisionManager.checkCollisions(collidables, this.game.goal);
     this.game.player.update(this.game.mouse);
-    this.game.particleSystem.update(deltaTime, this.game.time);
+    this.game.particleManager.update(deltaTime, this.game.time);
     this.game.guardians.forEach((guardian) =>
-      guardian.update(this.game.particleSystem.getParticles(), this.game.goal)
+      guardian.update(this.game.particleManager.getParticles(), this.game.goal)
     );
 
     // Goal is reached! Level Complete!

@@ -22,7 +22,7 @@ export class LevelManager {
     this.game.player = new Player(50, this.game.canvas.height / 2, 30);
     this.game.goal.fill = false;
 
-    this.game.particleSystem.createPattern(levelConfig);
+    this.game.particleManager.createPattern(levelConfig);
     this.createGuardians();
   }
 
