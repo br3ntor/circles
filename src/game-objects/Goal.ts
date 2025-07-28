@@ -1,13 +1,16 @@
-import { Vector2 } from "./Vector2.js";
+import { BehaviorManager } from "../managers/BehaviorManager.js";
 import { distance } from "../utils/utils.js";
 import { Player } from "./Player.js";
+import { IGameObject } from "./types.js";
+import { Vector2 } from "./Vector2.js";
 
-export class Goal {
+export class Goal implements IGameObject {
   position: Vector2;
   x: number;
   y: number;
   radius: number;
   fill: boolean;
+  behaviorManager: BehaviorManager;
 
   constructor(x: number, y: number, radius: number) {
     this.position = new Vector2(x, y);
@@ -15,6 +18,7 @@ export class Goal {
     this.y = y;
     this.radius = radius;
     this.fill = false;
+    this.behaviorManager = new BehaviorManager();
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -40,7 +44,13 @@ export class Goal {
     ctx.restore();
   }
 
-  update(ctx: CanvasRenderingContext2D, player: Player) {
+  update(
+    ctx: CanvasRenderingContext2D,
+    player: Player,
+    deltaTime: number,
+    time: number
+  ) {
+    this.behaviorManager.update(this, deltaTime, time);
     // Collision detection for player entering goal
     this.draw(ctx);
     const dist = distance(this.position.x, this.position.y, player.x, player.y);

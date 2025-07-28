@@ -1,22 +1,23 @@
-import type { Particle, ParticleBehavior } from "../game-objects";
+import { IGameObject } from "../game-objects/types";
+import { IBehavior } from "../managers/BehaviorManager";
 
 export type LightingBehaviorMode = "none" | "lightUp";
 
-export class LightingBehavior implements ParticleBehavior {
+export class LightingBehavior implements IBehavior {
   mode: LightingBehaviorMode;
 
   constructor(mode: LightingBehaviorMode = "lightUp") {
     this.mode = mode;
   }
 
-  update(particle: Particle): void {
+  update(gameObject: IGameObject): void {
     // This behavior might have time-based lighting effects in the future
   }
 
-  handleCollision(particle: Particle, otherParticle: Particle) {
+  handleCollision(gameObject: IGameObject, other: IGameObject) {
     if (this.mode === "lightUp") {
-      particle.fillOpacity = 0.8;
-      otherParticle.fillOpacity = 0.8;
+      gameObject.fillOpacity = 0.8;
+      other.fillOpacity = 0.8;
     }
   }
 }

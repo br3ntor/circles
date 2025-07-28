@@ -1,3 +1,4 @@
+import { getRandomColorFromScheme } from "./color-schemes";
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
@@ -112,23 +113,15 @@ export interface LevelConfig<P extends Pattern = Pattern> {
   vy?: () => number;
 }
 
-const colors = [
-  "hsl(0, 100%, 71%)",
-  "hsl(177, 56%, 58%)",
-  "hsl(190, 56%, 58%)",
-  "hsl(152, 44%, 67%)",
-  "hsl(45, 100%, 85%)",
-];
-
 export const levels: LevelConfig[] = [
   {
     pattern: "waves",
     behaviors: [
-      { type: "sinusoidal", amplitude: -1, frequency: 2 },
+      { type: "sinusoidal", amplitude: 50, frequency: 2 },
       { type: "wall", mode: "teleport" },
     ],
     particleCount: 10,
-    color: () => "white",
+    color: () => getRandomColorFromScheme("cosmic"),
     vx: () => 100,
     vy: () => 0,
   },
@@ -183,7 +176,7 @@ export const levels: LevelConfig[] = [
     ],
     particleCount: 30,
     radius: () => 50,
-    color: () => colors[Math.floor(Math.random() * colors.length)],
+    color: () => getRandomColorFromScheme("pastel"),
     vx: () => (Math.random() - 0.5) * 100,
     vy: () => (Math.random() - 0.5) * 100,
   },
@@ -197,7 +190,7 @@ export const levels: LevelConfig[] = [
     ],
     particleCount: balls() + 20,
     radius: () => 10,
-    color: () => colors[Math.floor(Math.random() * colors.length)],
+    color: () => getRandomColorFromScheme("ocean"),
     vx: () => 220,
     vy: () => 0,
   },
@@ -226,7 +219,7 @@ export const levels: LevelConfig[] = [
     behaviors: [{ type: "wall", mode: "teleport" }],
     particleCount: balls() + 30,
     radius: () => 10,
-    color: () => colors[Math.floor(Math.random() * colors.length)],
+    color: () => getRandomColorFromScheme("sunset"),
     vx: () => 0,
     vy: () => 20,
   },

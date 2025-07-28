@@ -1,13 +1,14 @@
+import { BehaviorManager } from "../managers/BehaviorManager.js";
 import { Vector2 } from "./Vector2.js";
-import { ParticleBehavior, ParticleOptions } from "./types.js";
+import { IGameObject, ParticleOptions } from "./types.js";
 
-export class Particle {
+export class Particle implements IGameObject {
   position: Vector2;
   velocity: Vector2;
   acceleration: Vector2;
   radius: number;
   color: string;
-  behaviors: ParticleBehavior[];
+  behaviorManager: BehaviorManager;
   angle: number;
   centerPoint?: Vector2;
   distance?: number;
@@ -29,7 +30,8 @@ export class Particle {
       typeof options.color === "function"
         ? options.color()
         : options.color ?? "white";
-    this.behaviors = options.behaviors ?? [];
+    this.behaviorManager = new BehaviorManager();
+    options.behaviors?.forEach((b) => this.behaviorManager.addBehavior(b));
     this.angle = options.angle ?? Math.random() * 2 * Math.PI;
     this.centerPoint = options.centerPoint;
     this.distance = options.distance;
@@ -59,9 +61,7 @@ export class Particle {
     this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
     this.acceleration = new Vector2(0, 0);
 
-    this.behaviors.forEach((behavior) =>
-      behavior.update(this, deltaTime, time)
-    );
+    this.behaviorManager.update(this, deltaTime, time);
 
     this.position = this.position.add(this.velocity.multiply(deltaTime));
   }

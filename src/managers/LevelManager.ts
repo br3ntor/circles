@@ -37,7 +37,7 @@ export class LevelManager {
       const distance = radius;
       const x = this.game.goal.x + Math.cos(radians) * distance;
       const y = this.game.goal.y + Math.sin(radians) * distance;
-      const newGuardian = new Guardian(x, y, radius, radians);
+      const newGuardian = new Guardian(x, y, radius, this.game.goal, radians);
       this.game.guardians.push(newGuardian);
       angle += spaceBetween;
     }

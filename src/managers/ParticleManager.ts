@@ -57,7 +57,7 @@ export class ParticleManager {
       particle.draw(ctx);
 
       // Handle seamless wrapping
-      const wallBehavior = particle.behaviors.find(
+      const wallBehavior = particle.behaviorManager.findBehavior(
         (b) => b instanceof WallBehavior
       ) as WallBehavior | undefined;
 

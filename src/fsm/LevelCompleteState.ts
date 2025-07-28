@@ -16,7 +16,7 @@ export class LevelCompleteState extends State {
     // which in this case the guardians will spiral back to the center
     // ignoring any particle processing for collisions etc.
     this.game.guardians.forEach((guardian) => {
-      guardian.update([], this.game.goal);
+      guardian.update(deltaTime, this.game.time);
     });
 
     // Once the animation is completed we can move on to the next state of the game.

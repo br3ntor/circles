@@ -1,10 +1,8 @@
-import { Vector2 } from "../game-objects";
+import { IGameObject, Vector2 } from "../game-objects";
 
-interface Collidable {
+export interface Collidable extends IGameObject {
   velocity: Vector2;
   mass: number;
-  radius: number;
-  position: Vector2;
 }
 
 /**

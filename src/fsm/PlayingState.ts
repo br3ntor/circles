@@ -5,6 +5,7 @@ import { Player } from "../game-objects/Player";
 import { Particle } from "../game-objects/Particle";
 import { Guardian } from "../game-objects/Guardian";
 import { LightingBehavior } from "../particle-behaviors";
+import { GoalCollisionBehavior } from "../particle-behaviors/GoalCollisionBehavior";
 
 export class PlayingState extends State {
   public enter(): void {
@@ -17,6 +18,13 @@ export class PlayingState extends State {
       "particle-goal-collision",
       this.handleParticleGoalCollision
     );
+
+    // Add GoalCollisionBehavior to all particles
+    this.game.particleManager
+      .getParticles()
+      .forEach((p) =>
+        p.behaviorManager.addBehavior(new GoalCollisionBehavior(false))
+      );
   }
 
   public exit(): void {
@@ -50,17 +58,8 @@ export class PlayingState extends State {
     const p2 = object2 instanceof Particle ? object2 : null;
 
     if (p1 && p2) {
-      // Let all behaviors react to the collision
-      p1.behaviors.forEach((behavior) => {
-        if (behavior.handleCollision) {
-          behavior.handleCollision(p1, p2, position1, position2);
-        }
-      });
-      p2.behaviors.forEach((behavior) => {
-        if (behavior.handleCollision) {
-          behavior.handleCollision(p2, p1, position2, position1);
-        }
-      });
+      p1.behaviorManager.handleCollision(p1, p2, position1, position2);
+      p2.behaviorManager.handleCollision(p2, p1, position2, position1);
     } else if (object1 instanceof Guardian || object2 instanceof Guardian) {
       const guardian = (
         object1 instanceof Guardian ? object1 : object2
@@ -69,11 +68,11 @@ export class PlayingState extends State {
       if (other instanceof Particle) {
         guardian.handleCollision(other);
         // Specifically check for lighting behavior on guardian collision
-        const lightingBehavior = other.behaviors.find(
+        const lightingBehavior = other.behaviorManager.findBehavior(
           (b): b is LightingBehavior => b instanceof LightingBehavior
         );
         // Lights up the particle on guardian collision
-        if (lightingBehavior?.mode === "lightUp") {
+        if ((lightingBehavior as LightingBehavior)?.mode === "lightUp") {
           other.fillOpacity = 0.5;
         }
       }
@@ -82,28 +81,13 @@ export class PlayingState extends State {
 
   private handleParticleGoalCollision = (event: Event) => {
     const customEvent = event as CustomEvent;
-    const { particle, goal } = customEvent.detail;
-
-    // 1. Calculate collision normal
-    const normal = particle.position.subtract(goal.position).normalize();
-
-    // 2. Calculate relative velocity
-    const relativeVelocity = particle.velocity;
-
-    // 3. Calculate impulse
-    const impulse = normal.multiply(-2 * relativeVelocity.dot(normal));
-
-    // 4. Apply impulse to particle's velocity
-    particle.velocity = particle.velocity.add(impulse);
-
-    // 5. Reposition particle to avoid sticking
-    const overlap =
-      particle.radius +
-      goal.radius -
-      particle.position.distanceTo(goal.position);
-    if (overlap > 0) {
-      particle.position = particle.position.add(normal.multiply(overlap));
-    }
+    const { particle, goal, position, goalPosition } = customEvent.detail;
+    particle.behaviorManager.handleCollision(
+      particle,
+      goal,
+      position,
+      goalPosition
+    );
   };
 
   public update(deltaTime: number): void {
@@ -116,11 +100,18 @@ export class PlayingState extends State {
     this.game.player.update(this.game.mouse);
     this.game.particleManager.update(deltaTime, this.game.time);
     this.game.guardians.forEach((guardian) =>
-      guardian.update(this.game.particleManager.getParticles(), this.game.goal)
+      guardian.update(deltaTime, this.game.time)
     );
 
     // Goal is reached! Level Complete!
-    if (this.game.goal.update(this.game.ctx, this.game.player)) {
+    if (
+      this.game.goal.update(
+        this.game.ctx,
+        this.game.player,
+        deltaTime,
+        this.game.time
+      )
+    ) {
       this.game.stateMachine.transitionTo(new LevelCompleteState(this.game));
       return;
     }
