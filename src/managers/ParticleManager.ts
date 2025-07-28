@@ -147,6 +147,7 @@ export class ParticleManager {
           );
         case "wave":
           return new WaveBehavior(
+            this.canvas,
             config.amplitude,
             config.frequency,
             config.speed

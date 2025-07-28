@@ -122,14 +122,21 @@ const colors = [
 
 export const levels: LevelConfig[] = [
   {
-    pattern: "random",
+    pattern: "waves",
     behaviors: [
+      { type: "sinusoidal", amplitude: -1, frequency: 2 },
       { type: "wall", mode: "teleport" },
-      {
-        type: "sinusoidal",
-        amplitude: -1,
-        frequency: 2,
-      },
+    ],
+    particleCount: 10,
+    color: () => "white",
+    vx: () => 100,
+    vy: () => 0,
+  },
+  {
+    pattern: "waves",
+    behaviors: [
+      { type: "wave", amplitude: 50, frequency: 0.1, speed: 100 },
+      { type: "wall", mode: "teleport" },
     ],
     particleCount: 10,
     color: () => "white",

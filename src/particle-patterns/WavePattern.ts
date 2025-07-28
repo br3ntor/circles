@@ -10,7 +10,7 @@ export class WavePattern implements IPattern {
   }: PatternCreatorInput): Particle[] {
     const particles: Particle[] = [];
     const waveAmplitude = 100;
-    const waveFrequency = 0.1;
+    const waveFrequency = 1;
 
     for (let i = 0; i < particleCount; i++) {
       const x = (i / particleCount) * canvas.width;

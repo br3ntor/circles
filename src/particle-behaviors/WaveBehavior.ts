@@ -1,33 +1,36 @@
 import { Particle, ParticleBehavior, Vector2 } from "../game-objects";
 
 export class WaveBehavior implements ParticleBehavior {
-  amplitude: number;
-  frequency: number;
-  speed: number;
-  baseY: number;
+  private amplitude: number;
+  private frequency: number;
+  private speed: number;
+  private baseY: number;
+  private canvas: HTMLCanvasElement;
+
+  private static readonly WAVE_OFFSET = 50;
 
   constructor(
+    canvas: HTMLCanvasElement,
     amplitude: number = 50,
     frequency: number = 0.02,
     speed: number = 100
   ) {
+    this.canvas = canvas;
     this.amplitude = amplitude;
     this.frequency = frequency;
     this.speed = speed;
     this.baseY = 0;
   }
 
-  update(particle: Particle, deltaTime: number, time: number): void {
+  update(particle: Particle, deltaTime: number): void {
     if (this.baseY === 0) this.baseY = particle.position.y;
 
-    // Calculate the target position for the next frame
     let nextX = particle.position.x + this.speed * deltaTime;
     const nextY =
       this.baseY + Math.sin(nextX * this.frequency) * this.amplitude;
 
-    // Wrap around screen
-    if (nextX > 850) {
-      nextX = -50;
+    if (nextX > this.canvas.width + WaveBehavior.WAVE_OFFSET) {
+      nextX = -WaveBehavior.WAVE_OFFSET;
     }
 
     const nextPosition = new Vector2(nextX, nextY);

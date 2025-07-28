@@ -30,6 +30,8 @@ export class SinusoidalMovement implements ParticleBehavior {
     // We directly set the y position to create the wave.
     // The particle's x velocity will continue to move it forward.
     particle.position.y =
-      this.initialY + this.actualAmplitude * Math.sin(this.frequency * time);
+      this.initialY +
+      this.actualAmplitude *
+        Math.sin(this.frequency * time + particle.position.x / 100);
   }
 }
