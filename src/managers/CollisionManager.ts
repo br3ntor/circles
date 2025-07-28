@@ -39,7 +39,7 @@ export class CollisionManager extends EventTarget {
   }
 
   public checkCollisions(
-    objects: (Particle | Player | Guardian)[],
+    objects: Exclude<Collidable, Goal>[],
     goal: Goal
   ): void {
     // Reset ghost collision flags at the beginning of the check

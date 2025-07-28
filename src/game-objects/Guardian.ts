@@ -135,7 +135,7 @@ export class Guardian {
     this.opacity = 0.6;
     this.color = collidingObject.color;
     if ("fillOpacity" in collidingObject) {
-      collidingObject.fillOpacity = 1;
+      collidingObject.fillOpacity = 0.3;
     }
   }
 }

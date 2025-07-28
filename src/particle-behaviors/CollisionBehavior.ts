@@ -22,8 +22,8 @@ export class CollisionBehavior implements ParticleBehavior {
   ) {
     resolveCollision(particle, otherParticle, position1, position2);
     if (this.mode === "lightUp") {
-      particle.fillOpacity = 1;
-      otherParticle.fillOpacity = 1;
+      particle.fillOpacity = 0.8;
+      otherParticle.fillOpacity = 0.8;
     }
   }
 }

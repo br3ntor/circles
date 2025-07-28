@@ -36,7 +36,7 @@ export class Particle {
     this.mass = options.mass ?? 1;
     this.opacity = options.opacity ?? 1;
     this.shouldRemove = false;
-    this.fillOpacity = 0.2;
+    this.fillOpacity = 0.02;
   }
 
   get x() {
@@ -51,8 +51,8 @@ export class Particle {
     this.age += deltaTime;
 
     // Fade out the fill opacity
-    if (this.fillOpacity > 0.2) {
-      this.fillOpacity = Math.max(0.2, this.fillOpacity - 2 * deltaTime);
+    if (this.fillOpacity > 0.02) {
+      this.fillOpacity = Math.max(0.02, this.fillOpacity - 1 * deltaTime);
     }
 
     // Apply acceleration before behaviors
