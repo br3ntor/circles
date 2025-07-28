@@ -2,6 +2,10 @@
 
 This document outlines the future plans and desired features for the game.
 
+## High-Level Goals
+
+- [ ] **MVP Definition**: Complete a basic set of levels and evaluate what else is needed for a minimum viable product.
+
 ## Gameplay Enhancements
 
 - [x] **Re-enable Particle Patterns**: Restore the `createSpiralPattern`, `createStarPattern`, `createCirclePattern`, `createWavePattern`, and `createOrbitPattern` functions in `src/game-objects.ts` to enable more complex and visually interesting levels.
@@ -9,7 +13,11 @@ This document outlines the future plans and desired features for the game.
 - [ ] **Player Abilities/Power-ups**: Add special abilities for the player, such as a temporary speed boost or invisibility.
 - [ ] **Enhanced Guardian-Particle Interactions**: Make guardian collisions with particles more dynamic, causing different effects beyond just lighting up.
 - [ ] **Life System**: Implement a life system to track player lives.
-- [ ] **Guardian Abilities** Implement different abilities for guardians. Manipulate particles, shoot particles, attract particles. Oh what if maybe particles bestowed abilities on the guardians when they collide?
+- [ ] **Configurable Guardian Behaviors**: Implement a system to add a variety of behaviors to guardians, similar to the particle behavior system.
+  - [ ] **Movement Patterns**: Add different movement patterns (e.g., clockwise, counter-clockwise, custom paths).
+  - [ ] **Collision Logic**: Allow guardians to have configurable collision (e.g., collide with particles, ignore them).
+  - [ ] **Starting Formations**: Create different starting patterns for guardians.
+- [ ] **Particle Size Animation**: Add particle behaviors for growing or shrinking in size over time or on events.
 
 ## UI/UX Improvements
 
@@ -18,6 +26,7 @@ This document outlines the future plans and desired features for the game.
   - [ ] Display the current level number.
   - [ ] Show the player's remaining lives.
 - [ ] **Level Transition Display**: Show the level number in the center of the screen during the transition animation.
+- [ ] **Configurable Color Schemes**: Implement a system for defining and switching between different color palettes for the game.
 
 ## Game Modes
 
@@ -35,15 +44,18 @@ This document outlines the future plans and desired features for the game.
 
 ## Code Refactoring
 
-- [ ] **Split `game-objects.ts`**: Refactor the monolithic `src/game-objects.ts` file into smaller, more focused modules (e.g., `player.ts`, `particle.ts`, `guardian.ts`, etc.) to improve code navigation and maintainability.
+- [x] **Split `game-objects.ts`**: Refactor the monolithic `src/game-objects.ts` file into smaller, more focused modules (e.g., `player.ts`, `particle.ts`, `guardian.ts`, etc.) to improve code navigation and maintainability.
+- [ ] **Review Collision Detection**: Investigate collision detection functions to ensure they follow a consistent and efficient pattern.
 
 ## Architectural & Systems Improvements (Future Considerations)
 
-- [ ] **UI Management System**: Create a dedicated `UIManager` to handle rendering and input for all UI elements (HUD, menus, etc.) to keep UI logic separate from game logic.
+- [x] **UI Management System**: Create a dedicated `UIManager` to handle rendering and input for all UI elements (HUD, menus, etc.) to keep UI logic separate from game logic.
+- [ ] **Advanced Particle Lighting System**: Enhance the particle lighting system to be more configurable, allowing for different behaviors and animated light patterns.
 - [ ] **Centralized Event System (Event Bus)**: Implement an event bus to decouple systems. This allows objects to communicate through events (e.g., `PLAYER_DIED`, `LEVEL_COMPLETE`) without direct dependencies, making the codebase more modular and easier to extend.
 - [ ] **Robust Input Handler**: Develop a central `InputManager` to process raw browser inputs (keyboard, mouse) and translate them into game-specific actions, simplifying input handling throughout the application.
 - [ ] **Audio Manager**: Create a simple `AudioManager` to control loading and playback of sound effects and music, centralizing all audio-related functionality.
+  - [ ] Implement sound effects for key game events (e.g., particle collision, level complete, player death).
 - [ ] **Decouple Particle Creation with Emitters**: Refactor the particle creation logic by introducing an "Emitter" or "Generator" system. Each pattern (e.g., spiral, wave) will have its own Emitter class responsible for generating particle positions and initial properties. This will decouple the `ParticleSystem` from the specific creation logic, making the architecture more modular, flexible, and easier to extend with new patterns.
-
+  - [ ] Emitters could be attached to game objects like guardians, allowing them to "shoot" particles.
 - [ ] **Runtime Debug Panel**: Create a debug panel to modify patterns and behaviors at runtime.
 - [ ] **Dynamic Behavior Chaining**: Allow behaviors to be chained or stacked dynamically at runtime for more complex interactions.
