@@ -30,7 +30,7 @@ export class Particle {
         ? options.color()
         : options.color ?? "white";
     this.behaviors = options.behaviors ?? [];
-    this.angle = options.angle ?? 0;
+    this.angle = options.angle ?? Math.random() * 2 * Math.PI;
     this.centerPoint = options.centerPoint;
     this.distance = options.distance;
     this.mass = options.mass ?? 1;
@@ -64,16 +64,6 @@ export class Particle {
     );
 
     this.position = this.position.add(this.velocity.multiply(deltaTime));
-  }
-
-  draw_old(ctx: CanvasRenderingContext2D): void {
-    ctx.save();
-    ctx.globalAlpha = this.opacity;
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
   }
 
   draw(

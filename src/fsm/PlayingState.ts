@@ -4,7 +4,7 @@ import { LevelCompleteState } from "./LevelCompleteState";
 import { Player } from "../game-objects/Player";
 import { Particle } from "../game-objects/Particle";
 import { Guardian } from "../game-objects/Guardian";
-import { CollisionBehavior } from "../particle-behaviors";
+import { LightingBehavior } from "../particle-behaviors";
 
 export class PlayingState extends State {
   public enter(): void {
@@ -50,31 +50,32 @@ export class PlayingState extends State {
     const p2 = object2 instanceof Particle ? object2 : null;
 
     if (p1 && p2) {
-      const behavior1 = p1.behaviors.find(
-        (b): b is CollisionBehavior => b instanceof CollisionBehavior
-      );
-      const behavior2 = p2.behaviors.find(
-        (b): b is CollisionBehavior => b instanceof CollisionBehavior
-      );
-
-      if (behavior1) {
-        behavior1.handleCollision(p1, p2, position1, position2);
-      } else if (behavior2) {
-        behavior2.handleCollision(p2, p1, position2, position1);
-      }
+      // Let all behaviors react to the collision
+      p1.behaviors.forEach((behavior) => {
+        if (behavior.handleCollision) {
+          behavior.handleCollision(p1, p2, position1, position2);
+        }
+      });
+      p2.behaviors.forEach((behavior) => {
+        if (behavior.handleCollision) {
+          behavior.handleCollision(p2, p1, position2, position1);
+        }
+      });
     } else if (object1 instanceof Guardian || object2 instanceof Guardian) {
       const guardian = (
         object1 instanceof Guardian ? object1 : object2
       ) as Guardian;
       const other = object1 instanceof Guardian ? object2 : object1;
       if (other instanceof Particle) {
-        const behavior = other.behaviors.find(
-          (b): b is CollisionBehavior => b instanceof CollisionBehavior
-        );
-        if (behavior?.mode === "lightUp") {
-          other.fillOpacity = 1;
-        }
         guardian.handleCollision(other);
+        // Specifically check for lighting behavior on guardian collision
+        const lightingBehavior = other.behaviors.find(
+          (b): b is LightingBehavior => b instanceof LightingBehavior
+        );
+        // Lights up the particle on guardian collision
+        if (lightingBehavior?.mode === "lightUp") {
+          other.fillOpacity = 0.5;
+        }
       }
     }
   };

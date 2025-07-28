@@ -1,4 +1,5 @@
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
+import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
 import { balls, niceColor } from "../utils/utils";
 
@@ -17,7 +18,10 @@ export type BehaviorType =
   | "spiral"
   | "wave"
   | "randomMovement"
-  | "fadeOut";
+  | "fadeOut"
+  | "lighting"
+  | "experimental"
+  | "sinusoidal";
 
 export type WallBehaviorConfig = {
   type: "wall";
@@ -47,10 +51,27 @@ export type WaveBehaviorConfig = {
 export type RandomMovementBehaviorConfig = {
   type: "randomMovement";
   intensity: number;
+  turnSpeed: number;
 };
 export type FadeOutBehaviorConfig = {
   type: "fadeOut";
   lifespan: number;
+};
+
+export type LightingBehaviorConfig = {
+  type: "lighting";
+  mode?: LightingBehaviorMode;
+};
+
+export type ExperimentalBehaviorConfig = {
+  type: "experimental";
+  turnSpeed?: number;
+};
+
+export type SinusoidalMovementBehaviorConfig = {
+  type: "sinusoidal";
+  amplitude?: number;
+  frequency?: number;
 };
 
 export type BehaviorConfig =
@@ -60,7 +81,10 @@ export type BehaviorConfig =
   | SpiralBehaviorConfig
   | WaveBehaviorConfig
   | RandomMovementBehaviorConfig
-  | FadeOutBehaviorConfig;
+  | FadeOutBehaviorConfig
+  | LightingBehaviorConfig
+  | ExperimentalBehaviorConfig
+  | SinusoidalMovementBehaviorConfig;
 
 // Pattern Configurations
 export type SpiralPatternConfig = {
@@ -100,20 +124,55 @@ export const levels: LevelConfig[] = [
   {
     pattern: "random",
     behaviors: [
-      { type: "wall", mode: "seamless" },
-      { type: "collision", mode: "lightUp" },
+      { type: "wall", mode: "teleport" },
+      {
+        type: "sinusoidal",
+        amplitude: -1,
+        frequency: 2,
+      },
     ],
-    radius: () => 150,
-    particleCount: 6,
+    particleCount: 10,
+    color: () => "white",
+    vx: () => 100,
+    vy: () => 0,
+  },
+  {
+    pattern: "spiral",
+    patternConfig: {
+      spiralDensity: 2,
+      angleStep: 0.5,
+    },
+    behaviors: [
+      { type: "wall", mode: "teleport" },
+      { type: "experimental" },
+      // { type: "randomMovement", intensity: 50, turnSpeed: 50 },
+      // { type: "collision", mode: "resolve" },
+      { type: "lighting", mode: "lightUp" },
+    ],
+    radius: () => 20,
+    particleCount: 30,
     color: niceColor,
-    vx: () => (Math.random() - 0.5) * 400,
-    vy: () => (Math.random() - 0.5) * 200,
+    vx: () => (Math.random() - 0.5) * 100,
+    vy: () => (Math.random() - 0.5) * 100,
+  },
+  {
+    pattern: "random",
+    behaviors: [
+      { type: "wall", mode: "seamless" },
+      { type: "collision", mode: "resolve" },
+      { type: "lighting", mode: "lightUp" },
+    ],
+    radius: () => 50,
+    particleCount: 60,
+    color: niceColor,
+    vy: () => Math.random() * 20 + 20,
   },
   {
     pattern: "random",
     behaviors: [
       { type: "wall", mode: "collide" },
-      { type: "collision", mode: "lightUp" },
+      { type: "collision", mode: "resolve" },
+      { type: "lighting", mode: "lightUp" },
     ],
     particleCount: 30,
     radius: () => 50,
@@ -126,28 +185,14 @@ export const levels: LevelConfig[] = [
     pattern: "random",
     behaviors: [
       { type: "wall", mode: "collide" },
-      { type: "collision", mode: "lightUp" },
+      { type: "collision", mode: "resolve" },
+      { type: "lighting", mode: "lightUp" },
     ],
     particleCount: balls() + 20,
     radius: () => 10,
     color: () => colors[Math.floor(Math.random() * colors.length)],
     vx: () => 220,
     vy: () => 0,
-  },
-  {
-    pattern: "spiral",
-    patternConfig: {
-      spiralDensity: 2,
-      angleStep: 0.5,
-    },
-    behaviors: [
-      { type: "wall", mode: "teleport" },
-      { type: "randomMovement", intensity: 800 },
-      { type: "collision", mode: "lightUp" },
-    ],
-    radius: () => 20,
-    particleCount: 30,
-    color: niceColor,
   },
 
   {

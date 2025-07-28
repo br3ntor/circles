@@ -47,4 +47,8 @@ export class Vector2 {
   dot(other: Vector2) {
     return this.x * other.x + this.y * other.y;
   }
+
+  angle() {
+    return Math.atan2(this.y, this.x);
+  }
 }

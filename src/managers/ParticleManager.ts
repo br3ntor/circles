@@ -6,6 +6,9 @@ import {
   CollisionBehavior,
   WallBehavior,
   FadeOutBehavior,
+  LightingBehavior,
+  ExperimentalBehavior,
+  SinusoidalMovement,
 } from "../particle-behaviors";
 import {
   BehaviorConfig,
@@ -150,8 +153,18 @@ export class ParticleManager {
           );
         case "randomMovement":
           return new RandomMovement(config.intensity);
+        case "experimental":
+          return new ExperimentalBehavior(config.turnSpeed);
         case "fadeOut":
           return new FadeOutBehavior(config.lifespan);
+        case "lighting":
+          return new LightingBehavior(config.mode);
+        case "sinusoidal":
+          return new SinusoidalMovement(
+            this.canvas,
+            config.amplitude,
+            config.frequency
+          );
         default:
           // The following line should be unreachable with the new types, but it's good practice to keep it.
           // @ts-expect-error
