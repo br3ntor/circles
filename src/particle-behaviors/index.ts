@@ -8,3 +8,5 @@ export * from "./FadeOutBehavior";
 export * from "./LightingBehavior";
 export * from "./ExperimentalBehavior";
 export * from "./SinusoidalMovement";
+
+export * from "./GoalCollisionBehavior";

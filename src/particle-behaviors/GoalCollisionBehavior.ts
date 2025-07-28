@@ -5,7 +5,11 @@ import { Goal } from "../game-objects/Goal";
 import { Particle } from "../game-objects/Particle";
 
 export class GoalCollisionBehavior implements IBehavior {
-  constructor(private bounce: boolean = true) {}
+  bounce: boolean;
+
+  constructor(bounce: boolean = false) {
+    this.bounce = bounce;
+  }
 
   update(gameObject: IGameObject, deltaTime: number, time: number): void {
     // No update logic needed for this behavior

@@ -5,7 +5,6 @@ import { Player } from "../game-objects/Player";
 import { Particle } from "../game-objects/Particle";
 import { Guardian } from "../game-objects/Guardian";
 import { LightingBehavior } from "../particle-behaviors";
-import { GoalCollisionBehavior } from "../particle-behaviors/GoalCollisionBehavior";
 
 export class PlayingState extends State {
   public enter(): void {
@@ -18,13 +17,6 @@ export class PlayingState extends State {
       "particle-goal-collision",
       this.handleParticleGoalCollision
     );
-
-    // Add GoalCollisionBehavior to all particles
-    this.game.particleManager
-      .getParticles()
-      .forEach((p) =>
-        p.behaviorManager.addBehavior(new GoalCollisionBehavior(false))
-      );
   }
 
   public exit(): void {

@@ -1,5 +1,6 @@
 import { getRandomColorFromScheme } from "./color-schemes";
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
+import { GoalCollisionBehavior } from "../particle-behaviors";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
 import { balls, niceColor } from "../utils/utils";
@@ -22,7 +23,8 @@ export type BehaviorType =
   | "fadeOut"
   | "lighting"
   | "experimental"
-  | "sinusoidal";
+  | "sinusoidal"
+  | "goalCollision";
 
 export type WallBehaviorConfig = {
   type: "wall";
@@ -75,6 +77,11 @@ export type SinusoidalMovementBehaviorConfig = {
   frequency?: number;
 };
 
+export type GoalCollisionBehaviorConfig = {
+  type: "goalCollision";
+  bounce?: boolean;
+};
+
 export type BehaviorConfig =
   | WallBehaviorConfig
   | CollisionBehaviorConfig
@@ -85,7 +92,8 @@ export type BehaviorConfig =
   | FadeOutBehaviorConfig
   | LightingBehaviorConfig
   | ExperimentalBehaviorConfig
-  | SinusoidalMovementBehaviorConfig;
+  | SinusoidalMovementBehaviorConfig
+  | GoalCollisionBehaviorConfig;
 
 // Pattern Configurations
 export type SpiralPatternConfig = {
@@ -119,6 +127,7 @@ export const levels: LevelConfig[] = [
     behaviors: [
       { type: "sinusoidal", amplitude: 50, frequency: 2 },
       { type: "wall", mode: "teleport" },
+      // { type: "goalCollision", bounce: true },
     ],
     particleCount: 10,
     color: () => getRandomColorFromScheme("cosmic"),

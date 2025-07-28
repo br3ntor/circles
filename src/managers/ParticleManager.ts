@@ -9,6 +9,7 @@ import {
   LightingBehavior,
   ExperimentalBehavior,
   SinusoidalMovement,
+  GoalCollisionBehavior,
 } from "../particle-behaviors";
 import {
   BehaviorConfig,
@@ -166,6 +167,8 @@ export class ParticleManager {
             config.amplitude,
             config.frequency
           );
+        case "goalCollision":
+          return new GoalCollisionBehavior(config.bounce);
         default:
           // The following line should be unreachable with the new types, but it's good practice to keep it.
           // @ts-expect-error
