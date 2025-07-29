@@ -35,6 +35,7 @@ export class PlayingState extends State {
     const { object1, object2, position1, position2 } = customEvent.detail;
 
     if (object1 instanceof Player || object2 instanceof Player) {
+      this.game.soundManager.playSound("player-death");
       const player = (object1 instanceof Player ? object1 : object2) as Player;
       const collidedObject = (object1 instanceof Player ? object2 : object1) as
         | Particle
@@ -50,6 +51,7 @@ export class PlayingState extends State {
     const p2 = object2 instanceof Particle ? object2 : null;
 
     if (p1 && p2) {
+      this.game.soundManager.playSound("particle-collision");
       p1.behaviorManager.handleCollision(p1, p2, position1, position2);
       p2.behaviorManager.handleCollision(p2, p1, position2, position1);
     } else if (object1 instanceof Guardian || object2 instanceof Guardian) {
@@ -74,6 +76,7 @@ export class PlayingState extends State {
   private handleParticleGoalCollision = (event: Event) => {
     const customEvent = event as CustomEvent;
     const { particle, goal, position, goalPosition } = customEvent.detail;
+    this.game.soundManager.playSound("particle-goal-collision");
     particle.behaviorManager.handleCollision(
       particle,
       goal,

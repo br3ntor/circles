@@ -9,6 +9,7 @@ import { Timer } from "./game-objects/Timer";
 import { ScoreManager } from "./managers/ScoreManager";
 import { UIManager } from "./managers/UIManager";
 import { CollisionManager } from "./managers/CollisionManager";
+import { SoundManager } from "./managers/SoundManager";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -28,6 +29,7 @@ export class Game {
   scoreManager: ScoreManager;
   uiManager: UIManager;
   collisionManager: CollisionManager;
+  soundManager: SoundManager;
   paused = false;
 
   constructor() {
@@ -55,9 +57,35 @@ export class Game {
     this.scoreManager = ScoreManager.getInstance();
     this.uiManager = UIManager.getInstance();
     this.uiManager.setTimer(this.timer);
+    this.soundManager = SoundManager.getInstance();
+    // this.soundManager = SoundManager.getInstance();
+  }
+
+  public async init() {
+    await this.loadSounds();
     this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
     this.animate();
+  }
+
+  async loadSounds() {
+    await this.soundManager.loadSound(
+      "level1",
+      "/circles/sounds/Half-Life02.mp3"
+    );
+    await this.soundManager.loadSound("level2", "/sounds/level2.mp3");
+    await this.soundManager.loadSound(
+      "player-death",
+      "/sounds/player-death.wav"
+    );
+    await this.soundManager.loadSound(
+      "particle-collision",
+      "/circles/sounds/pause-back-click.wav"
+    );
+    await this.soundManager.loadSound(
+      "particle-goal-collision",
+      "/sounds/particle-goal-collision.wav"
+    );
   }
 
   reset() {

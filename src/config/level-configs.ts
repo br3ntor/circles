@@ -132,21 +132,23 @@ export interface PatternInstanceConfig<P extends Pattern = Pattern> {
 export interface LevelConfig {
   globalBehaviors?: BehaviorConfig[];
   patterns: PatternInstanceConfig[];
+  music?: string;
 }
 
 export const levels: LevelConfig[] = [
   {
+    music: "level1",
     globalBehaviors: [
       { type: "wall", mode: "teleport" },
-      // { type: "collision", mode: "resolve" },
+      { type: "collision", mode: "resolve" },
       { type: "lighting", mode: "lightUp" },
     ],
     patterns: [
       {
         pattern: "random",
         behaviors: [
-          { type: "wall", mode: "teleport" },
-          { type: "collision", mode: "resolve" },
+          // { type: "wall", mode: "teleport" },
+          // { type: "collision", mode: "resolve" },
         ],
         particleCount: 10,
         radius: () => 30,
@@ -156,7 +158,8 @@ export const levels: LevelConfig[] = [
       },
       {
         pattern: "random",
-        behaviors: [{ type: "wall", mode: "teleport" }],
+        // behaviors: [{ type: "wall", mode: "teleport" }],
+        behaviors: [],
         particleCount: 10,
         radius: () => 30,
         color: () => "blue",
@@ -166,6 +169,7 @@ export const levels: LevelConfig[] = [
     ],
   },
   {
+    music: "level2",
     globalBehaviors: [{ type: "wall", mode: "teleport" }],
     patterns: [
       {
