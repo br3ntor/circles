@@ -1,4 +1,5 @@
-import { Particle } from "../game-objects/index.js";
+import { Particle, ParticleOptions } from "../game-objects/index.js";
+import { resolve } from "../utils/utils.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class StarPattern implements IPattern {
@@ -19,10 +20,21 @@ export class StarPattern implements IPattern {
       const x = canvas.width / 2 + Math.cos(angle) * distance;
       const y = canvas.height / 2 + Math.sin(angle) * distance;
 
-      const particle = new Particle(x, y, {
+      const resolvedOptions: ParticleOptions = {
         ...options,
+        vx: resolve(options.vx),
+        vy: resolve(options.vy),
+        color: resolve(options.color),
+        radius: resolve(options.radius),
         behaviors,
-      });
+        angle: resolve(options.angle),
+        centerPoint: resolve(options.centerPoint),
+        distance: resolve(options.distance),
+        mass: resolve(options.mass),
+        opacity: resolve(options.opacity),
+      };
+
+      const particle = new Particle(x, y, resolvedOptions);
       particles.push(particle);
     }
     return particles;

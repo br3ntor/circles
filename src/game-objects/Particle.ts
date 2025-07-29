@@ -23,16 +23,10 @@ export class Particle implements IGameObject {
     this.id = `particle-${Particle.nextId++}`;
     this.age = 0;
     this.position = new Vector2(x, y);
-    this.velocity = new Vector2(
-      typeof options.vx === "function" ? options.vx() : options.vx,
-      typeof options.vy === "function" ? options.vy() : options.vy
-    );
+    this.velocity = new Vector2(options.vx ?? 0, options.vy ?? 0);
     this.acceleration = new Vector2(0, 0);
     this.radius = options.radius ?? 10;
-    this.color =
-      typeof options.color === "function"
-        ? options.color()
-        : options.color ?? "white";
+    this.color = options.color ?? "white";
     this.behaviorManager = new BehaviorManager();
     options.behaviors?.forEach((b) => this.behaviorManager.addBehavior(b));
     this.angle = options.angle ?? Math.random() * 2 * Math.PI;

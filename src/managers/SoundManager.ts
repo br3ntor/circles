@@ -4,7 +4,7 @@ export class SoundManager {
   private soundBuffers: Map<string, AudioBuffer> = new Map();
   private playingSources: Map<string, AudioBufferSourceNode[]> = new Map();
 
-  private isPaused = false;
+  // private isPaused = false;
 
   private constructor() {
     this.audioContext = new (window.AudioContext ||
@@ -83,12 +83,12 @@ export class SoundManager {
   }
 
   public pauseAllSounds(): void {
-    this.isPaused = true;
+    // this.isPaused = true;
     this.audioContext.suspend();
   }
 
   public resumeAllSounds(): void {
-    this.isPaused = false;
+    // this.isPaused = false;
     this.audioContext.resume();
   }
 

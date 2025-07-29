@@ -2,7 +2,7 @@ import { getRandomColorFromScheme } from "./color-schemes";
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
-import { balls, niceColor } from "../utils/utils";
+import { balls, niceColor, randInt } from "../utils/utils";
 
 export type Pattern =
   | "random"
@@ -137,83 +137,94 @@ export interface LevelConfig {
 
 export const levels: LevelConfig[] = [
   {
-    music: "level2",
-    globalBehaviors: [{ type: "wall", mode: "teleport" }],
-    patterns: [
-      {
-        pattern: "waves",
-        patternConfig: {
-          amplitude: -1,
-          frequency: 0.5,
-          yOffset: 0,
-        },
-        behaviors: [
-          { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
-        ],
-        particleCount: 5,
-        color: () => "red",
-        vx: () => -30,
-        vy: () => 0,
-      },
-      {
-        pattern: "waves",
-        patternConfig: {
-          amplitude: -1,
-          frequency: 0.5,
-          yOffset: 0,
-          xOffset: 300,
-        },
-        behaviors: [
-          { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
-        ],
-        particleCount: 5,
-        color: () => "green",
-        vx: () => 0,
-      },
-      {
-        pattern: "waves",
-        patternConfig: {
-          amplitude: -1,
-          frequency: 0.5,
-          yOffset: 0,
-          xOffset: 500,
-        },
-        behaviors: [
-          { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
-        ],
-        particleCount: 5,
-        color: () => "blue",
-        vx: () => 30,
-        vy: () => 0,
-      },
-    ],
-  },
-  {
     music: "level1",
-    globalBehaviors: [
-      { type: "wall", mode: "teleport" },
-      { type: "collision", mode: "resolve" },
-      { type: "lighting", mode: "lightUp" },
-    ],
     patterns: [
       {
         pattern: "random",
         behaviors: [],
-        particleCount: 20,
-        radius: () => 30,
-        color: () => "red",
-        vx: () => (Math.random() - 0.5) * 200,
-        vy: () => (Math.random() - 0.5) * 200,
-      },
-      {
-        pattern: "random",
-        behaviors: [],
-        particleCount: 20,
-        radius: () => 30,
-        color: () => "blue",
-        vx: () => (Math.random() - 0.5) * 200,
-        vy: () => (Math.random() - 0.5) * 200,
+        particleCount: balls(),
+        radius: () => randInt(10, 60),
       },
     ],
   },
+  // {
+  //   music: "level2",
+  //   globalBehaviors: [{ type: "wall", mode: "teleport" }],
+  //   patterns: [
+  //     {
+  //       pattern: "waves",
+  //       patternConfig: {
+  //         amplitude: -1,
+  //         frequency: 0.5,
+  //         yOffset: 0,
+  //       },
+  //       behaviors: [
+  //         { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
+  //       ],
+  //       particleCount: 5,
+  //       color: () => "red",
+  //       vx: () => -30,
+  //       vy: () => 0,
+  //     },
+  //     {
+  //       pattern: "waves",
+  //       patternConfig: {
+  //         amplitude: -1,
+  //         frequency: 0.5,
+  //         yOffset: 0,
+  //         xOffset: 300,
+  //       },
+  //       behaviors: [
+  //         { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
+  //       ],
+  //       particleCount: 5,
+  //       color: () => "green",
+  //       vx: () => 0,
+  //     },
+  //     {
+  //       pattern: "waves",
+  //       patternConfig: {
+  //         amplitude: -1,
+  //         frequency: 0.5,
+  //         yOffset: 0,
+  //         xOffset: 500,
+  //       },
+  //       behaviors: [
+  //         { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
+  //       ],
+  //       particleCount: 5,
+  //       color: () => "blue",
+  //       vx: () => 30,
+  //       vy: () => 0,
+  //     },
+  //   ],
+  // },
+  // {
+  //   music: "level1",
+  //   globalBehaviors: [
+  //     { type: "wall", mode: "teleport" },
+  //     { type: "collision", mode: "resolve" },
+  //     { type: "lighting", mode: "lightUp" },
+  //   ],
+  //   patterns: [
+  //     {
+  //       pattern: "random",
+  //       behaviors: [],
+  //       particleCount: 20,
+  //       radius: () => 30,
+  //       color: () => "red",
+  //       vx: () => (Math.random() - 0.5) * 200,
+  //       vy: () => (Math.random() - 0.5) * 200,
+  //     },
+  //     {
+  //       pattern: "random",
+  //       behaviors: [],
+  //       particleCount: 20,
+  //       radius: () => 30,
+  //       color: () => "blue",
+  //       vx: () => (Math.random() - 0.5) * 200,
+  //       vy: () => (Math.random() - 0.5) * 200,
+  //     },
+  //   ],
+  // },
 ];

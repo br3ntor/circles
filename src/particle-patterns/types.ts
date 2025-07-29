@@ -1,10 +1,14 @@
-import { Particle, ParticleBehavior, ParticleOptions } from "../game-objects";
+import {
+  Particle,
+  ParticleBehavior,
+  ConfigurableParticleOptions,
+} from "../game-objects";
 import { PatternConfigMap } from "../config/level-configs";
 
 export interface PatternCreatorInput {
   particleCount: number;
   behaviors: ParticleBehavior[];
-  options: ParticleOptions;
+  options: ConfigurableParticleOptions;
   canvas: HTMLCanvasElement;
 }
 

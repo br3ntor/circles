@@ -86,3 +86,11 @@ export function randIntLow(min: number, max: number) {
   const r = Math.pow(Math.random(), 10);
   return Math.floor(r * (max - min + 1) + min);
 }
+
+// Helper to resolve properties that can be functions
+export function resolve<T>(value: T | (() => T)): T {
+  if (typeof value === "function") {
+    return (value as () => T)();
+  }
+  return value;
+}

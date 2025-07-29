@@ -117,16 +117,18 @@ export class ParticleManager {
           patternConfig.behaviors
         );
         const allBehaviors = [...globalBehaviors, ...instanceBehaviors];
+        const {
+          pattern,
+          patternConfig: pc,
+          behaviors,
+          particleCount,
+          ...options
+        } = patternConfig;
         const particles = patternCreator.create(
           {
             behaviors: allBehaviors,
             particleCount: patternConfig.particleCount ?? 100,
-            options: {
-              radius: patternConfig.radius ? patternConfig.radius() : undefined,
-              color: patternConfig.color,
-              vx: patternConfig.vx,
-              vy: patternConfig.vy,
-            },
+            options,
             canvas: this.canvas,
           },
           patternConfig.patternConfig ?? {}

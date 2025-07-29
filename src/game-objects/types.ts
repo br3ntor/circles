@@ -25,11 +25,24 @@ export interface ParticleBehavior extends IBehavior {
   ): void;
 }
 
-export interface ParticleOptions {
+export interface ConfigurableParticleOptions {
   vx?: number | (() => number);
   vy?: number | (() => number);
-  radius?: number;
+  radius?: number | (() => number);
   color?: string | (() => string);
+  behaviors?: ParticleBehavior[];
+  angle?: number;
+  centerPoint?: Vector2;
+  distance?: number;
+  mass?: number;
+  opacity?: number;
+}
+
+export interface ParticleOptions {
+  vx?: number;
+  vy?: number;
+  radius?: number;
+  color?: string;
   behaviors?: ParticleBehavior[];
   angle?: number;
   centerPoint?: Vector2;

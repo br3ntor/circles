@@ -1,4 +1,5 @@
-import { Particle } from "../game-objects/index.js";
+import { Particle, ParticleOptions } from "../game-objects/index.js";
+import { resolve } from "../utils/utils.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class OrbitPattern implements IPattern {
@@ -14,13 +15,25 @@ export class OrbitPattern implements IPattern {
     for (let i = 0; i < particleCount; i++) {
       const r = Math.random() * 200 + 50;
       const angle = Math.random() * Math.PI * 2;
+
+      const resolvedOptions: ParticleOptions = {
+        ...options,
+        vx: resolve(options.vx),
+        vy: resolve(options.vy),
+        color: resolve(options.color),
+        radius: resolve(options.radius),
+        behaviors,
+        angle: resolve(options.angle),
+        centerPoint: resolve(options.centerPoint),
+        distance: resolve(options.distance),
+        mass: resolve(options.mass),
+        opacity: resolve(options.opacity),
+      };
+
       const particle = new Particle(
         centerX + Math.cos(angle) * r,
         centerY + Math.sin(angle) * r,
-        {
-          ...options,
-          behaviors,
-        }
+        resolvedOptions
       );
       particles.push(particle);
     }

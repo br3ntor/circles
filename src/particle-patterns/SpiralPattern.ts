@@ -1,5 +1,6 @@
-import { Particle } from "../game-objects/index.js";
+import { Particle, ParticleOptions } from "../game-objects/index.js";
 import { SpiralPatternConfig } from "../config/level-configs.js";
+import { resolve } from "../utils/utils.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class SpiralPattern implements IPattern {
@@ -16,12 +17,21 @@ export class SpiralPattern implements IPattern {
       const x = window.innerWidth / 2 + Math.cos(angle) * distance;
       const y = window.innerHeight / 2 + Math.sin(angle) * distance;
 
-      const particle = new Particle(x, y, {
+      const resolvedOptions: ParticleOptions = {
         ...options,
+        vx: resolve(options.vx),
+        vy: resolve(options.vy),
+        color: resolve(options.color),
+        radius: resolve(options.radius),
         behaviors,
         angle,
         distance,
-      });
+        centerPoint: resolve(options.centerPoint),
+        mass: resolve(options.mass),
+        opacity: resolve(options.opacity),
+      };
+
+      const particle = new Particle(x, y, resolvedOptions);
       particles.push(particle);
     }
     return particles;
