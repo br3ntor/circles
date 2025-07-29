@@ -3,7 +3,7 @@ import { IGameObject } from "../game-objects/types";
 import { Guardian } from "../game-objects/Guardian";
 import { Goal } from "../game-objects/Goal";
 import { Vector2 } from "../game-objects/Vector2";
-import { getHSL } from "../utils/utils";
+import { getHSL } from "../lib/utils";
 
 export class GuardianOrbitBehavior implements IBehavior {
   constructor(private goal: Goal) {}

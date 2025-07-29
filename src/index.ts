@@ -1,6 +1,6 @@
 import "./styles/style.css";
 import { Game } from "./game";
-import { setupEventListeners } from "./utils/event-listeners";
+import { setupEventListeners } from "./managers/InputManager";
 
 (async function initGame() {
   const game = new Game();

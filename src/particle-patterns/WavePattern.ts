@@ -1,7 +1,7 @@
 import { Particle, ParticleOptions } from "../game-objects/index.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 import { WavePatternConfig } from "../config/level-configs.js";
-import { resolve } from "../utils/utils.js";
+import { resolve } from "../lib/utils.js";
 
 export class WavePattern implements IPattern {
   create(

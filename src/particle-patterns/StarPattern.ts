@@ -1,5 +1,5 @@
 import { Particle, ParticleOptions } from "../game-objects/index.js";
-import { resolve } from "../utils/utils.js";
+import { resolve } from "../lib/utils.js";
 import { IPattern, PatternCreatorInput } from "./types.js";
 
 export class StarPattern implements IPattern {

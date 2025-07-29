@@ -1,5 +1,5 @@
 import { BehaviorManager } from "../managers/BehaviorManager.js";
-import { distance } from "../utils/utils.js";
+import { distance } from "../lib/utils.js";
 import { Player } from "./Player.js";
 import { IGameObject } from "./types.js";
 import { Vector2 } from "./Vector2.js";

@@ -1,4 +1,4 @@
-import { distance } from "../utils/utils.js";
+import { distance } from "../lib/utils.js";
 import { Particle } from "./Particle.js";
 import { Vector2 } from "./Vector2.js";
 

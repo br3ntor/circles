@@ -1,6 +1,6 @@
 import { IGameObject, Vector2 } from "../game-objects";
 import { IBehavior } from "../managers/BehaviorManager";
-import resolveCollision, { Collidable } from "../utils/elastic-collision";
+import resolveCollision, { Collidable } from "../lib/elastic-collision";
 
 export type CollisionBehaviorMode = "none" | "repel" | "resolve";
 

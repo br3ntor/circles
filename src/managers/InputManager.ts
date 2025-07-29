@@ -1,5 +1,5 @@
 import { Game } from "../game";
-import { distance } from "./utils";
+import { distance } from "../lib/utils";
 import { ReadyToStartState } from "../fsm/ReadyToStartState";
 import { PlayingState } from "../fsm/PlayingState";
 import { GameOverState } from "../fsm/GameOverState";
