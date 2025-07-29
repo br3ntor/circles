@@ -1,15 +1,18 @@
 import { ScoreManager } from "./ScoreManager";
 import { Timer } from "../game-objects/Timer";
 import { gameConfig } from "../config/game-config";
+import { SoundManager } from "./SoundManager";
 
 export class UIManager {
   private static instance: UIManager;
   private timer: Timer;
   private scoreManager: ScoreManager;
+  private soundManager: SoundManager;
 
   private constructor() {
     this.timer = new Timer();
     this.scoreManager = ScoreManager.getInstance();
+    this.soundManager = SoundManager.getInstance();
   }
 
   public static getInstance(): UIManager {
@@ -31,6 +34,16 @@ export class UIManager {
     ctx.font = gameConfig.ui.timerFont;
     ctx.textAlign = "right";
     ctx.fillText(formattedTime, ctx.canvas.width - 20, 60);
+    ctx.restore();
+  }
+
+  public drawSoundIcon(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    ctx.fillStyle = gameConfig.ui.primaryColor;
+    ctx.font = "30px Arial";
+    ctx.textAlign = "left";
+    const icon = this.soundManager.getMuted() ? "🔇" : "🔊";
+    ctx.fillText(icon, 20, 60);
     ctx.restore();
   }
 

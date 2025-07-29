@@ -1,15 +1,15 @@
 export class SoundManager {
   private static instance: SoundManager;
-  private audioContext: AudioContext;
+  private audioContext: AudioContext | null = null;
   private soundBuffers: Map<string, AudioBuffer> = new Map();
   private playingSources: Map<string, AudioBufferSourceNode[]> = new Map();
+  private gainNode: GainNode | null = null;
+  private isMuted = true;
+  private isStarted = false;
 
   // private isPaused = false;
 
-  private constructor() {
-    this.audioContext = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
-  }
+  private constructor() {}
 
   public static getInstance(): SoundManager {
     if (!SoundManager.instance) {
@@ -18,14 +18,40 @@ export class SoundManager {
     return SoundManager.instance;
   }
 
-  public resumeAudioContext(): void {
-    if (this.audioContext.state === "suspended") {
-      this.audioContext.resume();
+  public start(): void {
+    if (this.audioContext) {
+      // If context already exists, just resume it if it's suspended.
+      if (this.audioContext.state === "suspended") {
+        this.audioContext.resume();
+      }
+      return;
+    }
+
+    this.audioContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)();
+    this.gainNode = this.audioContext.createGain();
+    this.gainNode.connect(this.audioContext.destination);
+    this.gainNode.gain.value = this.isMuted ? 0 : 1;
+    this.isStarted = true;
+  }
+
+  public getMuted(): boolean {
+    return this.isMuted;
+  }
+
+  public getStarted(): boolean {
+    return this.isStarted;
+  }
+
+  public toggleMute(): void {
+    this.isMuted = !this.isMuted;
+    if (this.gainNode) {
+      this.gainNode.gain.value = this.isMuted ? 0 : 1;
     }
   }
 
   public async loadSound(name: string, url: string): Promise<void> {
-    if (this.soundBuffers.has(name)) {
+    if (this.soundBuffers.has(name) || !this.audioContext) {
       return;
     }
     try {
@@ -39,6 +65,9 @@ export class SoundManager {
   }
 
   public playSound(name: string, loop = false): void {
+    if (!this.audioContext || !this.gainNode) {
+      return;
+    }
     const audioBuffer = this.soundBuffers.get(name);
     if (!audioBuffer) {
       console.warn(`Sound not found: ${name}`);
@@ -48,7 +77,7 @@ export class SoundManager {
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.loop = loop;
-    source.connect(this.audioContext.destination);
+    source.connect(this.gainNode);
     source.start(0);
 
     if (!this.playingSources.has(name)) {
@@ -84,12 +113,16 @@ export class SoundManager {
 
   public pauseAllSounds(): void {
     // this.isPaused = true;
-    this.audioContext.suspend();
+    if (this.audioContext) {
+      this.audioContext.suspend();
+    }
   }
 
   public resumeAllSounds(): void {
     // this.isPaused = false;
-    this.audioContext.resume();
+    if (this.audioContext) {
+      this.audioContext.resume();
+    }
   }
 
   public isPlaying(name: string): boolean {

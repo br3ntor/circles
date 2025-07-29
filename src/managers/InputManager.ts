@@ -22,6 +22,23 @@ export function setupEventListeners(game: Game) {
    * Left click events
    */
   addEventListener("click", (event) => {
+    const soundIconRect = { x: 20, y: 30, width: 40, height: 30 };
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+
+    if (
+      clickX > soundIconRect.x &&
+      clickX < soundIconRect.x + soundIconRect.width &&
+      clickY > soundIconRect.y &&
+      clickY < soundIconRect.y + soundIconRect.height
+    ) {
+      if (!game.soundManager.getStarted()) {
+        game.initAudio();
+      }
+      game.soundManager.toggleMute();
+      return;
+    }
+
     const currentState = game.stateMachine.currentState;
 
     if (currentState instanceof GameOverState) {
@@ -80,7 +97,9 @@ export function setupEventListeners(game: Game) {
     if (document.hidden) {
       game.pause();
     } else {
-      game.resume();
+      if (game.soundManager.getStarted()) {
+        game.resume();
+      }
     }
   });
 }
