@@ -1,6 +1,7 @@
 import { Vector2 } from "./Vector2.js";
 
 export interface IGameObject {
+  id: string;
   position: Vector2;
   velocity?: Vector2;
   radius: number;

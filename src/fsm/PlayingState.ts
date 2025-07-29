@@ -10,8 +10,8 @@ export class PlayingState extends State {
   public enter(): void {
     this.game.timer.start();
     this.game.collisionManager.addEventListener(
-      "collision",
-      this.handleCollision
+      "collision-start",
+      this.handleCollisionStart
     );
     this.game.collisionManager.addEventListener(
       "particle-goal-collision",
@@ -21,8 +21,8 @@ export class PlayingState extends State {
 
   public exit(): void {
     this.game.collisionManager.removeEventListener(
-      "collision",
-      this.handleCollision
+      "collision-start",
+      this.handleCollisionStart
     );
     this.game.collisionManager.removeEventListener(
       "particle-goal-collision",
@@ -30,7 +30,7 @@ export class PlayingState extends State {
     );
   }
 
-  private handleCollision = (event: Event) => {
+  private handleCollisionStart = (event: Event) => {
     const customEvent = event as CustomEvent;
     const { object1, object2, position1, position2 } = customEvent.detail;
 
@@ -51,9 +51,36 @@ export class PlayingState extends State {
     const p2 = object2 instanceof Particle ? object2 : null;
 
     if (p1 && p2) {
-      this.game.soundManager.playSound("particle-collision");
-      p1.behaviorManager.handleCollision(p1, p2, position1, position2);
-      p2.behaviorManager.handleCollision(p2, p1, position2, position1);
+      // It's important to call handleCollision on both particles, as they might have different behaviors.
+      const type1 = p1.behaviorManager.handleCollision(
+        p1,
+        p2,
+        position1,
+        position2
+      );
+      const type2 = p2.behaviorManager.handleCollision(
+        p2,
+        p1,
+        position2,
+        position1
+      );
+
+      // Determine the effective collision type. 'repel' takes precedence.
+      let effectiveCollisionType: "repel" | "resolve" | "none" = "none";
+      if (type1 === "repel" || type2 === "repel") {
+        effectiveCollisionType = "repel";
+      } else if (type1 === "resolve" || type2 === "resolve") {
+        effectiveCollisionType = "resolve";
+      }
+
+      // Play sound only for specific collision types.
+      if (
+        effectiveCollisionType === "repel" ||
+        effectiveCollisionType === "resolve"
+      ) {
+        this.game.soundManager.playSound("particle-collision");
+      }
+      // Sounds for other collision types can be added here.
     } else if (object1 instanceof Guardian || object2 instanceof Guardian) {
       const guardian = (
         object1 instanceof Guardian ? object1 : object2
@@ -61,11 +88,9 @@ export class PlayingState extends State {
       const other = object1 instanceof Guardian ? object2 : object1;
       if (other instanceof Particle) {
         guardian.handleCollision(other);
-        // Specifically check for lighting behavior on guardian collision
         const lightingBehavior = other.behaviorManager.findBehavior(
           (b): b is LightingBehavior => b instanceof LightingBehavior
         );
-        // Lights up the particle on guardian collision
         if ((lightingBehavior as LightingBehavior)?.mode === "lightUp") {
           other.fillOpacity = 0.5;
         }

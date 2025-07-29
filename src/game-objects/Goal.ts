@@ -5,6 +5,8 @@ import { IGameObject } from "./types.js";
 import { Vector2 } from "./Vector2.js";
 
 export class Goal implements IGameObject {
+  id: string;
+  static nextId = 0;
   position: Vector2;
   x: number;
   y: number;
@@ -13,6 +15,7 @@ export class Goal implements IGameObject {
   behaviorManager: BehaviorManager;
 
   constructor(x: number, y: number, radius: number) {
+    this.id = `goal-${Goal.nextId++}`;
     this.position = new Vector2(x, y);
     this.x = x;
     this.y = y;

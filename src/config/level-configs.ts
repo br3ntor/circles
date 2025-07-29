@@ -159,32 +159,33 @@ export const levels: LevelConfig[] = [
         pattern: "waves",
         patternConfig: {
           amplitude: -1,
-          frequency: 0.1,
+          frequency: 0.5,
           yOffset: 0,
           xOffset: 300,
         },
         behaviors: [
-          { type: "sinusoidal", amplitude: -1, frequency: 1, yOffset: 0 },
+          { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
         ],
         particleCount: 5,
         color: () => "green",
         vx: () => 0,
       },
-      // {
-      //   pattern: "waves",
-      //   patternConfig: {
-      //     amplitude: 100,
-      //     frequency: 0.1,
-      //     yOffset: 150,
-      //   },
-      //   behaviors: [
-      //     { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 150 },
-      //   ],
-      //   particleCount: 10,
-      //   color: () => "blue",
-      //   vx: () => 100,
-      //   vy: () => 0,
-      // },
+      {
+        pattern: "waves",
+        patternConfig: {
+          amplitude: -1,
+          frequency: 0.5,
+          yOffset: 0,
+          xOffset: 500,
+        },
+        behaviors: [
+          { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
+        ],
+        particleCount: 5,
+        color: () => "blue",
+        vx: () => 30,
+        vy: () => 0,
+      },
     ],
   },
   {
@@ -197,11 +198,8 @@ export const levels: LevelConfig[] = [
     patterns: [
       {
         pattern: "random",
-        behaviors: [
-          // { type: "wall", mode: "teleport" },
-          // { type: "collision", mode: "resolve" },
-        ],
-        particleCount: 10,
+        behaviors: [],
+        particleCount: 20,
         radius: () => 30,
         color: () => "red",
         vx: () => (Math.random() - 0.5) * 200,
@@ -209,9 +207,8 @@ export const levels: LevelConfig[] = [
       },
       {
         pattern: "random",
-        // behaviors: [{ type: "wall", mode: "teleport" }],
         behaviors: [],
-        particleCount: 10,
+        particleCount: 20,
         radius: () => 30,
         color: () => "blue",
         vx: () => (Math.random() - 0.5) * 200,

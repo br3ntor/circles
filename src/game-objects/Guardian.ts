@@ -7,6 +7,8 @@ import { GuardianState, IGameObject } from "./types.js";
 import { Vector2 } from "./Vector2.js";
 
 export class Guardian implements IGameObject {
+  id: string;
+  static nextId = 0;
   position: Vector2;
   velocity: Vector2;
   radius: number;
@@ -26,6 +28,7 @@ export class Guardian implements IGameObject {
     radians = 0,
     distanceFromCenter = 50 // Default to 40
   ) {
+    this.id = `guardian-${Guardian.nextId++}`;
     this.position = new Vector2(x, y);
     this.velocity = new Vector2(0, 0);
     this.radius = radius;

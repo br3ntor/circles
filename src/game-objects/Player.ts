@@ -2,13 +2,18 @@ import { distance } from "../utils/utils.js";
 import { Particle } from "./Particle.js";
 import { Vector2 } from "./Vector2.js";
 
-export class Player {
+import { IGameObject } from "./types";
+
+export class Player implements IGameObject {
+  id: string;
+  static nextId = 0;
   position: Vector2;
   speed: number;
   radius: number;
   color: string;
 
   constructor(x: number, y: number, radius: number, color?: string) {
+    this.id = `player-${Player.nextId++}`;
     this.position = new Vector2(x, y);
     this.speed = 2;
     this.radius = radius;

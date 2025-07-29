@@ -3,6 +3,8 @@ import { Vector2 } from "./Vector2.js";
 import { IGameObject, ParticleOptions } from "./types.js";
 
 export class Particle implements IGameObject {
+  id: string;
+  static nextId = 0;
   position: Vector2;
   velocity: Vector2;
   acceleration: Vector2;
@@ -18,6 +20,7 @@ export class Particle implements IGameObject {
   shouldRemove: boolean;
   fillOpacity: number;
   constructor(x: number, y: number, options: ParticleOptions = {}) {
+    this.id = `particle-${Particle.nextId++}`;
     this.age = 0;
     this.position = new Vector2(x, y);
     this.velocity = new Vector2(

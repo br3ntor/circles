@@ -9,10 +9,17 @@ type Collidable = Particle | Player | Guardian | Goal;
 
 export class CollisionManager extends EventTarget {
   private canvas: HTMLCanvasElement;
+  private activeCollisions = new Set<string>();
 
   constructor(canvas: HTMLCanvasElement) {
     super();
     this.canvas = canvas;
+  }
+
+  private getCollisionKey(obj1: Collidable, obj2: Collidable): string {
+    // Ensure consistent order for the key
+    const ids = [obj1.id, obj2.id].sort();
+    return ids.join("-");
   }
 
   public getWrappedPositions(object: Collidable): Vector2[] {
@@ -53,7 +60,9 @@ export class CollisionManager extends EventTarget {
     objects: Exclude<Collidable, Goal>[],
     goal: Goal
   ): void {
-    // Reset ghost collision flags at the beginning of the check
+    const currentFrameCollisions = new Set<string>();
+
+    // Reset ghost collision flags
     for (const obj of objects) {
       if ("isGhostColliding" in obj) {
         obj.isGhostColliding = false;
@@ -61,11 +70,11 @@ export class CollisionManager extends EventTarget {
     }
 
     this.checkParticleGoalCollisions(
-      objects.filter((obj) => "velocity" in obj) as Particle[],
+      objects.filter((obj) => obj instanceof Particle) as Particle[],
       goal
     );
 
-    pair_loop: for (let i = 0; i < objects.length; i++) {
+    for (let i = 0; i < objects.length; i++) {
       for (let j = i + 1; j < objects.length; j++) {
         const obj1 = objects[i];
         const obj2 = objects[j];
@@ -75,34 +84,58 @@ export class CollisionManager extends EventTarget {
 
         for (const pos1 of obj1Positions) {
           for (const pos2 of obj2Positions) {
-            const distance = pos1.distanceTo(pos2);
+            if (pos1.distanceTo(pos2) < obj1.radius + obj2.radius) {
+              const collisionKey = this.getCollisionKey(obj1, obj2);
+              currentFrameCollisions.add(collisionKey);
 
-            if (distance < obj1.radius + obj2.radius) {
-              const isObj1Ghost = pos1 !== obj1.position;
-              const isObj2Ghost = pos2 !== obj2.position;
+              if (!this.activeCollisions.has(collisionKey)) {
+                // New collision
+                this.activeCollisions.add(collisionKey);
+                this.dispatchEvent(
+                  new CustomEvent("collision-start", {
+                    detail: {
+                      object1: obj1,
+                      object2: obj2,
+                      position1: pos1,
+                      position2: pos2,
+                    },
+                  })
+                );
+              }
 
-              if (isObj1Ghost && "isGhostColliding" in obj1) {
+              // Handle ghost collision flags
+              if (pos1 !== obj1.position && "isGhostColliding" in obj1) {
                 obj1.isGhostColliding = true;
               }
-              if (isObj2Ghost && "isGhostColliding" in obj2) {
+              if (pos2 !== obj2.position && "isGhostColliding" in obj2) {
                 obj2.isGhostColliding = true;
               }
 
-              this.dispatchEvent(
-                new CustomEvent("collision", {
-                  detail: {
-                    object1: obj1,
-                    object2: obj2,
-                    position1: pos1,
-                    position2: pos2,
-                  },
-                })
-              );
-              // Prevent dispatching multiple events for the same pair in one frame
-              continue pair_loop;
+              // Break from inner loops once a collision is found for the pair
+              goto_next_pair: break;
             }
           }
+          // Label for goto
+          // @ts-ignore
+          if (typeof goto_next_pair !== "undefined") break;
         }
+      }
+    }
+
+    // Check for ended collisions
+    for (const key of this.activeCollisions) {
+      if (!currentFrameCollisions.has(key)) {
+        const [id1, id2] = key.split("-");
+        const obj1 = objects.find((o) => o.id === id1);
+        const obj2 = objects.find((o) => o.id === id2);
+        if (obj1 && obj2) {
+          this.dispatchEvent(
+            new CustomEvent("collision-end", {
+              detail: { object1: obj1, object2: obj2 },
+            })
+          );
+        }
+        this.activeCollisions.delete(key);
       }
     }
   }

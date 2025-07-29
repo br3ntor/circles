@@ -24,11 +24,12 @@ export class CollisionBehavior implements IBehavior {
     other: IGameObject,
     position1: Vector2,
     position2: Vector2
-  ) {
+  ): CollisionBehaviorMode {
     if (this.mode === "resolve") {
       if (isCollidable(gameObject) && isCollidable(other)) {
         resolveCollision(gameObject, other, position1, position2);
       }
+      return "resolve";
     } else if (this.mode === "repel") {
       // Apply a gentle repulsion force instead of an instant resolution
       const repulsionStrength = 10; // Adjust as needed
@@ -38,6 +39,8 @@ export class CollisionBehavior implements IBehavior {
         gameObject.velocity = gameObject.velocity.add(force);
         other.velocity = other.velocity.subtract(force);
       }
+      return "repel";
     }
+    return "none";
   }
 }

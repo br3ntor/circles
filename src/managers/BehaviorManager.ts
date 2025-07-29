@@ -1,5 +1,6 @@
 import { Vector2 } from "../game-objects/Vector2.js";
 import { IGameObject } from "../game-objects/types";
+import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior.js";
 
 export interface IBehavior {
   update(gameObject: IGameObject, deltaTime: number, time: number): void;
@@ -8,7 +9,7 @@ export interface IBehavior {
     other: IGameObject,
     position: Vector2,
     otherPosition: Vector2
-  ): void;
+  ): CollisionBehaviorMode | void;
 }
 
 export class BehaviorManager {
@@ -40,11 +41,24 @@ export class BehaviorManager {
     other: IGameObject,
     position: Vector2,
     otherPosition: Vector2
-  ) {
+  ): CollisionBehaviorMode | "none" {
+    let collisionMode: CollisionBehaviorMode | "none" = "none";
     for (const behavior of this.behaviors) {
       if (behavior.handleCollision) {
-        behavior.handleCollision(gameObject, other, position, otherPosition);
+        const result = behavior.handleCollision(
+          gameObject,
+          other,
+          position,
+          otherPosition
+        );
+        // A behavior can return a mode. If it does, we store it.
+        // This allows multiple collision behaviors to run, with the last one
+        // determining the "type" of collision for sound purposes.
+        if (result && result !== "none") {
+          collisionMode = result;
+        }
       }
     }
+    return collisionMode;
   }
 }
