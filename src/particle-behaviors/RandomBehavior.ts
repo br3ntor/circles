@@ -1,6 +1,6 @@
 import { Particle, ParticleBehavior, Vector2 } from "../game-objects";
 
-export class RandomMovement implements ParticleBehavior {
+export class RandomBehavior implements ParticleBehavior {
   intensity: number;
   turnSpeed: number;
 

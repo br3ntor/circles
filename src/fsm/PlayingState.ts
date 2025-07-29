@@ -101,7 +101,7 @@ export class PlayingState extends State {
   private handleParticleGoalCollision = (event: Event) => {
     const customEvent = event as CustomEvent;
     const { particle, goal, position, goalPosition } = customEvent.detail;
-    this.game.soundManager.playSound("particle-goal-collision");
+    // this.game.soundManager.playSound("particle-goal-collision");
     particle.behaviorManager.handleCollision(
       particle,
       goal,

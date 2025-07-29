@@ -1,6 +1,6 @@
 import { Particle, ParticleBehavior } from "../game-objects";
 
-export class SinusoidalMovement implements ParticleBehavior {
+export class SinusoidalBehavior implements ParticleBehavior {
   private canvas: HTMLCanvasElement;
   private amplitude: number;
   private frequency: number;

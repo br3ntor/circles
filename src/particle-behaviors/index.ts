@@ -1,4 +1,4 @@
-export * from "./RandomMovement";
+export * from "./RandomBehavior";
 export * from "./OrbitBehavior";
 export * from "./SpiralBehavior";
 export * from "./WaveBehavior";
@@ -7,6 +7,5 @@ export * from "./WallBehavior";
 export * from "./FadeOutBehavior";
 export * from "./LightingBehavior";
 export * from "./ExperimentalBehavior";
-export * from "./SinusoidalMovement";
-
+export * from "./SinusoidalBehavior";
 export * from "./GoalCollisionBehavior";

@@ -1,6 +1,6 @@
 import {
   OrbitBehavior,
-  RandomMovement,
+  RandomBehavior,
   SpiralBehavior,
   WaveBehavior,
   CollisionBehavior,
@@ -8,7 +8,7 @@ import {
   FadeOutBehavior,
   LightingBehavior,
   ExperimentalBehavior,
-  SinusoidalMovement,
+  SinusoidalBehavior,
   GoalCollisionBehavior,
 } from "../particle-behaviors";
 import {
@@ -164,7 +164,7 @@ export class ParticleManager {
             config.yOffset
           );
         case "randomMovement":
-          return new RandomMovement(config.intensity);
+          return new RandomBehavior(config.intensity);
         case "experimental":
           return new ExperimentalBehavior(config.turnSpeed);
         case "fadeOut":
@@ -172,7 +172,7 @@ export class ParticleManager {
         case "lighting":
           return new LightingBehavior(config.mode);
         case "sinusoidal":
-          return new SinusoidalMovement(
+          return new SinusoidalBehavior(
             this.canvas,
             config.amplitude,
             config.frequency,

@@ -84,10 +84,10 @@ export class Game {
       "particle-collision",
       "/circles/sounds/match-ready.ogg"
     );
-    await this.soundManager.loadSound(
-      "particle-goal-collision",
-      "/sounds/particle-goal-collision.wav"
-    );
+    // await this.soundManager.loadSound(
+    //   "particle-goal-collision",
+    //   "/sounds/particle-goal-collision.wav"
+    // );
     await this.soundManager.loadSound(
       "level-complete",
       "/circles/sounds/cow_moo_1.ogg"
