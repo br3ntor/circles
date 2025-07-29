@@ -106,30 +106,37 @@ export class ParticleManager {
 
   createPattern(config: LevelConfig): void {
     this.clearParticles();
-    const patternCreator = this.patterns[config.pattern];
-    if (patternCreator) {
-      const behaviors = this._createBehaviorsFromConfig(config.behaviors);
-      const particles = patternCreator.create(
-        {
-          behaviors,
-          particleCount: config.particleCount ?? 100,
-          options: {
-            radius: config.radius ? config.radius() : undefined,
-            color: config.color,
-            vx: config.vx,
-            vy: config.vy,
+    const globalBehaviors = this._createBehaviorsFromConfig(
+      config.globalBehaviors ?? []
+    );
+
+    for (const patternConfig of config.patterns) {
+      const patternCreator = this.patterns[patternConfig.pattern];
+      if (patternCreator) {
+        const instanceBehaviors = this._createBehaviorsFromConfig(
+          patternConfig.behaviors
+        );
+        const allBehaviors = [...globalBehaviors, ...instanceBehaviors];
+        const particles = patternCreator.create(
+          {
+            behaviors: allBehaviors,
+            particleCount: patternConfig.particleCount ?? 100,
+            options: {
+              radius: patternConfig.radius ? patternConfig.radius() : undefined,
+              color: patternConfig.color,
+              vx: patternConfig.vx,
+              vy: patternConfig.vy,
+            },
+            canvas: this.canvas,
           },
-          canvas: this.canvas,
-        },
-        config.patternConfig ?? {}
-      );
-      this.particles.push(...particles);
+          patternConfig.patternConfig ?? {}
+        );
+        this.particles.push(...particles);
+      }
     }
   }
 
-  private _createBehaviorsFromConfig(
-    configs: BehaviorConfig[]
-  ): ParticleBehavior[] {
+  _createBehaviorsFromConfig(configs: BehaviorConfig[]): ParticleBehavior[] {
     const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
     return configs.map((config) => {
       switch (config.type) {

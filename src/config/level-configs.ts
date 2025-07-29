@@ -103,12 +103,10 @@ export type SpiralPatternConfig = {
 };
 
 export type WavePatternConfig = {
-  sets: {
-    amplitude: number;
-    frequency: number;
-    yOffset: number;
-    xOffset?: number;
-  }[];
+  amplitude: number;
+  frequency: number;
+  yOffset: number;
+  xOffset?: number;
 };
 
 export type PatternConfigMap = {
@@ -120,7 +118,7 @@ export type PatternConfigMap = {
   orbit: never;
 };
 
-export interface LevelConfig<P extends Pattern = Pattern> {
+export interface PatternInstanceConfig<P extends Pattern = Pattern> {
   pattern: P;
   patternConfig?: PatternConfigMap[P];
   behaviors: BehaviorConfig[];
@@ -131,153 +129,90 @@ export interface LevelConfig<P extends Pattern = Pattern> {
   vy?: () => number;
 }
 
+export interface LevelConfig {
+  globalBehaviors?: BehaviorConfig[];
+  patterns: PatternInstanceConfig[];
+}
+
 export const levels: LevelConfig[] = [
   {
-    pattern: "waves",
-    patternConfig: {
-      sets: [
-        { amplitude: 100, frequency: 0.1, yOffset: -150 },
-        { amplitude: 100, frequency: 0.1, yOffset: 0 },
-        { amplitude: 100, frequency: 0.1, yOffset: 150 },
-      ],
-    },
-    behaviors: [
-      { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: -150 },
-      { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 0 },
-      { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 150 },
+    globalBehaviors: [
       { type: "wall", mode: "teleport" },
-      // { type: "goalCollision", bounce: true },
-    ],
-    particleCount: 30,
-    color: () => getRandomColorFromScheme("cosmic"),
-    vx: () => 100,
-    vy: () => 0,
-  },
-  {
-    pattern: "spiral",
-    patternConfig: {
-      spiralDensity: 2,
-      angleStep: 0.5,
-    },
-    behaviors: [
-      { type: "wall", mode: "teleport" },
-      { type: "experimental" },
-      // { type: "randomMovement", intensity: 50, turnSpeed: 50 },
       // { type: "collision", mode: "resolve" },
       { type: "lighting", mode: "lightUp" },
     ],
-    radius: () => 20,
-    particleCount: 30,
-    color: niceColor,
-    vx: () => (Math.random() - 0.5) * 100,
-    vy: () => (Math.random() - 0.5) * 100,
-  },
-  {
-    pattern: "random",
-    behaviors: [
-      { type: "wall", mode: "seamless" },
-      { type: "collision", mode: "resolve" },
-      { type: "lighting", mode: "lightUp" },
-    ],
-    radius: () => 50,
-    particleCount: 60,
-    color: niceColor,
-    vy: () => Math.random() * 20 + 20,
-  },
-  {
-    pattern: "random",
-    behaviors: [
-      { type: "wall", mode: "collide" },
-      { type: "collision", mode: "resolve" },
-      { type: "lighting", mode: "lightUp" },
-    ],
-    particleCount: 30,
-    radius: () => 50,
-    color: () => getRandomColorFromScheme("pastel"),
-    vx: () => (Math.random() - 0.5) * 100,
-    vy: () => (Math.random() - 0.5) * 100,
-  },
-
-  {
-    pattern: "random",
-    behaviors: [
-      { type: "wall", mode: "collide" },
-      { type: "collision", mode: "resolve" },
-      { type: "lighting", mode: "lightUp" },
-    ],
-    particleCount: balls() + 20,
-    radius: () => 10,
-    color: () => getRandomColorFromScheme("ocean"),
-    vx: () => 220,
-    vy: () => 0,
-  },
-
-  {
-    pattern: "spiral",
-    patternConfig: {
-      spiralDensity: 8,
-      angleStep: 0.5,
-    },
-    behaviors: [
+    patterns: [
       {
-        type: "spiral",
-        initialRadius: 200,
-        growthRate: 30,
-        rotationSpeed: 0.3,
+        pattern: "random",
+        behaviors: [
+          { type: "wall", mode: "teleport" },
+          { type: "collision", mode: "resolve" },
+        ],
+        particleCount: 10,
+        radius: () => 30,
+        color: () => "red",
+        vx: () => (Math.random() - 0.5) * 200,
+        vy: () => (Math.random() - 0.5) * 200,
       },
-      { type: "wall", mode: "teleport" },
+      {
+        pattern: "random",
+        behaviors: [{ type: "wall", mode: "teleport" }],
+        particleCount: 10,
+        radius: () => 30,
+        color: () => "blue",
+        vx: () => (Math.random() - 0.5) * 200,
+        vy: () => (Math.random() - 0.5) * 200,
+      },
     ],
-    radius: () => 20,
-    particleCount: 30,
-    color: niceColor,
   },
   {
-    pattern: "random",
-    behaviors: [{ type: "wall", mode: "teleport" }],
-    particleCount: balls() + 30,
-    radius: () => 10,
-    color: () => getRandomColorFromScheme("sunset"),
-    vx: () => 0,
-    vy: () => 20,
+    globalBehaviors: [{ type: "wall", mode: "teleport" }],
+    patterns: [
+      {
+        pattern: "waves",
+        patternConfig: {
+          amplitude: 100,
+          frequency: 0.1,
+          yOffset: -150,
+        },
+        behaviors: [
+          { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: -150 },
+        ],
+        particleCount: 10,
+        color: () => "red",
+        vx: () => 100,
+        vy: () => 0,
+      },
+      {
+        pattern: "waves",
+        patternConfig: {
+          amplitude: 100,
+          frequency: 0.1,
+          yOffset: 0,
+        },
+        behaviors: [
+          { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 0 },
+        ],
+        particleCount: 10,
+        color: () => "green",
+        vx: () => 100,
+        vy: () => 0,
+      },
+      {
+        pattern: "waves",
+        patternConfig: {
+          amplitude: 100,
+          frequency: 0.1,
+          yOffset: 150,
+        },
+        behaviors: [
+          { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 150 },
+        ],
+        particleCount: 10,
+        color: () => "blue",
+        vx: () => 100,
+        vy: () => 0,
+      },
+    ],
   },
-
-  // {
-  //   pattern: "random",
-  //   behaviors: [{ type: "wall", mode: "wrap" }, { type: "collision" }],
-  //   particleCount: balls() + 50,
-  //   radius: () => 20,
-  //   color: () => colors[Math.floor(Math.random() * colors.length)],
-  //   vx: () => (Math.random() - 0.5) * 200,
-  //   vy: () => (Math.random() - 0.5) * 200,
-  // },
-  // {
-  //   pattern: "random",
-  //   behaviors: [{ type: "wall", mode: "collide" }, { type: "collision" }],
-  //   particleCount: balls(),
-  //   radius: () => Math.random() * 30 + 10,
-  //   color: () => colors[Math.floor(Math.random() * colors.length)],
-  //   vx: () => (Math.random() - 0.5) * 100,
-  //   vy: () => (Math.random() - 0.5) * 100,
-  // },
-  // {
-  //   pattern: "waves",
-  //   behaviors: [
-  //     { type: "wall", mode: "wrap" },
-  //     { type: "wave", amplitude: 50, frequency: 0.02, speed: 100 },
-  //   ],
-  //   particleCount: 200,
-  // },
-  // {
-  //   pattern: "orbit",
-  //   behaviors: [
-  //     { type: "wall", mode: "collide" },
-  //     {
-  //       type: "orbit",
-  //       // centerPoint will be calculated in ParticleManager
-  //       radius: 200,
-  //       speed: 1,
-  //     },
-  //   ],
-  //   particleCount: 100,
-  // },
 ];

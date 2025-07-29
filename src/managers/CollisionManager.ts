@@ -1,8 +1,9 @@
 import type { Goal } from "../game-objects/Goal";
-import type { Particle } from "../game-objects/Particle";
+import { Particle } from "../game-objects/Particle";
 import type { Player } from "../game-objects/Player";
 import type { Guardian } from "../game-objects/Guardian";
 import { Vector2 } from "../game-objects/Vector2";
+import { WallBehavior } from "../particle-behaviors";
 
 type Collidable = Particle | Player | Guardian | Goal;
 
@@ -16,24 +17,34 @@ export class CollisionManager extends EventTarget {
 
   public getWrappedPositions(object: Collidable): Vector2[] {
     const positions: Vector2[] = [object.position];
-    const { width, height } = this.canvas;
-    const { x, y } = object.position;
-    const r = object.radius;
 
-    // Ghost positions for seamless wrapping
-    if (x < r) positions.push(new Vector2(x + width, y));
-    if (x > width - r) positions.push(new Vector2(x - width, y));
-    if (y < r) positions.push(new Vector2(x, y + height));
-    if (y > height - r) positions.push(new Vector2(x, y - height));
+    // Only apply wrapping logic for particles with seamless wall behavior
+    if (object instanceof Particle) {
+      const wallBehavior = object.behaviorManager.findBehavior(
+        (b) => b instanceof WallBehavior
+      ) as WallBehavior | undefined;
 
-    // Corner ghosts
-    if (x < r && y < r) positions.push(new Vector2(x + width, y + height));
-    if (x > width - r && y < r)
-      positions.push(new Vector2(x - width, y + height));
-    if (x < r && y > height - r)
-      positions.push(new Vector2(x + width, y - height));
-    if (x > width - r && y > height - r)
-      positions.push(new Vector2(x - width, y - height));
+      if (wallBehavior?.mode === "seamless") {
+        const { width, height } = this.canvas;
+        const { x, y } = object.position;
+        const r = object.radius;
+
+        // Ghost positions for seamless wrapping
+        if (x < r) positions.push(new Vector2(x + width, y));
+        if (x > width - r) positions.push(new Vector2(x - width, y));
+        if (y < r) positions.push(new Vector2(x, y + height));
+        if (y > height - r) positions.push(new Vector2(x, y - height));
+
+        // Corner ghosts
+        if (x < r && y < r) positions.push(new Vector2(x + width, y + height));
+        if (x > width - r && y < r)
+          positions.push(new Vector2(x - width, y + height));
+        if (x < r && y > height - r)
+          positions.push(new Vector2(x + width, y - height));
+        if (x > width - r && y > height - r)
+          positions.push(new Vector2(x - width, y - height));
+      }
+    }
 
     return positions;
   }
