@@ -41,6 +41,7 @@ export function setupEventListeners(game: Game) {
       );
 
       if (clickDistance < game.player.radius) {
+        game.initAudio();
         game.stateMachine.transitionTo(new PlayingState(game));
       }
     }
@@ -50,6 +51,7 @@ export function setupEventListeners(game: Game) {
     const currentState = game.stateMachine.currentState;
     if (event.key === " " || event.code === "Space") {
       if (currentState instanceof ReadyToStartState) {
+        game.initAudio();
         game.stateMachine.transitionTo(new PlayingState(game));
       }
       if (currentState instanceof GameOverState) {

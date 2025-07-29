@@ -4,6 +4,8 @@ export class SoundManager {
   private soundBuffers: Map<string, AudioBuffer> = new Map();
   private playingSources: Map<string, AudioBufferSourceNode[]> = new Map();
 
+  private isPaused = false;
+
   private constructor() {
     this.audioContext = new (window.AudioContext ||
       (window as any).webkitAudioContext)();
@@ -14,6 +16,12 @@ export class SoundManager {
       SoundManager.instance = new SoundManager();
     }
     return SoundManager.instance;
+  }
+
+  public resumeAudioContext(): void {
+    if (this.audioContext.state === "suspended") {
+      this.audioContext.resume();
+    }
   }
 
   public async loadSound(name: string, url: string): Promise<void> {
@@ -72,5 +80,20 @@ export class SoundManager {
       sources.forEach((source: AudioBufferSourceNode) => source.stop());
     }
     this.playingSources.clear();
+  }
+
+  public pauseAllSounds(): void {
+    this.isPaused = true;
+    this.audioContext.suspend();
+  }
+
+  public resumeAllSounds(): void {
+    this.isPaused = false;
+    this.audioContext.resume();
+  }
+
+  public isPlaying(name: string): boolean {
+    const sources = this.playingSources.get(name);
+    return !!sources && sources.length > 0;
   }
 }

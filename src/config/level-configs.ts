@@ -137,6 +137,57 @@ export interface LevelConfig {
 
 export const levels: LevelConfig[] = [
   {
+    music: "level2",
+    globalBehaviors: [{ type: "wall", mode: "teleport" }],
+    patterns: [
+      {
+        pattern: "waves",
+        patternConfig: {
+          amplitude: -1,
+          frequency: 0.5,
+          yOffset: 0,
+        },
+        behaviors: [
+          { type: "sinusoidal", amplitude: -1, frequency: 0.5, yOffset: 0 },
+        ],
+        particleCount: 5,
+        color: () => "red",
+        vx: () => -30,
+        vy: () => 0,
+      },
+      {
+        pattern: "waves",
+        patternConfig: {
+          amplitude: -1,
+          frequency: 0.1,
+          yOffset: 0,
+          xOffset: 300,
+        },
+        behaviors: [
+          { type: "sinusoidal", amplitude: -1, frequency: 1, yOffset: 0 },
+        ],
+        particleCount: 5,
+        color: () => "green",
+        vx: () => 0,
+      },
+      // {
+      //   pattern: "waves",
+      //   patternConfig: {
+      //     amplitude: 100,
+      //     frequency: 0.1,
+      //     yOffset: 150,
+      //   },
+      //   behaviors: [
+      //     { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 150 },
+      //   ],
+      //   particleCount: 10,
+      //   color: () => "blue",
+      //   vx: () => 100,
+      //   vy: () => 0,
+      // },
+    ],
+  },
+  {
     music: "level1",
     globalBehaviors: [
       { type: "wall", mode: "teleport" },
@@ -165,57 +216,6 @@ export const levels: LevelConfig[] = [
         color: () => "blue",
         vx: () => (Math.random() - 0.5) * 200,
         vy: () => (Math.random() - 0.5) * 200,
-      },
-    ],
-  },
-  {
-    music: "level2",
-    globalBehaviors: [{ type: "wall", mode: "teleport" }],
-    patterns: [
-      {
-        pattern: "waves",
-        patternConfig: {
-          amplitude: 100,
-          frequency: 0.1,
-          yOffset: -150,
-        },
-        behaviors: [
-          { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: -150 },
-        ],
-        particleCount: 10,
-        color: () => "red",
-        vx: () => 100,
-        vy: () => 0,
-      },
-      {
-        pattern: "waves",
-        patternConfig: {
-          amplitude: 100,
-          frequency: 0.1,
-          yOffset: 0,
-        },
-        behaviors: [
-          { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 0 },
-        ],
-        particleCount: 10,
-        color: () => "green",
-        vx: () => 100,
-        vy: () => 0,
-      },
-      {
-        pattern: "waves",
-        patternConfig: {
-          amplitude: 100,
-          frequency: 0.1,
-          yOffset: 150,
-        },
-        behaviors: [
-          { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 150 },
-        ],
-        particleCount: 10,
-        color: () => "blue",
-        vx: () => 100,
-        vy: () => 0,
       },
     ],
   },

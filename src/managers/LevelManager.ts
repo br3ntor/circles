@@ -18,12 +18,11 @@ export class LevelManager {
       return;
     }
 
-    // this.game.soundManager.stopAllSounds();
     if (levelConfig.music) {
-      // Lets just do a good old fashion human bad code hack
-      // This is to keep the previous song playing if the new level has no music set
-      this.game.soundManager.stopAllSounds();
-      this.game.soundManager.playSound(levelConfig.music, true);
+      if (!this.game.soundManager.isPlaying(levelConfig.music)) {
+        this.game.soundManager.stopAllSounds();
+        this.game.soundManager.playSound(levelConfig.music, true);
+      }
     }
 
     this.game.guardians = [];

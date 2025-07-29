@@ -5,6 +5,7 @@ import { levels } from "../config/level-configs";
 
 export class LevelCompleteState extends State {
   public enter(): void {
+    this.game.soundManager.playSound("level-complete");
     this.game.timer.stop();
     this.game.scoreManager.addLevelTime(this.game.timer.duration);
     this.game.timer.reset();

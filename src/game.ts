@@ -58,7 +58,6 @@ export class Game {
     this.uiManager = UIManager.getInstance();
     this.uiManager.setTimer(this.timer);
     this.soundManager = SoundManager.getInstance();
-    // this.soundManager = SoundManager.getInstance();
   }
 
   public async init() {
@@ -73,19 +72,30 @@ export class Game {
       "level1",
       "/circles/sounds/Half-Life02.mp3"
     );
-    await this.soundManager.loadSound("level2", "/sounds/level2.mp3");
+    await this.soundManager.loadSound(
+      "level2",
+      "/circles/sounds/Half-Life19.mp3"
+    );
     await this.soundManager.loadSound(
       "player-death",
-      "/sounds/player-death.wav"
+      "/circles/sounds/squeaky.ogg"
     );
     await this.soundManager.loadSound(
       "particle-collision",
-      "/circles/sounds/pause-back-click.wav"
+      "/circles/sounds/match-ready.ogg"
     );
     await this.soundManager.loadSound(
       "particle-goal-collision",
       "/sounds/particle-goal-collision.wav"
     );
+    await this.soundManager.loadSound(
+      "level-complete",
+      "/circles/sounds/cow_moo_1.ogg"
+    );
+  }
+
+  initAudio(): void {
+    this.soundManager.resumeAudioContext();
   }
 
   reset() {
@@ -126,10 +136,12 @@ export class Game {
 
   pause() {
     this.paused = true;
+    this.soundManager.pauseAllSounds();
   }
 
   resume() {
     this.paused = false;
+    this.soundManager.resumeAllSounds();
     this.lastTime = performance.now();
   }
 
