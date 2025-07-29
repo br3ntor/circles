@@ -1,6 +1,5 @@
 import { getRandomColorFromScheme } from "./color-schemes";
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
-import { GoalCollisionBehavior } from "../particle-behaviors";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
 import { balls, niceColor } from "../utils/utils";
@@ -50,6 +49,7 @@ export type WaveBehaviorConfig = {
   amplitude: number;
   frequency: number;
   speed: number;
+  yOffset?: number;
 };
 export type RandomMovementBehaviorConfig = {
   type: "randomMovement";
@@ -75,6 +75,7 @@ export type SinusoidalMovementBehaviorConfig = {
   type: "sinusoidal";
   amplitude?: number;
   frequency?: number;
+  yOffset?: number;
 };
 
 export type GoalCollisionBehaviorConfig = {
@@ -101,12 +102,21 @@ export type SpiralPatternConfig = {
   angleStep?: number;
 };
 
+export type WavePatternConfig = {
+  sets: {
+    amplitude: number;
+    frequency: number;
+    yOffset: number;
+    xOffset?: number;
+  }[];
+};
+
 export type PatternConfigMap = {
   spiral: SpiralPatternConfig;
   random: never;
   star: never;
   circle: never;
-  waves: never;
+  waves: WavePatternConfig;
   orbit: never;
 };
 
@@ -124,24 +134,22 @@ export interface LevelConfig<P extends Pattern = Pattern> {
 export const levels: LevelConfig[] = [
   {
     pattern: "waves",
+    patternConfig: {
+      sets: [
+        { amplitude: 100, frequency: 0.1, yOffset: -150 },
+        { amplitude: 100, frequency: 0.1, yOffset: 0 },
+        { amplitude: 100, frequency: 0.1, yOffset: 150 },
+      ],
+    },
     behaviors: [
-      { type: "sinusoidal", amplitude: 50, frequency: 2 },
+      { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: -150 },
+      { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 0 },
+      { type: "sinusoidal", amplitude: 100, frequency: 0.1, yOffset: 150 },
       { type: "wall", mode: "teleport" },
       // { type: "goalCollision", bounce: true },
     ],
-    particleCount: 10,
+    particleCount: 30,
     color: () => getRandomColorFromScheme("cosmic"),
-    vx: () => 100,
-    vy: () => 0,
-  },
-  {
-    pattern: "waves",
-    behaviors: [
-      { type: "wave", amplitude: 50, frequency: 0.1, speed: 100 },
-      { type: "wall", mode: "teleport" },
-    ],
-    particleCount: 10,
-    color: () => "white",
     vx: () => 100,
     vy: () => 0,
   },

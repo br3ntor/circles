@@ -151,7 +151,8 @@ export class ParticleManager {
             this.canvas,
             config.amplitude,
             config.frequency,
-            config.speed
+            config.speed,
+            config.yOffset
           );
         case "randomMovement":
           return new RandomMovement(config.intensity);
@@ -165,7 +166,8 @@ export class ParticleManager {
           return new SinusoidalMovement(
             this.canvas,
             config.amplitude,
-            config.frequency
+            config.frequency,
+            config.yOffset
           );
         case "goalCollision":
           return new GoalCollisionBehavior(config.bounce);

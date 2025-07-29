@@ -5,6 +5,7 @@ export class WaveBehavior implements ParticleBehavior {
   private frequency: number;
   private speed: number;
   private baseY: number;
+  private yOffset: number;
   private canvas: HTMLCanvasElement;
 
   private static readonly WAVE_OFFSET = 50;
@@ -13,17 +14,19 @@ export class WaveBehavior implements ParticleBehavior {
     canvas: HTMLCanvasElement,
     amplitude: number = 50,
     frequency: number = 0.02,
-    speed: number = 100
+    speed: number = 100,
+    yOffset: number = 0
   ) {
     this.canvas = canvas;
     this.amplitude = amplitude;
     this.frequency = frequency;
     this.speed = speed;
     this.baseY = 0;
+    this.yOffset = yOffset;
   }
 
   update(particle: Particle, deltaTime: number): void {
-    if (this.baseY === 0) this.baseY = particle.position.y;
+    if (this.baseY === 0) this.baseY = this.canvas.height / 2 + this.yOffset;
 
     let nextX = particle.position.x + this.speed * deltaTime;
     const nextY =

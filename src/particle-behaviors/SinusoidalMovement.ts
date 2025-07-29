@@ -6,15 +6,18 @@ export class SinusoidalMovement implements ParticleBehavior {
   private frequency: number;
   private initialY: number | null = null;
   private actualAmplitude: number;
+  private yOffset: number;
 
   constructor(
     canvas: HTMLCanvasElement,
     amplitude: number = 100,
-    frequency = 1
+    frequency = 1,
+    yOffset = 0
   ) {
     this.canvas = canvas;
     this.amplitude = amplitude;
     this.frequency = frequency;
+    this.yOffset = yOffset;
 
     // A value of -1 for amplitude means we want it to fill the canvas height
     this.actualAmplitude =
@@ -24,7 +27,7 @@ export class SinusoidalMovement implements ParticleBehavior {
   update(particle: Particle, deltaTime: number, time: number): void {
     if (this.initialY === null) {
       // We'll oscillate around the center of the canvas
-      this.initialY = this.canvas.height / 2;
+      this.initialY = this.canvas.height / 2 + this.yOffset;
     }
 
     // We directly set the y position to create the wave.
