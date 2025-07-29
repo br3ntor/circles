@@ -61,6 +61,7 @@ export class Game {
   }
 
   public async init() {
+    await this.loadSounds();
     this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new ReadyToStartState(this));
     this.animate();
@@ -93,9 +94,8 @@ export class Game {
     );
   }
 
-  async initAudio(): Promise<void> {
-    this.soundManager.start();
-    await this.loadSounds();
+  initAudio(): void {
+    this.soundManager.resumeAudioContext();
   }
 
   reset() {
