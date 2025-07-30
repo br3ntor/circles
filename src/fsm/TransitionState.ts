@@ -37,18 +37,26 @@ export class TransitionState extends State {
       this.transitionManager.isFinished()
     ) {
       // The "out" phase is over, the level is visible, start playing
-      this.game.stateMachine.transitionTo(new ReadyToStartState(this.game));
+      this.game.stateMachine.transitionTo(
+        new ReadyToStartState(this.game, true)
+      );
     }
   }
 
   public draw(ctx: CanvasRenderingContext2D): void {
+    // During both "in" and "out" transitions, we want to see the game objects.
+    // The game state (player/guardian positions) is updated between the "in" and "out" phases.
+    this.game.particleManager.draw(ctx);
+    this.game.goal.draw(ctx);
+    this.game.player.draw(ctx);
+    this.game.guardians.forEach((g) => g.draw(ctx));
+
     if (this.transitionPhase === "out") {
-      this.game.particleManager.draw(ctx);
-      this.game.goal.draw(ctx);
-      this.game.player.draw(ctx);
-      this.game.guardians.forEach((g) => g.draw(ctx));
+      // The "Ready?" UI only appears for the new level.
       this.game.uiManager.drawReadyUI(ctx, this.game);
     }
+
+    // The transition (iris wipe) is drawn on top of everything.
     this.transitionManager.draw(ctx);
   }
 }

@@ -1,3 +1,6 @@
 node_modules/
 .vscode/
 dist/
+public/sounds/*.mp3
+public/sounds/*.ogg
+public/sounds/*.wav

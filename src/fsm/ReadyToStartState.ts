@@ -3,8 +3,17 @@ import { PlayingState } from "./PlayingState";
 import { distance } from "../lib/utils";
 
 export class ReadyToStartState extends State {
+  private levelAlreadyLoaded: boolean;
+
+  constructor(game: any, levelAlreadyLoaded = false) {
+    super(game);
+    this.levelAlreadyLoaded = levelAlreadyLoaded;
+  }
+
   public enter(): void {
-    this.game.levelManager.loadLevel();
+    if (!this.levelAlreadyLoaded) {
+      this.game.levelManager.loadLevel();
+    }
   }
 
   public update(deltaTime: number): void {}
