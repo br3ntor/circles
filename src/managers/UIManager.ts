@@ -117,6 +117,55 @@ export class UIManager {
       );
     }
   }
+  public drawGameCompleteUI(
+    ctx: CanvasRenderingContext2D,
+    fadeAlpha: number,
+    canvas: HTMLCanvasElement
+  ) {
+    const score = this.scoreManager.calculateScore();
+    const totalTime = this.scoreManager.getTotalTime();
+    const formattedTotalTime = this.formatTime(totalTime);
+    // Fade out the game world
+    ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    this.drawText(
+      ctx,
+      "YOU WIN",
+      canvas.width / 2,
+      canvas.height / 2 - 100,
+      "100px 'Times New Roman'",
+      `rgba(0, 255, 0, ${fadeAlpha})`
+    );
+
+    this.drawText(
+      ctx,
+      `Total Time: ${formattedTotalTime}`,
+      canvas.width / 2,
+      canvas.height / 2,
+      "24px 'Times New Roman'",
+      `rgba(222, 222, 222, ${fadeAlpha})`
+    );
+    this.drawText(
+      ctx,
+      `Final Score: ${score}`,
+      canvas.width / 2,
+      canvas.height / 2 + 50,
+      "24px 'Times New Roman'",
+      `rgba(222, 222, 222, ${fadeAlpha})`
+    );
+
+    if (fadeAlpha >= 0.8) {
+      this.drawText(
+        ctx,
+        "Click to return to main menu",
+        canvas.width / 2,
+        canvas.height / 2 + 100,
+        "24px 'Times New Roman'",
+        "#DEDEDE"
+      );
+    }
+  }
   public drawReadyUI(ctx: CanvasRenderingContext2D, game: any) {
     // Draw left start area barrier
     ctx.beginPath();
