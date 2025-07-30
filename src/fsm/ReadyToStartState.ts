@@ -4,7 +4,7 @@ import { distance } from "../lib/utils";
 
 export class ReadyToStartState extends State {
   public enter(): void {
-    // The game is already reset before entering this state.
+    this.game.levelManager.loadLevel();
   }
 
   public update(deltaTime: number): void {}

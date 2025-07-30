@@ -2,6 +2,7 @@ import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
 import { balls, randInt } from "../lib/utils";
+import { getRandomColorFromScheme } from "./color-schemes";
 
 export type Pattern =
   | "random"
@@ -136,6 +137,24 @@ export interface LevelConfig {
 
 export const levels: LevelConfig[] = [
   {
+    music: "level2",
+    patterns: [
+      {
+        pattern: "random",
+        behaviors: [
+          { type: "collision", mode: "resolve" },
+          { type: "lighting", mode: "lightUp" },
+          { type: "wall", mode: "collide" },
+        ],
+        particleCount: balls() + 20,
+        radius: () => randInt(10, 60),
+        vx: () => (Math.random() - 0.5) * 100,
+        vy: () => (Math.random() - 0.5) * 100,
+        color: () => getRandomColorFromScheme("cosmic"),
+      },
+    ],
+  },
+  {
     music: "level1",
     patterns: [
       {
@@ -146,6 +165,7 @@ export const levels: LevelConfig[] = [
       },
     ],
   },
+
   // {
   //   music: "level2",
   //   globalBehaviors: [{ type: "wall", mode: "teleport" }],

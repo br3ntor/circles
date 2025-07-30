@@ -62,7 +62,6 @@ export class Game {
   }
 
   public async init() {
-    this.levelManager.loadLevel();
     this.stateMachine.transitionTo(new LoadingState(this));
     this.animate();
   }

@@ -13,10 +13,10 @@ export class PlayingState extends State {
       "collision-start",
       this.handleCollisionStart
     );
-    this.game.collisionManager.addEventListener(
-      "particle-goal-collision",
-      this.handleParticleGoalCollision
-    );
+    // this.game.collisionManager.addEventListener(
+    //   "particle-goal-collision",
+    //   this.handleParticleGoalCollision
+    // );
   }
 
   public exit(): void {
@@ -24,10 +24,10 @@ export class PlayingState extends State {
       "collision-start",
       this.handleCollisionStart
     );
-    this.game.collisionManager.removeEventListener(
-      "particle-goal-collision",
-      this.handleParticleGoalCollision
-    );
+    // this.game.collisionManager.removeEventListener(
+    //   "particle-goal-collision",
+    //   this.handleParticleGoalCollision
+    // );
   }
 
   private handleCollisionStart = (event: Event) => {

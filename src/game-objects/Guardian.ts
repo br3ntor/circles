@@ -72,10 +72,10 @@ export class Guardian implements IGameObject {
 
   handleCollision(collidingObject: Player | Particle) {
     // Light up particles and guardian on collision
-    this.opacity = 0.6;
-    this.color = collidingObject.color;
-    if ("fillOpacity" in collidingObject) {
-      collidingObject.fillOpacity = 0.3;
-    }
+    // this.opacity = 0.6;
+    // this.color = collidingObject.color;
+    // if ("fillOpacity" in collidingObject) {
+    //   collidingObject.fillOpacity = 0.3;
+    // }
   }
 }

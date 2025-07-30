@@ -17,7 +17,8 @@ This document outlines the future plans and desired features for the game.
   - [ ] **Movement Patterns**: Add different movement patterns (e.g., clockwise, counter-clockwise, custom paths).
   - [ ] **Collision Logic**: Allow guardians to have configurable collision (e.g., collide with particles, ignore them).
   - [ ] **Starting Formations**: Create different starting patterns for guardians.
-- [ ] **Particle Size Animation**: Add particle behaviors for growing or shrinking in size over time or on events.
+  - [ ] **Particle Size Animation**: Add particle behaviors for growing or shrinking in size over time or on events.
+  - [ ] **Delayed Particle Movement**: For one or more particles in a static pattern to trigger off domino effect.
 
 ## UI/UX Improvements
 
