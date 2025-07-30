@@ -149,4 +149,76 @@ export class UIManager {
     ctx.textAlign = "center";
     ctx.fillText(text, x, y);
   }
+
+  public drawLoadingScreen(ctx: CanvasRenderingContext2D): void {
+    this.drawText(
+      ctx,
+      "Loading...",
+      ctx.canvas.width / 2,
+      ctx.canvas.height / 2,
+      "50px Arial",
+      "#DEDEDE"
+    );
+  }
+
+  public drawMainMenu(
+    ctx: CanvasRenderingContext2D,
+    options: string[],
+    selectedOption: number
+  ): void {
+    this.drawText(
+      ctx,
+      "Main Menu",
+      ctx.canvas.width / 2,
+      ctx.canvas.height / 2 - 150,
+      "50px Arial",
+      "#DEDEDE"
+    );
+
+    options.forEach((option, index) => {
+      const color = index === selectedOption ? "yellow" : "#DEDEDE";
+      this.drawText(
+        ctx,
+        option,
+        ctx.canvas.width / 2,
+        ctx.canvas.height / 2 - 50 + index * 50,
+        "30px Arial",
+        color
+      );
+    });
+  }
+
+  public drawLeaderboard(
+    ctx: CanvasRenderingContext2D,
+    leaderboard: { name: string; score: number }[]
+  ): void {
+    this.drawText(
+      ctx,
+      "Leaderboard",
+      ctx.canvas.width / 2,
+      ctx.canvas.height / 2 - 150,
+      "50px Arial",
+      "#DEDEDE"
+    );
+
+    leaderboard.forEach((entry, index) => {
+      this.drawText(
+        ctx,
+        `${entry.name}: ${entry.score}`,
+        ctx.canvas.width / 2,
+        ctx.canvas.height / 2 - 50 + index * 50,
+        "30px Arial",
+        "#DEDEDE"
+      );
+    });
+
+    this.drawText(
+      ctx,
+      "Press Enter to return",
+      ctx.canvas.width / 2,
+      ctx.canvas.height - 100,
+      "20px Arial",
+      "#DEDEDE"
+    );
+  }
 }

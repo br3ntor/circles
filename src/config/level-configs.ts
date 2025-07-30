@@ -1,8 +1,7 @@
-import { getRandomColorFromScheme } from "./color-schemes";
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
-import { balls, niceColor, randInt } from "../lib/utils";
+import { balls, randInt } from "../lib/utils";
 
 export type Pattern =
   | "random"

@@ -28,5 +28,39 @@ export class GameOverState extends State {
     }
   }
 
+  public draw(ctx: CanvasRenderingContext2D): void {
+    this.game.particleManager.draw(ctx);
+    this.game.goal.draw(ctx);
+    this.game.player.draw(ctx);
+    this.game.guardians.forEach((g) => g.draw(ctx));
+
+    const { fadeAlpha, collidedObject } = this;
+
+    // Draw a glowing effect around the collided object
+    if (collidedObject) {
+      ctx.save();
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "red";
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 3;
+      const positions =
+        this.game.collisionManager.getWrappedPositions(collidedObject);
+      for (const pos of positions) {
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, collidedObject.radius + 5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    this.game.uiManager.drawGameOverUI(ctx, fadeAlpha, this.game.canvas);
+  }
+
   public exit(): void {}
+
+  public handleInput(event: KeyboardEvent | MouseEvent) {
+    if (this.fadeAlpha >= 0.8) {
+      this.game.reset();
+    }
+  }
 }

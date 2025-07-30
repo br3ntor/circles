@@ -10,4 +10,5 @@ export abstract class State {
   public enter(): void {}
   public exit(): void {}
   public abstract update(deltaTime: number): void;
+  public draw(ctx: CanvasRenderingContext2D): void {}
 }

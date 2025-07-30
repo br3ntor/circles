@@ -1,6 +1,7 @@
 import { Goal, Guardian, Player } from "./game-objects";
 import { ParticleManager } from "./managers/ParticleManager";
 import { StateMachine } from "./fsm/StateMachine";
+import { LoadingState } from "./fsm/LoadingState";
 import { ReadyToStartState } from "./fsm/ReadyToStartState";
 import { LevelManager } from "./managers/LevelManager";
 import { Renderer } from "./managers/Renderer";
@@ -61,9 +62,8 @@ export class Game {
   }
 
   public async init() {
-    await this.loadSounds();
     this.levelManager.loadLevel();
-    this.stateMachine.transitionTo(new ReadyToStartState(this));
+    this.stateMachine.transitionTo(new LoadingState(this));
     this.animate();
   }
 

@@ -41,7 +41,14 @@ export class TransitionState extends State {
     }
   }
 
-  public draw(): void {
-    this.transitionManager.draw(this.game.ctx);
+  public draw(ctx: CanvasRenderingContext2D): void {
+    if (this.transitionPhase === "out") {
+      this.game.particleManager.draw(ctx);
+      this.game.goal.draw(ctx);
+      this.game.player.draw(ctx);
+      this.game.guardians.forEach((g) => g.draw(ctx));
+      this.game.uiManager.drawReadyUI(ctx, this.game);
+    }
+    this.transitionManager.draw(ctx);
   }
 }

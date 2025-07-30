@@ -8,4 +8,8 @@ export class GameCompleteState extends State {
   public update(deltaTime: number): void {
     // In a real game, you might have a "click to restart" or "back to main menu" option here.
   }
+
+  public draw(ctx: CanvasRenderingContext2D): void {
+    this.game.uiManager.drawFinalScore(ctx);
+  }
 }
