@@ -6,6 +6,7 @@ export class SoundManager {
   private gainNode: GainNode;
   private isMuted = true; // Start muted by default
   private isStarted = false;
+  private currentMusic: string | null = null;
 
   private constructor() {
     this.audioContext = new (window.AudioContext ||
@@ -85,6 +86,23 @@ export class SoundManager {
     };
   }
 
+  public playMusic(name: string): void {
+    if (this.currentMusic === name) {
+      return;
+    }
+
+    this.stopMusic();
+    this.playSound(name, true);
+    this.currentMusic = name;
+  }
+
+  public stopMusic(): void {
+    if (this.currentMusic) {
+      this.stopSound(this.currentMusic);
+      this.currentMusic = null;
+    }
+  }
+
   public stopSound(name: string): void {
     const sources = this.playingSources.get(name);
     if (sources) {
@@ -98,6 +116,7 @@ export class SoundManager {
       sources.forEach((source: AudioBufferSourceNode) => source.stop());
     }
     this.playingSources.clear();
+    this.stopMusic();
   }
 
   public pauseAllSounds(): void {

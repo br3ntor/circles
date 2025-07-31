@@ -34,6 +34,10 @@ export class ReadyToStartState extends State {
       if (!this.game.soundManager.getStarted()) {
         this.game.initAudio();
       }
+      const levelMusic = this.game.levelManager.getCurrentLevelMusic();
+      if (levelMusic) {
+        this.game.soundManager.playMusic(levelMusic);
+      }
       this.game.stateMachine.transitionTo(new PlayingState(this.game));
     }
 
@@ -48,6 +52,10 @@ export class ReadyToStartState extends State {
       if (clickDistance < this.game.player.radius) {
         if (!this.game.soundManager.getStarted()) {
           this.game.initAudio();
+        }
+        const levelMusic = this.game.levelManager.getCurrentLevelMusic();
+        if (levelMusic) {
+          this.game.soundManager.playMusic(levelMusic);
         }
         this.game.stateMachine.transitionTo(new PlayingState(this.game));
       }

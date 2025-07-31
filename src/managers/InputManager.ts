@@ -1,4 +1,5 @@
 import { Game } from "../game";
+import { MainMenuState } from "../fsm/MainMenuState";
 import { ReadyToStartState } from "../fsm/ReadyToStartState";
 
 export function setupEventListeners(game: Game) {
@@ -37,6 +38,9 @@ export function setupEventListeners(game: Game) {
         game.initAudio();
       }
       game.soundManager.toggleMute();
+      if (game.stateMachine.currentState instanceof MainMenuState) {
+        game.soundManager.playMusic("level1");
+      }
       return;
     }
 

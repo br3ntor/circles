@@ -18,13 +18,6 @@ export class LevelManager {
       return;
     }
 
-    if (levelConfig.music) {
-      if (!this.game.soundManager.isPlaying(levelConfig.music)) {
-        this.game.soundManager.stopAllSounds();
-        this.game.soundManager.playSound(levelConfig.music, true);
-      }
-    }
-
     this.game.guardians = [];
     this.game.player = new Player(50, this.game.canvas.height / 2, 30);
     this.game.goal.fill = false;
@@ -48,6 +41,10 @@ export class LevelManager {
       this.game.guardians.push(newGuardian);
       angle += spaceBetween;
     }
+  }
+
+  getCurrentLevelMusic(): string | undefined {
+    return levels[this.currentLevel]?.music;
   }
 
   reset() {

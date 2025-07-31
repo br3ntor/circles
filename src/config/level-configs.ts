@@ -137,6 +137,17 @@ export interface LevelConfig {
 
 export const levels: LevelConfig[] = [
   {
+    music: "level1",
+    patterns: [
+      {
+        pattern: "random",
+        behaviors: [],
+        particleCount: balls() + 20,
+        radius: () => randInt(10, 60),
+      },
+    ],
+  },
+  {
     music: "level2",
     patterns: [
       {
@@ -151,17 +162,6 @@ export const levels: LevelConfig[] = [
         vx: () => (Math.random() - 0.5) * 100,
         vy: () => (Math.random() - 0.5) * 100,
         color: () => getRandomColorFromScheme("cosmic"),
-      },
-    ],
-  },
-  {
-    music: "level1",
-    patterns: [
-      {
-        pattern: "random",
-        behaviors: [],
-        particleCount: balls() + 20,
-        radius: () => randInt(10, 60),
       },
     ],
   },
