@@ -1,9 +1,10 @@
+import { animatedMainMenuLevels } from "../config/animated-main-menu-configs";
 import { Game } from "../game";
-import { State } from "./State";
 import { LeaderboardState } from "./LeaderboardState";
+import { LevelState } from "./LevelState";
 import { ReadyToStartState } from "./ReadyToStartState";
 
-export class MainMenuState extends State {
+export class MainMenuState extends LevelState {
   private options = ["Start Game", "Leaderboards"];
   private selectedOption = 0;
 
@@ -11,10 +12,17 @@ export class MainMenuState extends State {
     super(game);
   }
 
-  enter(): void {}
+  enter(): void {
+    super.enter();
+    const randomIndex = Math.floor(
+      Math.random() * animatedMainMenuLevels.length
+    );
+    const levelConfig = animatedMainMenuLevels[randomIndex];
+    this.game.particleManager.createPattern(levelConfig);
+  }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    this.game.animatedMainMenuManager.draw(ctx);
+    super.draw(ctx);
     const animatedGradient =
       this.game.animatedMainMenuManager.getAnimatedGradientFill(ctx);
     this.game.uiManager.drawMainMenu(
@@ -25,9 +33,15 @@ export class MainMenuState extends State {
     );
   }
 
-  exit(): void {}
+  exit(): void {
+    super.exit();
+  }
 
   update(deltaTime: number, time: number): void {
+    super.update(deltaTime, time);
+    this.game.collisionManager.checkCollisions(
+      this.game.particleManager.getParticles()
+    );
     this.game.animatedMainMenuManager.update(deltaTime, time);
   }
 

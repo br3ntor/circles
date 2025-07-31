@@ -1,5 +1,6 @@
 import { animatedMainMenuLevels } from "../config/animated-main-menu-configs";
 import { ColorSchemeName, getColorScheme } from "../config/color-schemes";
+import { Particle } from "../game-objects/Particle";
 import { Game } from "../game";
 
 export class AnimatedMainMenuManager {
@@ -12,22 +13,12 @@ export class AnimatedMainMenuManager {
 
   constructor(game: Game) {
     this.game = game;
-    this.loadRandomLevel();
     const scheme = getColorScheme(this.colorSchemeName);
     const repeatedScheme = Array(this.colorDensity).fill(scheme).flat();
     this.colors = [...repeatedScheme, scheme[0]];
   }
 
-  private loadRandomLevel(): void {
-    const randomIndex = Math.floor(
-      Math.random() * animatedMainMenuLevels.length
-    );
-    const levelConfig = animatedMainMenuLevels[randomIndex];
-    this.game.particleManager.createPattern(levelConfig);
-  }
-
   public update(deltaTime: number, time: number): void {
-    this.game.particleManager.update(deltaTime, time);
     this.gradientAnimationTime += this.gradientSpeed * deltaTime;
   }
 

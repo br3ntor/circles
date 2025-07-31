@@ -10,6 +10,7 @@ export const animatedMainMenuLevels: LevelConfig[] = [
         behaviors: [
           { type: "collision", mode: "resolve" },
           { type: "wall", mode: "seamless" },
+          { type: "lighting", mode: "lightUp" },
         ],
         particleCount: balls() + 20,
         radius: () => randInt(10, 60),

@@ -58,7 +58,7 @@ export class CollisionManager extends EventTarget {
 
   public checkCollisions(
     objects: Exclude<Collidable, Goal>[],
-    goal: Goal
+    goal?: Goal
   ): void {
     const currentFrameCollisions = new Set<string>();
 
@@ -69,10 +69,12 @@ export class CollisionManager extends EventTarget {
       }
     }
 
-    this.checkParticleGoalCollisions(
-      objects.filter((obj) => obj instanceof Particle) as Particle[],
-      goal
-    );
+    if (goal) {
+      this.checkParticleGoalCollisions(
+        objects.filter((obj) => obj instanceof Particle) as Particle[],
+        goal
+      );
+    }
 
     for (let i = 0; i < objects.length; i++) {
       for (let j = i + 1; j < objects.length; j++) {

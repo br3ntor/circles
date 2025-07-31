@@ -1,4 +1,4 @@
-import { State } from "./State";
+import { LevelState } from "./LevelState";
 import { GameOverState } from "./GameOverState";
 import { LevelCompleteState } from "./LevelCompleteState";
 import { Player } from "../game-objects/Player";
@@ -6,13 +6,10 @@ import { Particle } from "../game-objects/Particle";
 import { Guardian } from "../game-objects/Guardian";
 import { LightingBehavior } from "../particle-behaviors";
 
-export class PlayingState extends State {
+export class PlayingState extends LevelState {
   public enter(): void {
+    super.enter();
     this.game.timer.start();
-    this.game.collisionManager.addEventListener(
-      "collision-start",
-      this.handleCollisionStart
-    );
     // this.game.collisionManager.addEventListener(
     //   "particle-goal-collision",
     //   this.handleParticleGoalCollision
@@ -20,17 +17,15 @@ export class PlayingState extends State {
   }
 
   public exit(): void {
-    this.game.collisionManager.removeEventListener(
-      "collision-start",
-      this.handleCollisionStart
-    );
+    super.exit();
     // this.game.collisionManager.removeEventListener(
     //   "particle-goal-collision",
     //   this.handleParticleGoalCollision
     // );
   }
 
-  private handleCollisionStart = (event: Event) => {
+  protected onCollisionStart = (event: Event) => {
+    super.onCollisionStart(event);
     const customEvent = event as CustomEvent;
     const { object1, object2, position1, position2 } = customEvent.detail;
 
@@ -47,41 +42,7 @@ export class PlayingState extends State {
       return;
     }
 
-    const p1 = object1 instanceof Particle ? object1 : null;
-    const p2 = object2 instanceof Particle ? object2 : null;
-
-    if (p1 && p2) {
-      // It's important to call handleCollision on both particles, as they might have different behaviors.
-      const type1 = p1.behaviorManager.handleCollision(
-        p1,
-        p2,
-        position1,
-        position2
-      );
-      const type2 = p2.behaviorManager.handleCollision(
-        p2,
-        p1,
-        position2,
-        position1
-      );
-
-      // Determine the effective collision type. 'repel' takes precedence.
-      let effectiveCollisionType: "repel" | "resolve" | "none" = "none";
-      if (type1 === "repel" || type2 === "repel") {
-        effectiveCollisionType = "repel";
-      } else if (type1 === "resolve" || type2 === "resolve") {
-        effectiveCollisionType = "resolve";
-      }
-
-      // Play sound only for specific collision types.
-      if (
-        effectiveCollisionType === "repel" ||
-        effectiveCollisionType === "resolve"
-      ) {
-        this.game.soundManager.playSound("particle-collision");
-      }
-      // Sounds for other collision types can be added here.
-    } else if (object1 instanceof Guardian || object2 instanceof Guardian) {
+    if (object1 instanceof Guardian || object2 instanceof Guardian) {
       const guardian = (
         object1 instanceof Guardian ? object1 : object2
       ) as Guardian;
@@ -111,6 +72,7 @@ export class PlayingState extends State {
   };
 
   public update(deltaTime: number, time: number): void {
+    super.update(deltaTime, time);
     const collidables = [
       this.game.player,
       ...this.game.particleManager.getParticles(),
@@ -118,7 +80,6 @@ export class PlayingState extends State {
     ];
     this.game.collisionManager.checkCollisions(collidables, this.game.goal);
     this.game.player.update(this.game.mouse);
-    this.game.particleManager.update(deltaTime, this.game.time);
     this.game.guardians.forEach((guardian) =>
       guardian.update(deltaTime, this.game.time)
     );
@@ -138,7 +99,7 @@ export class PlayingState extends State {
   }
 
   public draw(ctx: CanvasRenderingContext2D): void {
-    this.game.particleManager.draw(ctx);
+    super.draw(ctx);
     this.game.goal.draw(ctx);
     this.game.player.draw(ctx);
     this.game.guardians.forEach((g) => g.draw(ctx));
