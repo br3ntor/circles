@@ -42,13 +42,13 @@ export class Game {
     this.canvas.height = window.innerHeight;
     this.canvas.style.background = "#0c0c0c";
     this.mouse = { x: 0, y: 0 };
-    this.particleManager = new ParticleManager(this.canvas);
-    this.guardians = [];
     this.goal = new Goal(
       this.canvas.width / 1.2,
       this.canvas.height / 2,
       gameConfig.goal.radius
     );
+    this.particleManager = new ParticleManager(this.canvas, this.goal);
+    this.guardians = [];
     this.stateMachine = new StateMachine();
     this.levelManager = new LevelManager(this);
     this.renderer = new Renderer(this);

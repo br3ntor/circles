@@ -1,3 +1,4 @@
+import { Range } from "../lib/utils.js";
 import { Vector2 } from "./Vector2.js";
 
 export interface IGameObject {
@@ -28,7 +29,7 @@ export interface ParticleBehavior extends IBehavior {
 export interface ConfigurableParticleOptions {
   vx?: number | (() => number);
   vy?: number | (() => number);
-  radius?: number | (() => number);
+  radius?: number | (() => number) | Range;
   color?: string | (() => string);
   behaviors?: ParticleBehavior[];
   angle?: number;

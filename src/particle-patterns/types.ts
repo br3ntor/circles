@@ -1,4 +1,5 @@
 import {
+  Goal,
   Particle,
   ParticleBehavior,
   ConfigurableParticleOptions,
@@ -10,6 +11,7 @@ export interface PatternCreatorInput {
   behaviors: ParticleBehavior[];
   options: ConfigurableParticleOptions;
   canvas: HTMLCanvasElement;
+  goal: Goal;
 }
 
 export interface IPattern {

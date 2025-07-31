@@ -1,7 +1,7 @@
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
-import { balls, randInt } from "../lib/utils";
+import { balls, randInt, Range } from "../lib/utils";
 import { getRandomColorFromScheme } from "./color-schemes";
 
 export type Pattern =
@@ -109,9 +109,13 @@ export type WavePatternConfig = {
   xOffset?: number;
 };
 
+export type RandomPatternConfig = {
+  density?: number;
+};
+
 export type PatternConfigMap = {
   spiral: SpiralPatternConfig;
-  random: never;
+  random: RandomPatternConfig;
   star: never;
   circle: never;
   waves: WavePatternConfig;
@@ -123,7 +127,7 @@ export interface PatternInstanceConfig<P extends Pattern = Pattern> {
   patternConfig?: PatternConfigMap[P];
   behaviors: BehaviorConfig[];
   particleCount?: number;
-  radius?: () => number;
+  radius?: number | Range;
   color?: () => string;
   vx?: () => number;
   vy?: () => number;
@@ -137,31 +141,36 @@ export interface LevelConfig {
 
 export const levels: LevelConfig[] = [
   {
-    music: "level1",
-    patterns: [
-      {
-        pattern: "random",
-        behaviors: [],
-        particleCount: balls() + 20,
-        radius: () => randInt(10, 60),
-      },
-    ],
-  },
-  {
     music: "level2",
     patterns: [
       {
         pattern: "random",
+        patternConfig: {
+          density: 0.1,
+        },
         behaviors: [
           { type: "collision", mode: "resolve" },
           { type: "lighting", mode: "lightUp" },
           { type: "wall", mode: "collide" },
         ],
-        particleCount: balls() + 20,
-        radius: () => randInt(10, 60),
+        radius: { min: 10, max: 60 },
         vx: () => (Math.random() - 0.5) * 100,
         vy: () => (Math.random() - 0.5) * 100,
         color: () => getRandomColorFromScheme("cosmic"),
+      },
+    ],
+  },
+  {
+    music: "level1",
+    patterns: [
+      {
+        pattern: "random",
+        patternConfig: {
+          density: 0.11,
+        },
+        behaviors: [],
+        particleCount: 1,
+        radius: { min: 10, max: 60 },
       },
     ],
   },

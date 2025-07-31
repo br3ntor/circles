@@ -23,6 +23,7 @@ import { RandomPattern } from "../particle-patterns/RandomPattern.js";
 import { SpiralPattern } from "../particle-patterns/SpiralPattern.js";
 import { StarPattern } from "../particle-patterns/StarPattern.js";
 import { WavePattern } from "../particle-patterns/WavePattern.js";
+import { Goal } from "../game-objects/Goal.js";
 import { Particle } from "../game-objects/Particle.js";
 import { Vector2 } from "../game-objects/Vector2.js";
 import { ParticleBehavior } from "../game-objects/types.js";
@@ -33,9 +34,11 @@ export class ParticleManager {
   private patterns: {
     [key in Pattern]?: IPattern;
   };
+  private goal: Goal;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, goal: Goal) {
     this.canvas = canvas;
+    this.goal = goal;
     this.particles = [];
     this.patterns = {
       random: new RandomPattern(),
@@ -130,6 +133,7 @@ export class ParticleManager {
             particleCount: patternConfig.particleCount ?? 100,
             options,
             canvas: this.canvas,
+            goal: this.goal,
           },
           patternConfig.patternConfig ?? {}
         );

@@ -94,3 +94,25 @@ export function resolve<T>(value: T | (() => T)): T {
   }
   return value;
 }
+
+export type Range = { min: number; max: number };
+
+// Helper to get the average value from a number or a Range object.
+export function getAverageValue(value: number | Range): number {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "min" in value &&
+    "max" in value
+  ) {
+    return (value.min + value.max) / 2;
+  }
+  // Fallback for unexpected types, returning a default.
+  console.warn(
+    `Unexpected type for getAverageValue: ${typeof value}. Returning default 10.`
+  );
+  return 10;
+}

@@ -13,7 +13,7 @@ export const animatedMainMenuLevels: LevelConfig[] = [
           { type: "lighting", mode: "lightUp" },
         ],
         particleCount: balls() + 20,
-        radius: () => randInt(10, 60),
+        radius: { min: 10, max: 60 },
         vx: () => (Math.random() - 0.5) * 100,
         vy: () => (Math.random() - 0.5) * 100,
         color: () => getRandomColorFromScheme("cosmic"),
