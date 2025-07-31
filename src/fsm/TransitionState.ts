@@ -19,7 +19,7 @@ export class TransitionState extends State {
     this.transitionManager.start("in", center);
   }
 
-  public update(deltaTime: number): void {
+  public update(deltaTime: number, time: number): void {
     this.transitionManager.update(deltaTime);
 
     if (this.transitionPhase === "in" && this.transitionManager.isFinished()) {

@@ -110,7 +110,7 @@ export class PlayingState extends State {
     );
   };
 
-  public update(deltaTime: number): void {
+  public update(deltaTime: number, time: number): void {
     const collidables = [
       this.game.player,
       ...this.game.particleManager.getParticles(),

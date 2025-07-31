@@ -19,6 +19,8 @@ This document outlines the future plans and desired features for the game.
   - [ ] **Starting Formations**: Create different starting patterns for guardians.
   - [ ] **Particle Size Animation**: Add particle behaviors for growing or shrinking in size over time or on events.
   - [ ] **Delayed Particle Movement**: For one or more particles in a static pattern to trigger off domino effect.
+- [ ] **Advanced Obstacles**: Introduce more complex obstacles between the player and the goal.
+- [ ] **Static Guardians**: Guardians that can have behaviors like bouncing particles off, sucking them in and spitting them out, or teleporting them.
 
 ## UI/UX Improvements
 
@@ -60,3 +62,4 @@ This document outlines the future plans and desired features for the game.
   - [ ] Emitters could be attached to game objects like guardians, allowing them to "shoot" particles.
 - [ ] **Runtime Debug Panel**: Create a debug panel to modify patterns and behaviors at runtime.
 - [ ] **Dynamic Behavior Chaining**: Allow behaviors to be chained or stacked dynamically at runtime for more complex interactions.
+- [ ] **Dynamic Particle Density**: Create a function to generate a number of particles based on a given ball density formula, allowing levels to adapt to varying screen sizes.

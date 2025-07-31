@@ -21,7 +21,7 @@ export class LoadingState extends State {
     // Optional: clean up any resources used by this state
   }
 
-  update(): void {
+  update(deltaTime: number, time: number): void {
     // The loading screen is drawn once in the enter method.
     // No need to redraw every frame.
   }

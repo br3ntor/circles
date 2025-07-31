@@ -10,6 +10,7 @@ export class LeaderboardState extends State {
   enter(): void {}
 
   draw(ctx: CanvasRenderingContext2D): void {
+    this.game.animatedMainMenuManager.draw(ctx);
     this.game.uiManager.drawLeaderboard(ctx, this.getMockLeaderboard());
   }
 
@@ -17,8 +18,8 @@ export class LeaderboardState extends State {
     // Optional: clean up any resources used by this state
   }
 
-  update(): void {
-    // Wait for input to return to the main menu
+  update(deltaTime: number, time: number): void {
+    this.game.animatedMainMenuManager.update(deltaTime, time);
   }
 
   handleInput(event: KeyboardEvent | MouseEvent) {

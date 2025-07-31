@@ -12,7 +12,7 @@ export class LevelCompleteState extends State {
     this.game.guardians.forEach((g) => (g.state = "returning"));
   }
 
-  public update(deltaTime: number): void {
+  public update(deltaTime: number, time: number): void {
     // Iterates the data for the next frame in the animation
     // which in this case the guardians will spiral back to the center
     // ignoring any particle processing for collisions etc.

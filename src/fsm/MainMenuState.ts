@@ -14,12 +14,15 @@ export class MainMenuState extends State {
   enter(): void {}
 
   draw(ctx: CanvasRenderingContext2D): void {
+    this.game.animatedMainMenuManager.draw(ctx);
     this.game.uiManager.drawMainMenu(ctx, this.options, this.selectedOption);
   }
 
   exit(): void {}
 
-  update(): void {}
+  update(deltaTime: number, time: number): void {
+    this.game.animatedMainMenuManager.update(deltaTime, time);
+  }
 
   handleInput(event: KeyboardEvent | MouseEvent) {
     if (event instanceof KeyboardEvent) {

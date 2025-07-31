@@ -11,6 +11,7 @@ import { ScoreManager } from "./managers/ScoreManager";
 import { UIManager } from "./managers/UIManager";
 import { CollisionManager } from "./managers/CollisionManager";
 import { SoundManager } from "./managers/SoundManager";
+import { AnimatedMainMenuManager } from "./managers/AnimatedMainMenuManager";
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -31,6 +32,7 @@ export class Game {
   uiManager: UIManager;
   collisionManager: CollisionManager;
   soundManager: SoundManager;
+  animatedMainMenuManager: AnimatedMainMenuManager;
   paused = false;
 
   constructor() {
@@ -59,6 +61,7 @@ export class Game {
     this.uiManager = UIManager.getInstance();
     this.uiManager.setTimer(this.timer);
     this.soundManager = SoundManager.getInstance();
+    this.animatedMainMenuManager = new AnimatedMainMenuManager(this);
   }
 
   public async init() {
@@ -129,7 +132,7 @@ export class Game {
     this.time += deltaTime;
     this.lastTime = now;
 
-    this.update(deltaTime);
+    this.update(deltaTime, this.time);
     this.draw();
   }
 
@@ -144,8 +147,8 @@ export class Game {
     this.lastTime = performance.now();
   }
 
-  update(deltaTime: number) {
-    this.stateMachine.update(deltaTime);
+  update(deltaTime: number, time: number) {
+    this.stateMachine.update(deltaTime, time);
   }
 
   draw() {

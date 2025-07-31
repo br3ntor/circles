@@ -16,7 +16,7 @@ export class ReadyToStartState extends State {
     }
   }
 
-  public update(deltaTime: number): void {}
+  public update(deltaTime: number, time: number): void {}
 
   public draw(ctx: CanvasRenderingContext2D): void {
     this.game.particleManager.draw(ctx);

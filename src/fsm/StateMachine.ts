@@ -15,9 +15,9 @@ export class StateMachine {
     this._currentState.enter();
   }
 
-  public update(deltaTime: number): void {
+  public update(deltaTime: number, time: number): void {
     if (this._currentState) {
-      this._currentState.update(deltaTime);
+      this._currentState.update(deltaTime, time);
     }
   }
 }

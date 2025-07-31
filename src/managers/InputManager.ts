@@ -60,9 +60,7 @@ export function setupEventListeners(game: Game) {
     if (document.hidden) {
       game.pause();
     } else {
-      if (game.soundManager.getStarted()) {
-        game.resume();
-      }
+      game.resume();
     }
   });
 }

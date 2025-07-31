@@ -21,7 +21,7 @@ export class GameOverState extends State {
     this.game.timer.stop();
   }
 
-  public update(deltaTime: number): void {
+  public update(deltaTime: number, time: number): void {
     if (this.fadeAlpha < 1) {
       this.fadeAlpha += 0.01; // A simple fade-in speed
       this.fadeAlpha = Math.min(this.fadeAlpha, 1);
