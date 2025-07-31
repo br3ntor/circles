@@ -6,6 +6,7 @@ export class AnimatedMainMenuManager {
   private game: Game;
   public gradientAnimationTime = 0;
   public gradientSpeed = 0.05;
+  public colorDensity = 4;
   public colorSchemeName: ColorSchemeName = "cosmic";
   public colors: string[] = [];
 
@@ -13,7 +14,8 @@ export class AnimatedMainMenuManager {
     this.game = game;
     this.loadRandomLevel();
     const scheme = getColorScheme(this.colorSchemeName);
-    this.colors = [...scheme, scheme[0]];
+    const repeatedScheme = Array(this.colorDensity).fill(scheme).flat();
+    this.colors = [...repeatedScheme, scheme[0]];
   }
 
   private loadRandomLevel(): void {
@@ -38,9 +40,9 @@ export class AnimatedMainMenuManager {
   ): CanvasGradient {
     const gradient = ctx.createLinearGradient(
       0,
-      ctx.canvas.height / 2 - 150,
+      ctx.canvas.height / 2 - 200,
       ctx.canvas.width,
-      ctx.canvas.height / 2 - 50
+      ctx.canvas.height / 2
     );
 
     const offset = this.gradientAnimationTime % 1;
