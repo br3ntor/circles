@@ -1,6 +1,7 @@
 import { Game } from "../game";
 import { MainMenuState } from "../fsm/MainMenuState";
 import { ReadyToStartState } from "../fsm/ReadyToStartState";
+import { animatedMainMenuLevels } from "../config/animated-main-menu-configs";
 
 export function setupEventListeners(game: Game) {
   // Updates mouse state
@@ -13,7 +14,13 @@ export function setupEventListeners(game: Game) {
   addEventListener("resize", () => {
     game.canvas.width = innerWidth;
     game.canvas.height = innerHeight;
-    game.reset();
+    const currentState = game.stateMachine.currentState;
+    const levelConfig = animatedMainMenuLevels[game.levelManager.currentLevel];
+    if (currentState instanceof MainMenuState) {
+      game.particleManager.createPattern(levelConfig);
+    } else {
+      game.reset();
+    }
   });
 
   function handleInput(event: MouseEvent | KeyboardEvent) {

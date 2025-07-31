@@ -1,7 +1,7 @@
 import { CollisionBehaviorMode } from "../particle-behaviors/CollisionBehavior";
 import { LightingBehaviorMode } from "../particle-behaviors/LightingBehavior";
 import { WallBehaviorMode } from "../particle-behaviors/WallBehavior";
-import { balls, randInt, Range } from "../lib/utils";
+import { Range } from "../lib/utils";
 import { getRandomColorFromScheme } from "./color-schemes";
 
 export type Pattern =
@@ -146,7 +146,7 @@ export const levels: LevelConfig[] = [
       {
         pattern: "random",
         patternConfig: {
-          density: 0.1,
+          density: 0.5,
         },
         behaviors: [
           { type: "collision", mode: "resolve" },
