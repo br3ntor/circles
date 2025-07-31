@@ -84,6 +84,9 @@ export class CollisionManager extends EventTarget {
         const obj1Positions = this.getWrappedPositions(obj1);
         const obj2Positions = this.getWrappedPositions(obj2);
 
+        // We run this even if not in seamless mode, it shouldn't be too much of a hit
+        // when not in seamless mode but prob good to not run at all if we can help it
+        // but will fix it later.
         for (const pos1 of obj1Positions) {
           for (const pos2 of obj2Positions) {
             if (pos1.distanceTo(pos2) < obj1.radius + obj2.radius) {

@@ -1,6 +1,4 @@
-import { animatedMainMenuLevels } from "../config/animated-main-menu-configs";
 import { ColorSchemeName, getColorScheme } from "../config/color-schemes";
-import { Particle } from "../game-objects/Particle";
 import { Game } from "../game";
 
 export class AnimatedMainMenuManager {

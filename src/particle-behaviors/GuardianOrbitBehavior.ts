@@ -48,8 +48,8 @@ export class GuardianOrbitBehavior implements IBehavior {
     }
 
     // Reset back to transparent after collision
-    if (guardian.opacity > 0.02) {
-      guardian.opacity -= 0.02;
+    if (guardian.opacity > 0.2) {
+      guardian.opacity -= 0.2;
       guardian.opacity = Math.max(0, guardian.opacity);
     }
 

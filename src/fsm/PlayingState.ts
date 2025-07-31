@@ -10,18 +10,18 @@ export class PlayingState extends LevelState {
   public enter(): void {
     super.enter();
     this.game.timer.start();
-    // this.game.collisionManager.addEventListener(
-    //   "particle-goal-collision",
-    //   this.handleParticleGoalCollision
-    // );
+    this.game.collisionManager.addEventListener(
+      "particle-goal-collision",
+      this.handleParticleGoalCollision
+    );
   }
 
   public exit(): void {
     super.exit();
-    // this.game.collisionManager.removeEventListener(
-    //   "particle-goal-collision",
-    //   this.handleParticleGoalCollision
-    // );
+    this.game.collisionManager.removeEventListener(
+      "particle-goal-collision",
+      this.handleParticleGoalCollision
+    );
   }
 
   protected onCollisionStart = (event: Event) => {
