@@ -15,7 +15,14 @@ export class MainMenuState extends State {
 
   draw(ctx: CanvasRenderingContext2D): void {
     this.game.animatedMainMenuManager.draw(ctx);
-    this.game.uiManager.drawMainMenu(ctx, this.options, this.selectedOption);
+    const animatedGradient =
+      this.game.animatedMainMenuManager.getAnimatedGradientFill(ctx);
+    this.game.uiManager.drawMainMenu(
+      ctx,
+      this.options,
+      this.selectedOption,
+      animatedGradient
+    );
   }
 
   exit(): void {}

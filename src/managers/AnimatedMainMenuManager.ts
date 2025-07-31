@@ -1,12 +1,19 @@
 import { animatedMainMenuLevels } from "../config/animated-main-menu-configs";
+import { ColorSchemeName, getColorScheme } from "../config/color-schemes";
 import { Game } from "../game";
 
 export class AnimatedMainMenuManager {
   private game: Game;
+  public gradientAnimationTime = 0;
+  public gradientSpeed = 0.05;
+  public colorSchemeName: ColorSchemeName = "cosmic";
+  public colors: string[] = [];
 
   constructor(game: Game) {
     this.game = game;
     this.loadRandomLevel();
+    const scheme = getColorScheme(this.colorSchemeName);
+    this.colors = [...scheme, scheme[0]];
   }
 
   private loadRandomLevel(): void {
@@ -19,9 +26,38 @@ export class AnimatedMainMenuManager {
 
   public update(deltaTime: number, time: number): void {
     this.game.particleManager.update(deltaTime, time);
+    this.gradientAnimationTime += this.gradientSpeed * deltaTime;
   }
 
   public draw(ctx: CanvasRenderingContext2D): void {
     this.game.particleManager.draw(ctx);
+  }
+
+  public getAnimatedGradientFill(
+    ctx: CanvasRenderingContext2D
+  ): CanvasGradient {
+    const gradient = ctx.createLinearGradient(
+      0,
+      ctx.canvas.height / 2 - 150,
+      ctx.canvas.width,
+      ctx.canvas.height / 2 - 50
+    );
+
+    const offset = this.gradientAnimationTime % 1;
+    const numColors = this.colors.length;
+    const stops: { position: number; color: string }[] = [];
+
+    for (let i = 0; i < numColors; i++) {
+      const position = (i / (numColors - 1) + offset) % 1;
+      stops.push({ position, color: this.colors[i] });
+    }
+
+    stops.sort((a, b) => a.position - b.position);
+
+    for (const stop of stops) {
+      gradient.addColorStop(stop.position, stop.color);
+    }
+
+    return gradient;
   }
 }

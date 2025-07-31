@@ -191,7 +191,7 @@ export class UIManager {
     x: number,
     y: number,
     font: string,
-    color: string
+    color: string | CanvasGradient
   ) {
     ctx.fillStyle = color;
     ctx.font = font;
@@ -213,15 +213,16 @@ export class UIManager {
   public drawMainMenu(
     ctx: CanvasRenderingContext2D,
     options: string[],
-    selectedOption: number
+    selectedOption: number,
+    animatedGradient?: CanvasGradient
   ): void {
     this.drawText(
       ctx,
-      "Main Menu",
+      "Circles",
       ctx.canvas.width / 2,
       ctx.canvas.height / 2 - 150,
-      "50px Arial",
-      "#DEDEDE"
+      "80px Arial",
+      animatedGradient || "#DEDEDE"
     );
 
     options.forEach((option, index) => {
