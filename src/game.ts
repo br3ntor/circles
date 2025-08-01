@@ -12,6 +12,11 @@ import { UIManager } from "./managers/UIManager";
 import { CollisionManager } from "./managers/CollisionManager";
 import { SoundManager } from "./managers/SoundManager";
 import { AnimatedMainMenuManager } from "./managers/AnimatedMainMenuManager";
+const isDev = import.meta.env.DEV;
+const baseAssetsPath = isDev
+  ? "/circles/sounds"
+  : "https://westcoastnoobs.com/assets";
+console.log(baseAssetsPath);
 
 export class Game {
   canvas: HTMLCanvasElement;
@@ -72,19 +77,19 @@ export class Game {
   async loadSounds() {
     await this.soundManager.loadSound(
       "level1",
-      "/circles/sounds/Half-Life02.mp3"
+      `${baseAssetsPath}/Half-Life02.mp3`
     );
     await this.soundManager.loadSound(
       "level2",
-      "/circles/sounds/Half-Life19.mp3"
+      `${baseAssetsPath}/Half-Life19.mp3`
     );
     await this.soundManager.loadSound(
       "player-death",
-      "/circles/sounds/squeaky.ogg"
+      `${baseAssetsPath}/squeaky.ogg`
     );
     await this.soundManager.loadSound(
       "particle-collision",
-      "/circles/sounds/match-ready.ogg"
+      `${baseAssetsPath}/match-ready.ogg`
     );
     // await this.soundManager.loadSound(
     //   "particle-goal-collision",
@@ -92,7 +97,7 @@ export class Game {
     // );
     await this.soundManager.loadSound(
       "level-complete",
-      "/circles/sounds/cow_moo_1.ogg"
+      `${baseAssetsPath}/cow_moo_1.ogg`
     );
   }
 

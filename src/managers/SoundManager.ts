@@ -39,6 +39,7 @@ export class SoundManager {
   }
 
   public toggleMute(): void {
+    this.resumeAudioContext();
     this.isMuted = !this.isMuted;
     this.gainNode.gain.value = this.isMuted ? 0 : 1;
   }
@@ -58,6 +59,7 @@ export class SoundManager {
   }
 
   public playSound(name: string, loop = false): void {
+    if (!this.isStarted || this.isMuted) return;
     const audioBuffer = this.soundBuffers.get(name);
     if (!audioBuffer) {
       console.warn(`Sound not found: ${name}`);
